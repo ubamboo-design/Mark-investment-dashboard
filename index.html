@@ -318,29 +318,78 @@
 </div>
 
 <script>
-   // 0. 定義 SVG 圖示資源庫 (已根據新標題更新圖示)
-    const cardAssets = {
-        // C01: 定期定額績效平庸嗎? -> 圖示：穩定堆疊上升的金幣與時鐘概念 (代表時間+紀律積累)
-        'C01': '<svg class="mc-image" viewBox="0 0 24 24"><path d="M12 2v20M2 12h20" opacity="0.3"/><path d="M6 16c0-1.1 1.8-2 4-2s4 .9 4 2"/><ellipse cx="10" cy="16" rx="4" ry="2"/><path d="M6 12c0-1.1 1.8-2 4-2s4 .9 4 2"/><ellipse cx="10" cy="12" rx="4" ry="2"/><path d="M6 8c0-1.1 1.8-2 4-2s4 .9 4 2"/><ellipse cx="10" cy="8" rx="4" ry="2"/><path d="M16 6l3 3l-3 3"/><path d="M19 9H13"/></svg>',
+   // 0. SVG 圖示資源庫（台灣投資迷因專用版，已重新設計）
+const cardAssets = {
+    // C01: 定期定額績效平庸嗎? → 烏龜背著慢慢疊高的金幣堆
+    'C01': `<svg class="mc-image" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M8 17c-2 0-4-2-4-5s2-5 4-5 4 2 4 5-2 5-4 5z"/>
+              <path d="M16 17c-2 0-4-2-4-5s2-5 4-5 4 2 4 5-2 5-4 5z"/>
+              <path d="M5 12h14"/>
+              <circle cx="12" cy="7" r="2"/><circle cx="12" cy="10" r="2.5"/><circle cx="12" cy="13.5" r="3"/>
+              <text x="12" y="21" font-size="4" text-anchor="middle" fill="currentColor">🐢</text>
+            </svg>`,
 
-        // C02: 獎金可以梭哈嗎? -> 圖示：推倒一大疊籌碼 All-in (代表高風險博弈)
-        'C02': '<svg class="mc-image" viewBox="0 0 24 24"><circle cx="7" cy="15" r="3"/><circle cx="13" cy="15" r="3"/><circle cx="10" cy="10" r="3"/><circle cx="10" cy="20" r="3"/><path d="M17 14l4-4M13 9l5.5-5.5"/><path d="M16 4h5v5"/></svg>',
+    // C02: 獎金可以梭哈嗎? → 猴子把一袋錢全推出去（All-in）
+    'C02': `<svg class="mc-image" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round">
+              <circle cx="12" cy="8" r="3"/>
+              <path d="M9 10c-1 1-2 3-1 4"/>
+              <path d="M15 10c1 1 2 3 1 4"/>
+              <path d="M12 11v3"/>
+              <rect x="7" y="14" width="10" height="6" rx="1"/>
+              <path d="M7 17h10"/>
+              <path d="M10 20l-3 2M14 20l3 2"/>
+              <text x="19" y="9" font-size="5" fill="currentColor">🙈</text>
+            </svg>`,
 
-        // C03: 股息cover每一天 -> 圖示：水龍頭持續滴出金幣 (代表源源不絕的被動現金流)
-        'C03': '<svg class="mc-image" viewBox="0 0 24 24"><path d="M12 2v7c0 1.1.9 2 2 2h4l-5 5l-5-5h3c0-2.2-1.8-4-4-4V2"/><path d="M12 16v6M9 22h6"/><circle cx="12" cy="14" r="2"/></svg>',
+    // C03: 股息cover每一天 → 雨傘擋著金幣雨
+    'C03': `<svg class="mc-image" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round">
+              <path d="M4 12h16"/>
+              <path d="M12 12c0-6 8-4 8-8"/>
+              <path d="M6 17s1-3 6-3s6 3 6 3v3H6z"/>
+              <circle cx="8" cy="7" r="1.5"/><circle cx="12" cy="5" r="1.5"/><circle cx="16" cy="7" r="1.5"/>
+              <circle cx="10" cy="10" r="1.5"/><circle cx="14" cy="10" r="1.5"/>
+              <text x="12" y="22" font-size="4" text-anchor="middle" fill="currentColor">💸</text>
+            </svg>`,
 
-        // C04: 問就是正2 -> 圖示：帶有 2X 標誌的火箭/陡峭上升箭頭 (代表槓桿加速)
-        'C04': '<svg class="mc-image" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8L21 10h-9l1-8z"/><path d="M16 16l3-3l3 3"/><path d="M19 13v8"/></svg>',
+    // C04: 問就是正2 → 2x火箭衝天
+    'C04': `<svg class="mc-image" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2L15 9L22 10L17 15L18 22L12 19L6 22L7 15L2 10L9 9Z"/>
+              <text x="12" y="16" font-size="7" text-anchor="middle" fill="currentColor" font-weight="bold">2X</text>
+              <path d="M12 19v3M9 22h6"/>
+            </svg>`,
 
-        // C05: 1檔就是全世界 -> 圖示：地球儀被一條上升的環繞箭頭包圍 (代表全球市場投資)
-        'C05': '<svg class="mc-image" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/><path d="M12 3c4.97 0 9 4.03 9 9s-4.03 9-9 9s-9-4.03-9-9s4.03-9 9-9z" opacity="0.3"/><path d="M8 12a4 4 0 1 0 8 0a4 4 0 1 0-8 0"/><path d="M17 7l3-3M20 4h-4M20 4v4"/></svg>',
+    // C05: 1檔就是全世界 → 地球被單一ETF環繞
+    'C05': `<svg class="mc-image" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round">
+              <circle cx="12" cy="12" r="8"/>
+              <path d="M12 4a8 8 0 0 0 0 16"/>
+              <path d="M4 12h16"/>
+              <rect x="8" y="10" width="8" height="4" rx="1"/>
+              <text x="12" y="14" font-size="3" text-anchor="middle" fill="currentColor">ETF</text>
+              <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-dasharray="2,2"/>
+            </svg>`,
 
-        // C06: 美國就是我爸爸 -> 圖示：華爾街公牛頭像 (代表強勢的美國市場)
-        'C06': '<svg class="mc-image" viewBox="0 0 24 24"><path d="M7 3L3 7v10c0 2.2 1.8 4 4 4h10c2.2 0 4-1.8 4-4V7l-4-4"/><circle cx="8.5" cy="12.5" r="1.5"/><circle cx="15.5" cy="12.5" r="1.5"/><path d="M12 17c-2 0-3.5-1.5-3.5-3.5M6 8h12"/></svg>',
+    // C06: 美國就是我爸爸 → 小孩抱著大公牛大腿
+    'C06': `<svg class="mc-image" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round">
+              <path d="M8 15c-2-2-3-5-2-8l4 1"/>
+              <path d="M16 15c2-2 3-5 2-8l-4 1"/>
+              <path d="M12 7v5"/>
+              <circle cx="10" cy="13" r="1.5"/><circle cx="14" cy="13" r="1.5"/>
+              <path d="M7 18h10l-1 3h-8z"/>
+              <path d="M12 3v4"/>
+              <text x="12" y="22" font-size="5" text-anchor="middle" fill="currentColor">🇺🇸</text>
+            </svg>`,
 
-        // C07: 可以進場了嗎? -> 圖示：放大鏡檢視圖表底部 (代表尋找買點/擇時)
-        'C07': '<svg class="mc-image" viewBox="0 0 24 24"><path d="M3 20h18L3 4v16z"/><circle cx="15" cy="11" r="5"/><path d="M18.5 14.5L22 18"/><path d="M15 8v6M12 11h6"/></svg>'
-    };
+    // C07: 可以進場了嗎? → 人站在懸崖邊看K線深淵
+    'C07': `<svg class="mc-image" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round">
+              <path d="M4 20h16"/>
+              <path d="M6 16l4-8l3 6l4-4"/>
+              <circle cx="12" cy="9" r="3"/>
+              <path d="M12 12v8"/>
+              <path d="M9 20s-2-4-5-4"/>
+              <path d="M15 20s2-4 5-4"/>
+              <text x="12" y="6" font-size="5" text-anchor="middle" fill="currentColor">？</text>
+            </svg>`
+};
 
     // 1. 初始化空變數，準備接收 Google Sheet 資料
     let cardsData = {}; 
@@ -566,4 +615,5 @@
 
 </body>
 </html>
+
 
