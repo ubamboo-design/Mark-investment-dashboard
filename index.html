@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PROJECT CAGE : 終極霓虹版</title>
+<title>PROJECT CAGE : 雙斧封印版</title>
 <style>
 :root{
 --bg:#0b0b0e;--card:#141418;--bar:#1c1c22;--text:#e0e0e0;--mute:#888;--gold:#ffd700;
@@ -42,10 +42,9 @@ h1{font-size:2.4rem;letter-spacing:4px;text-transform:uppercase;color:#fff;text-
 .mc-code{font-size:0.9rem;font-weight:900;color:#fff}
 .mc-target{font-size:0.7rem;background:rgba(0,0,0,0.5);padding:2px 6px;border-radius:4px;color:#ccc}
 .mc-image-container{flex-grow:1;display:flex;align-items:center;justify-content:center;margin:10px 0}
-.mc-image{width:68px;height:68px;transition:all .4s}
-.micro-card:hover .mc-image{transform:scale(1.25);filter:drop-shadow(0 0 20px currentColor)}
+.mc-image{width:72px;height:72px;transition:all .4s}
+.micro-card:hover .mc-image{transform:scale(1.3) rotate(6deg);filter:drop-shadow(0 0 25px currentColor)}
 .mc-name{font-size:0.95rem;font-weight:900;text-transform:uppercase;letter-spacing:1px;color:#fff;margin-bottom:3px}
-.mc-rpg-name{font-size:0.75rem;color:#888}
 .mc-cost-badge{margin-top:8px;padding:4px 10px;border:1px solid #555;border-radius:12px;font-size:0.8rem;background:rgba(0,0,0,0.4)}
 .arena-container{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-top:20px}
 @media(max-width:1000px){.arena-container{grid-template-columns:1fr}}
@@ -112,9 +111,8 @@ h1{font-size:2.4rem;letter-spacing:4px;text-transform:uppercase;color:#fff;text-
 </div>
 
 <script>
-// 終極核彈霓虹版 SVG 七連殺
+// 2025 終極七連殺 SVG（C04 已換成交叉雙斧核彈版）
 const cardAssets = {
-  // C01 定期定額 → 金幣聖山
   'C01':`<svg class="mc-image" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
     <ellipse cx="32" cy="52" rx="26" ry="10" fill="#ffd700" stroke="#b39700" stroke-width="5"/>
     <ellipse cx="32" cy="38" rx="26" ry="10" fill="#ffd700" stroke="#b39700" stroke-width="5"/>
@@ -123,7 +121,6 @@ const cardAssets = {
     <circle cx="32" cy="24" r="12" fill="#fff" opacity="0.3"/>
   </svg>`,
 
-  // C02 獎金梭哈 → 死亡光劍終極版
   'C02':`<svg class="mc-image" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
     <rect x="28" y="42" width="8" height="18" rx="4" fill="#333" stroke="#888" stroke-width="3"/>
     <rect x="25" y="45" width="14" height="6" rx="3" fill="#111"/>
@@ -137,7 +134,6 @@ const cardAssets = {
     <rect x="18" y="2" width="28" height="50" rx="14" fill="none" stroke="#ff6699" stroke-width="5" opacity="0.5"/>
   </svg>`,
 
-  // C03 股息cover每一天 → 黃金雨傘
   'C03':`<svg class="mc-image" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M8 28 Q32 8 56 28" stroke="#00ff6a" stroke-width="6" fill="none"/>
     <path d="M8 28 Q32 54 56 28" stroke="#00ff6a" stroke-width="6" fill="none"/>
@@ -148,15 +144,22 @@ const cardAssets = {
     <path d="M32 28 L32 12" stroke="#ffffff" stroke-width="3" opacity="0.6"/>
   </svg>`,
 
-  // C04 問就是正2 → 核彈2X火箭
+  // C04 問就是正2 → 交叉雙斧 SEALED 終極版
   'C04':`<svg class="mc-image" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M32 4 L44 28 L64 32 L44 36 L32 60 L20 36 L0 32 L20 28 Z" fill="#ff9100" opacity="0.9"/>
-    <path d="M32 4 L44 28 L64 32 L44 36 L32 60 L20 36 L0 32 L20 28 Z" stroke="#ff9100" stroke-width="5"/>
-    <text x="32" y="44" font-size="18" text-anchor="middle" fill="#fff" font-weight="900">2X</text>
-    <path d="M32 60 v8 M24 68 h16" stroke="#ff9100" stroke-width="6"/>
+    <!-- 左斧 -->
+    <path d="M18 12 L26 20 L22 38 L14 46 L18 52 L26 44 L30 46 L22 54 L14 46 Z" fill="#ff9100" stroke="#ffb800" stroke-width="4"/>
+    <rect x="24" y="8" width="8" height="28" rx="4" fill="#333" stroke="#666" stroke-width="3"/>
+    <!-- 右斧 -->
+    <path d="M46 12 L38 20 L42 38 L50 46 L46 52 L38 44 L34 46 L42 54 L50 46 Z" fill="#ff9100" stroke="#ffb800" stroke-width="4"/>
+    <rect x="32" y="8" width="8" height="28" rx="4" fill="#333" stroke="#666" stroke-width="3"/>
+    <!-- 交叉核心核爆光 -->
+    <circle cx="32" cy="28" r="11" fill="#ffb800" opacity="0.8"/>
+    <circle cx="32" cy="28" r="7" fill="#ffffff"/>
+    <circle cx="32" cy="28" r="15" fill="none" stroke="#ff9100" stroke-width="4" opacity="0.8"/>
+    <circle cx="32" cy="28" r="20" fill="none" stroke="#ffb800" stroke-width="3" opacity="0.5"/>
+    <text x="32" y="58" font-size="15" text-anchor="middle" fill="#ffb800" font-weight="900">2X</text>
   </svg>`,
 
-  // C05 1檔就是全世界 → 霓虹地球儀
   'C05':`<svg class="mc-image" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
     <circle cx="32" cy="32" r="24" stroke="#00d2ff" stroke-width="6"/>
     <circle cx="32" cy="32" r="18" stroke="#00d2ff" stroke-width="4" opacity="0.7"/>
@@ -165,7 +168,6 @@ const cardAssets = {
     <circle cx="32" cy="32" r="10" fill="#00d2ff" opacity="0.2"/>
   </svg>`,
 
-  // C06 美國就是我爸爸 → 美國隊長五角星盾
   'C06':`<svg class="mc-image" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M32 8 L48 16 v20 c0 14-16 28-16 28 s-16-14-16-28 v-20 Z" fill="#00d2ff" opacity="0.9"/>
     <path d="M32 8 L48 16 v20 c0 14-16 28-16 28 s-16-14-16-28 v-20 Z" stroke="#00d2ff" stroke-width="5"/>
@@ -173,7 +175,6 @@ const cardAssets = {
     <path d="M32 10 L38 28 L56 34 L40 40 L44 58 L32 48 L20 58 L24 40 L8 34 L26 28 Z" fill="#00d2ff" opacity="0.6" transform="translate(0,6) scale(0.5) translate(32,28)"/>
   </svg>`,
 
-  // C07 可以進場了嗎？→ 狙擊準心終極版
   'C07':`<svg class="mc-image" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
     <circle cx="32" cy="32" r="28" stroke="#bd00ff" stroke-width="6"/>
     <circle cx="32" cy="32" r="18" stroke="#bd00ff" stroke-width="5"/>
@@ -235,4 +236,36 @@ function renderArena(){
   const g={tw:[],us:[],mix:[]};
   portfolios.forEach(p=>{
     let tc=0,ta=0;
-    const icons=p.deck.map(code=>{const c=cardsData[code];return c?`<span class="g-mini-icon ${c.type}">${c.svg}</
+    const icons=p.deck.map(code=>{const c=cardsData[code];return c?`<span class="g-mini-icon ${c.type}">${c.svg}</span>`:''}).join('');
+    p.deck.forEach(d=>cardsData[d]&&(tc+=cardsData[d].cost,ta+=cardsData[d].current));
+    const s=calc(tc,ta);
+    const html=`
+      <div class="g-bar" onclick="this.classList.toggle('active')">
+        <div class="g-code">${p.code}</div>
+        <div class="g-info"><span class="g-name">${p.name}</span><div class="g-deck-icons">${icons}</div></div>
+        <div class="g-stats"><span class="g-roi ${s.cls}">${s.arrow} ${s.sign}${s.roi}%</span><span class="g-val">$${ta}萬</span></div>
+      </div>
+      <div class="g-details"><div class="highlight-content">亮點：${p.highlight||'無'}</div></div>`;
+    g[p.group].push(html);
+  });
+  con.innerHTML=`
+    <div class="arena-group group-tw"><div class="group-header">TAIWAN LEAGUE</div>${g.tw.join('')}</div>
+    <div class="arena-group group-us"><div class="group-header">US LEAGUE</div>${g.us.join('')}</div>
+    <div class="arena-group group-mix"><div class="group-header">SPECIAL LEAGUE</div>${g.mix.join('')}</div>`;
+}
+function openModal(k){
+  const c=cardsData[k];
+  document.getElementById('mCode').textContent=c.code;
+  document.getElementById('mCost').textContent=`$${c.cost} 萬`;
+  document.getElementById('mStrategy').textContent=c.strategy;
+  document.getElementById('mSop').textContent=c.sop;
+  const map={'type-tw':'--gold','type-us':'--us','type-yield':'--yield','type-ber':'--ber','type-trap':'--trap'};
+  const color=getComputedStyle(document.documentElement).getPropertyValue(map[c.type]||'--gold').trim();
+  document.querySelector('.modal-content').style.borderColor=color;
+  document.getElementById('cardModal').style.display='flex';
+}
+function closeModal(){document.getElementById('cardModal').style.display='none'}
+document.addEventListener('keydown',e=>e.key==='Escape'&&closeModal());
+</script>
+</body>
+</html>
