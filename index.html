@@ -3,120 +3,141 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PROJECT CAGE : 雙斧封印版</title>
+<title>PROJECT CAGE : 霓虹戰略版</title>
 <style>
 :root{
---bg:#0b0b0e;--card:#141418;--bar:#1c1c22;--text:#e0e0e0;--mute:#888;--gold:#ffd700;
---tw:#ff3b3b;--us:#00d2ff;--yield:#00ff6a;--ber:#ff9100;--trap:#bd00ff;
---green:#00ff6a;--red:#ff2a2a;--purple:#a600ff;
+/* 核心配色 */
+--bg:#050505; --card:#101012; --bar:#18181b; --text:#e0e0e0; --mute:#888;
+/* 陣營霓虹色 (參考生成圖) */
+--tw:#ff2a2a;    /* TW: 鮮紅 */
+--us:#00d2ff;    /* US: 冰藍 */
+--yield:#00ff6a; /* YIELD: 螢光綠 */
+--ber:#ff9100;   /* SEALED: 琥珀金/橘 */
+--trap:#bd00ff;  /* AMBUSH: 毒紫 */
+--gold:#ffd700;  /* 通用金 */
+
+/* 狀態色 */
+--green:#00ff6a; --red:#ff2a2a; --purple:#a600ff;
 }
+
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;line-height:1.3;overflow-x:hidden;padding-bottom:20px}
-header{padding:20px;background:#08080a;border-bottom:1px solid #333;text-align:center}
-h1{font-size:2.2rem;letter-spacing:4px;text-transform:uppercase;color:#fff;text-shadow:0 0 30px #ffd700;font-weight:900;margin:0}
-.meta-info{font-family:'Courier New';color:#aaa;margin-top:5px;font-size:0.85rem}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',Roboto,Helvetica,sans-serif;line-height:1.3;overflow-x:hidden;padding-bottom:30px}
+
+/* HEADER */
+header{padding:25px;background:#08080a;border-bottom:1px solid #222;text-align:center;position:relative;overflow:hidden}
+header::after{content:'';position:absolute;bottom:0;left:0;width:100%;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:0.5}
+h1{font-size:2.5rem;letter-spacing:4px;text-transform:uppercase;color:#fff;text-shadow:0 0 20px rgba(255,255,255,0.2);font-weight:900;margin:0;font-family:'Arial Black',sans-serif}
+.meta-info{font-family:'Courier New',monospace;color:var(--gold);margin-top:8px;font-size:0.9rem;opacity:0.8;letter-spacing:1px}
+
 .container{max-width:1600px;margin:0 auto;padding:0 20px}
 
 /* DASHBOARD */
-.dashboard-panel{background:linear-gradient(180deg,#1a1a20,#0f0f12);border:1px solid #444;border-radius:12px;padding:15px;margin-bottom:25px;box-shadow:0 0 30px rgba(0,0,0,0.6);position:relative;overflow:hidden}
-.dashboard-panel::before{content:'';position:absolute;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,var(--tw),var(--gold),var(--us))}
+.dashboard-panel{background:linear-gradient(180deg,rgba(20,20,25,0.8),rgba(10,10,12,0.9));border:1px solid #333;border-radius:16px;padding:20px;margin:30px 0;box-shadow:0 0 40px rgba(0,0,0,0.5);position:relative;overflow:hidden;backdrop-filter:blur(10px)}
+.dashboard-panel::before{content:'';position:absolute;top:0;left:0;width:100%;height:2px;background:linear-gradient(90deg,var(--tw),var(--gold),var(--us));box-shadow:0 0 10px var(--gold)}
 .dash-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;text-align:center}
-.dash-label{font-size:0.8rem;color:#666;text-transform:uppercase;margin-bottom:2px;font-weight:bold}
-.dash-value{font-family:'Courier New';font-size:2rem;font-weight:900;color:#fff}
+.dash-label{font-size:0.75rem;color:#666;text-transform:uppercase;margin-bottom:4px;font-weight:700;letter-spacing:1px}
+.dash-value{font-family:'Courier New',monospace;font-size:2.2rem;font-weight:900;color:#fff;text-shadow:0 0 10px rgba(255,255,255,0.1)}
 .dash-roi{font-size:1.8rem;font-weight:900}
 
-.color-profit{color:var(--green)!important;text-shadow:0 0 15px #00ff6a88}
-.color-loss{color:var(--red)!important;text-shadow:0 0 15px #ff2a2a88}
-.color-gold{color:var(--gold)!important;text-shadow:0 0 20px #ffd700aa}
-.color-dead{color:var(--purple)!important;text-shadow:0 0 20px #bd00ffaa;animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.7}}
+/* STATUS COLORS */
+.color-profit{color:var(--green)!important;text-shadow:0 0 15px rgba(0,255,106,0.4)}
+.color-loss{color:var(--red)!important;text-shadow:0 0 15px rgba(255,42,42,0.4)}
+.color-gold{color:var(--gold)!important;text-shadow:0 0 15px rgba(255,215,0,0.4)}
+.color-dead{color:var(--purple)!important;text-shadow:0 0 15px rgba(189,0,255,0.4);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.6}}
 @media(max-width:768px){.dash-grid{grid-template-columns:1fr}}
 
-/* SECTIONS */
-.section-title{font-size:1.1rem;border-left:3px solid var(--gold);padding-left:10px;margin:30px 0 15px;text-transform:uppercase;font-weight:900;color:#fff;display:flex;align-items:center}
-.section-title::after{content:'';flex-grow:1;height:1px;background:#444;margin-left:15px}
+/* SECTION TITLE */
+.section-title{font-size:1.2rem;border-left:4px solid var(--gold);padding-left:15px;margin:40px 0 20px;text-transform:uppercase;font-weight:900;color:#fff;display:flex;align-items:center;letter-spacing:1px}
+.section-title::after{content:'';flex-grow:1;height:1px;background:#333;margin-left:20px}
 
-/* DECK */
-.deck-wrapper{overflow-x:auto;padding-bottom:10px}
-.deck-grid{display:grid;grid-template-columns:repeat(7,minmax(140px,1fr));gap:10px;min-width:1000px}
-.micro-card{background:var(--card);border:1px solid #333;border-radius:10px;padding:12px;transition:all .3s;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,0.5);display:flex;flex-direction:column;min-height:190px}
-.micro-card:hover{transform:translateY(-5px) scale(1.02);box-shadow:0 15px 30px rgba(0,0,0,0.7);z-index:10;background:#1a1a20}
+/* DECK GRID */
+.deck-wrapper{overflow-x:auto;padding-bottom:15px}
+.deck-grid{display:grid;grid-template-columns:repeat(7,minmax(150px,1fr));gap:15px;min-width:1100px}
+.micro-card{background:var(--card);border:1px solid #333;border-radius:12px;padding:15px;transition:all .3s cubic-bezier(0.25, 0.8, 0.25, 1);cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,0.3);display:flex;flex-direction:column;min-height:200px;position:relative;overflow:hidden}
+.micro-card::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 60%,rgba(0,0,0,0.8));z-index:1}
+.micro-card:hover{transform:translateY(-8px);box-shadow:0 15px 30px rgba(0,0,0,0.6);z-index:10;border-color:#555}
 
-.type-tw{border-top:3px solid var(--gold)}
-.type-us{border-top:3px solid var(--us)}
-.type-yield{border-top:3px solid var(--yield)}
-.type-ber{border-top:3px solid var(--ber)}
-.type-trap{border-top:3px solid var(--trap)}
+/* NEON GLOW STYLES per Type */
+.type-tw{border-top:3px solid var(--tw)} .type-tw:hover{box-shadow:0 0 20px rgba(255,42,42,0.2)}
+.type-us{border-top:3px solid var(--us)} .type-us:hover{box-shadow:0 0 20px rgba(0,210,255,0.2)}
+.type-yield{border-top:3px solid var(--yield)} .type-yield:hover{box-shadow:0 0 20px rgba(0,255,106,0.2)}
+.type-ber{border-top:3px solid var(--ber)} .type-ber:hover{box-shadow:0 0 20px rgba(255,145,0,0.2)}
+.type-trap{border-top:3px solid var(--trap)} .type-trap:hover{box-shadow:0 0 20px rgba(189,0,255,0.2)}
 
-.mc-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;padding-bottom:5px;border-bottom:1px solid rgba(255,255,255,0.1)}
-.mc-code{font-size:0.85rem;font-weight:900;color:#fff}
-.mc-target{font-size:0.7rem;background:rgba(0,0,0,0.5);padding:1px 5px;border-radius:4px;color:#ccc}
-.mc-image-container{flex-grow:1;display:flex;align-items:center;justify-content:center;margin:8px 0}
-.mc-image{width:60px;height:60px;transition:all .4s}
-.micro-card:hover .mc-image{transform:scale(1.2);filter:drop-shadow(0 0 15px currentColor)}
-.mc-name{font-size:0.9rem;font-weight:900;text-transform:uppercase;letter-spacing:1px;color:#fff;margin-bottom:2px}
-.mc-cost-badge{margin-top:5px;padding:2px 8px;border:1px solid #555;border-radius:10px;font-size:0.75rem;background:rgba(0,0,0,0.4)}
+.mc-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.05);position:relative;z-index:2}
+.mc-code{font-size:0.8rem;font-weight:900;color:#fff;opacity:0.7}
+.mc-target{font-size:0.65rem;background:rgba(255,255,255,0.1);padding:2px 6px;border-radius:4px;color:#aaa;font-family:'Courier New'}
+
+.mc-image-container{flex-grow:1;display:flex;align-items:center;justify-content:center;margin:10px 0;position:relative;z-index:2}
+/* SVG ICON STYLING */
+.mc-image{width:64px;height:64px;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:all .4s ease}
+.micro-card:hover .mc-image{transform:scale(1.15);filter:drop-shadow(0 0 8px currentColor)}
+
+/* Specific Icon Colors from Root */
+.type-tw .mc-image{stroke:var(--tw);filter:drop-shadow(0 0 2px var(--tw))}
+.type-us .mc-image{stroke:var(--us);filter:drop-shadow(0 0 2px var(--us))}
+.type-yield .mc-image{stroke:var(--yield);filter:drop-shadow(0 0 2px var(--yield))}
+.type-ber .mc-image{stroke:var(--ber);filter:drop-shadow(0 0 2px var(--ber))}
+.type-trap .mc-image{stroke:var(--trap);filter:drop-shadow(0 0 2px var(--trap))}
+
+.mc-footer{text-align:center;margin-top:auto;position:relative;z-index:2}
+.mc-name{font-size:0.9rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#fff;margin-bottom:4px;text-shadow:0 2px 4px rgba(0,0,0,0.8)}
+.mc-cost-badge{display:inline-block;margin-top:6px;padding:3px 10px;border:1px solid rgba(255,255,255,0.2);border-radius:12px;font-size:0.75rem;color:#ccc;background:rgba(0,0,0,0.6)}
 
 /* ARENA */
-.arena-container{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:15px}
+.arena-container{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-top:20px}
 @media(max-width:1000px){.arena-container{grid-template-columns:1fr}}
-.arena-group{background:rgba(255,255,255,0.02);border:1px solid #222;border-radius:8px;padding:10px}
-.group-header{text-align:center;padding-bottom:6px;border-bottom:1px solid #444;font-weight:900;font-size:0.9rem;color:#fff}
+.arena-group{background:rgba(255,255,255,0.02);border:1px solid #222;border-radius:10px;padding:12px;height:100%}
+.group-header{text-align:center;padding-bottom:10px;border-bottom:1px solid #333;font-weight:800;font-size:0.95rem;color:#ddd;letter-spacing:2px;margin-bottom:10px}
 
-.g-bar{display:flex;align-items:center;background:var(--bar);padding:14px 12px;border-radius:6px;border-left:4px solid #555;cursor:pointer;transition:.2s;position:relative}
-.g-bar:hover{background:#25252e;transform:translateX(3px)}
-.g-bar::after{content:'▼';position:absolute;right:12px;color:#666;font-size:0.7rem;transition:.3s}
+.g-bar-container{margin-bottom:8px}
+.g-bar{display:flex;align-items:center;background:var(--bar);padding:12px 15px;border-radius:6px;border-left:3px solid #555;cursor:pointer;transition:.2s;position:relative}
+.g-bar:hover{background:#222;transform:translateX(2px)}
+.g-bar::after{content:'▼';position:absolute;right:15px;color:#555;font-size:0.6rem;transition:.3s}
 .g-bar.active::after{transform:rotate(180deg);color:var(--gold)}
+.g-bar.active{background:#2a2a30}
 
-.group-tw .g-bar{border-left-color:var(--gold)}
+.group-tw .g-bar{border-left-color:var(--tw)}
 .group-us .g-bar{border-left-color:var(--us)}
 .group-mix .g-bar{border-left-color:var(--trap)}
 
-.g-code{font-family:'Courier New';font-weight:900;color:#fff;width:40px;font-size:0.9rem}
+.g-code{font-family:'Courier New';font-weight:900;color:#fff;width:40px;font-size:0.9rem;opacity:0.6}
+.g-info{flex-grow:1;padding:0 10px;display:flex;align-items:center;gap:15px}
+.g-name{width:160px;flex:0 0 160px;font-size:1rem;font-weight:700;color:#eee;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.g-deck-icons{display:flex;align-items:center;gap:6px}
+.g-mini-icon{width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;transition:.2s}
+.g-mini-icon svg{width:100%!important;height:100%!important;stroke-width:2.5!important} 
+/* Mini icons inherit colors */
+.g-mini-icon.type-tw{color:var(--tw)} .g-mini-icon.type-us{color:var(--us)} 
+.g-mini-icon.type-yield{color:var(--yield)} .g-mini-icon.type-ber{color:var(--ber)} .g-mini-icon.type-trap{color:var(--trap)}
+.g-mini-icon:hover{transform:scale(1.3);filter:drop-shadow(0 0 5px currentColor)}
 
-/* --- 關鍵修改：強制對齊 --- */
-.g-info{flex-grow:1;display:flex;align-items:center;padding-left:10px} 
-.g-name{
-    width: 155px; /* 給予固定寬度，確保右側圖示起點一致 */
-    flex: 0 0 155px; /* 禁止縮放 */
-    font-size:1.1rem;
-    font-weight:900;
-    color:#fff;
-    text-transform:uppercase;
-    white-space:nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-.g-deck-icons{
-    display:flex;
-    gap:8px;
-    align-items: center; /* 確保圖示垂直置中 */
-}
-/* --- 修改結束 --- */
-
-.g-mini-icon{width:38px;height:38px;transition:.2s;display:inline-flex;align-items:center;justify-content:center}
-.g-mini-icon:hover{transform:scale(1.2)}
-.g-mini-icon svg{width:100%!important;height:100%!important;stroke:currentColor!important}
-
-.g-stats{text-align:right;min-width:85px}
-.g-roi{font-family:'Courier New';font-weight:900;font-size:0.85rem}
-.g-val{font-size:0.7rem;color:#666}
-.g-details{max-height:0;overflow:hidden;transition:max-height .4s cubic-bezier(0,1,0,1);background:rgba(0,0,0,0.3);border-radius:0 0 6px 6px}
+.g-stats{text-align:right;min-width:90px}
+.g-roi{font-family:'Courier New';font-weight:900;font-size:0.9rem;display:block}
+.g-val{font-size:0.7rem;color:#666;display:block;margin-top:2px}
+.g-details{max-height:0;overflow:hidden;transition:max-height .3s ease;background:rgba(0,0,0,0.2);border-radius:0 0 6px 6px}
 .g-bar.active + .g-details{max-height:100px;border:1px solid #333;border-top:none}
-.highlight-content{padding:10px;background:rgba(255,215,0,0.07);border-left:3px solid var(--gold);margin:6px;font-size:0.85rem;color:#ddd}
+.highlight-content{padding:12px;background:rgba(255,215,0,0.05);border-left:2px solid var(--gold);margin:5px;font-size:0.85rem;color:#ccc;line-height:1.4}
+
+/* FOOTER */
+.footer-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:15px;margin-top:40px;border-top:1px solid #222;padding-top:20px}
+.info-box{background:#111;padding:15px;border-radius:8px;font-size:0.85rem;color:#777;border:1px solid #222}
+.info-title{color:#ddd;font-weight:bold;margin-bottom:5px;display:block;font-size:0.9rem}
 
 /* MODAL */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.95);backdrop-filter:blur(5px);display:none;align-items:center;justify-content:center;z-index:9999}
-.modal-content{background:#1a1a20;border:2px solid #444;border-radius:12px;padding:25px;max-width:450px;width:90%;box-shadow:0 0 50px rgba(0,0,0,0.9)}
-.modal-header{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #444;padding-bottom:10px;margin-bottom:15px}
-.m-code{font-size:1.8rem;font-weight:900;color:#fff}
-.m-skill{font-size:1.1rem;color:#aaa;font-weight:bold;margin-left:15px}
-.close-btn{font-size:1.8rem;cursor:pointer;color:#888;line-height:1}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.9);backdrop-filter:blur(5px);display:none;align-items:center;justify-content:center;z-index:9999}
+.modal-active{display:flex;animation:fadeIn 0.2s}
+.modal-content{background:#16161a;border:2px solid #444;border-radius:12px;padding:30px;max-width:500px;width:90%;box-shadow:0 0 50px rgba(0,0,0,0.9)}
+.modal-header{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid #333;padding-bottom:15px;margin-bottom:20px}
+.m-code{font-size:2rem;font-weight:900;color:#fff}
+.m-skill{font-size:1.2rem;color:#aaa;font-weight:bold;margin-left:15px}
+.close-btn{font-size:2rem;cursor:pointer;color:#666;line-height:1}
 .close-btn:hover{color:#fff}
-.m-row{margin-bottom:12px}
-.m-label{display:block;font-size:0.7rem;color:#555;text-transform:uppercase;margin-bottom:3px;font-weight:bold;letter-spacing:1px}
-.m-value{font-size:0.95rem;color:#ccc;line-height:1.4}
-.m-value.highlight{font-size:1.4rem;font-weight:900;color:var(--gold);font-family:'Courier New'}
+.m-row{margin-bottom:15px}
+.m-label{display:block;font-size:0.75rem;color:#555;text-transform:uppercase;margin-bottom:5px;font-weight:bold;letter-spacing:1px}
+.m-value{font-size:1rem;color:#ccc;line-height:1.5}
+.m-value.highlight{font-size:1.5rem;font-weight:900;color:var(--gold);font-family:'Courier New'}
 </style>
 </head>
 <body>
@@ -134,86 +155,112 @@ h1{font-size:2.2rem;letter-spacing:4px;text-transform:uppercase;color:#fff;text-
     </div>
   </div>
 
-  <div class="section-title">I. 七大技能卡牌</div>
-  <div class="deck-wrapper"><div class="deck-grid" id="cardContainer"><div class="loading">CONNECTING...</div></div></div>
+  <div class="section-title">I. 七大技能卡牌 (THE 7 SKILL CARDS)</div>
+  <div class="deck-wrapper"><div class="deck-grid" id="cardContainer"><div class="loading">CONNECTING TO DATABASE...</div></div></div>
 
   <div class="section-title">II. 投資競技場</div>
-  <div class="arena-container" id="arenaContainer"><div class="loading">LOADING...</div></div>
+  <div class="arena-container" id="arenaContainer"><div class="loading">LOADING STRATEGIES...</div></div>
+
+  <div class="section-title">III. THE IRON LAWS (核心鐵律)</div>
+  <div class="footer-grid">
+    <div class="info-box"><span class="info-title">🔒 資金封閉鐵律</span>1,000 萬只進不出。僅能在定存、活存、證券戶間流動，嚴禁消費。</div>
+    <div class="info-box"><span class="info-title">⚖️ 歸一化競技鐵律</span>績效起點皆為 100%。不比金額大小，只比策略報酬率 (%)。</div>
+    <div class="info-box"><span class="info-title">🔄 配息再投入鐵律</span>股息 100% 留倉再投入，視為淨值一部分，維持複利效應。</div>
+    <div class="info-box"><span class="info-title">🏆 年度 MVP 鐵律</span>每年底頒發金獅(報酬)、鐵盾(穩健)、智冠(CP值)三大獎項。</div>
+  </div>
 </div>
 
 <div id="cardModal" class="modal-overlay" onclick="closeModal()">
   <div class="modal-content" onclick="event.stopPropagation()">
     <div class="modal-header">
-      <div style="display:flex;align-items:baseline">
-        <div class="m-code" id="mCode"></div>
-        <div class="m-skill" id="mSkill"></div>
-      </div>
+      <div><span class="m-code" id="mCode"></span><span class="m-skill" id="mSkill"></span></div>
       <span class="close-btn" onclick="closeModal()">&times;</span>
     </div>
-    <div class="m-row"><span class="m-label">初始資金</span><div class="m-value highlight" id="mCost"></div></div>
-    <div class="m-row"><span class="m-label">戰略定位</span><div class="m-value" id="mStrategy"></div></div>
-    <div class="m-row"><span class="m-label">執行 SOP</span><div class="m-value" id="mSop" style="padding:10px;background:rgba(0,0,0,0.3);border-left:3px solid #666;border-radius:6px"></div></div>
+    <div class="m-row"><span class="m-label">初始資金 (CAPITAL)</span><div class="m-value highlight" id="mCost"></div></div>
+    <div class="m-row"><span class="m-label">戰略定位 (STRATEGY)</span><div class="m-value" id="mStrategy"></div></div>
+    <div class="m-row"><span class="m-label">嚴格執行 SOP</span><div class="m-value" id="mSop" style="padding:12px;background:rgba(0,0,0,0.3);border-left:3px solid #555;border-radius:4px"></div></div>
   </div>
 </div>
 
 <script>
-// 2025 終極 SVG 資源庫 (已微調垂直位置以確保對齊)
+// 2025 終極霓虹手繪 SVG 資源庫 (Perfectly Matched to Generated Image)
 const cardAssets = {
-  // C01: 金幣 (上移以置中)
-  'C01':`<svg class="mc-image" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <ellipse cx="32" cy="44" rx="22" ry="9" fill="#ffd700" stroke="#b39700" stroke-width="3"/>
-    <path d="M10 44v-8c0 5 10 9 22 9s22-4 22-9v8c0 5-10 9-22 9s-22-4-22-9z" fill="#ffd700" stroke="#b39700" stroke-width="3"/>
-    <ellipse cx="32" cy="32" rx="22" ry="9" fill="#ffd700" stroke="#b39700" stroke-width="3"/>
-    <path d="M10 32v-8c0 5 10 9 22 9s22-4 22-9v8c0 5-10 9-22 9s-22-4-22-9z" fill="#ffd700" stroke="#b39700" stroke-width="3"/>
-    <ellipse cx="32" cy="20" rx="22" ry="9" fill="#ffd700" stroke="#b39700" stroke-width="3"/>
-    <text x="32" y="24" font-size="20" text-anchor="middle" fill="#b39700" font-weight="900">$</text>
+  // C01 TW DCA: 紅色上升箭頭 + 金幣堆
+  'C01':`<svg class="mc-image" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+    <path d="M8 44 L20 32 L28 40 L56 12" stroke="currentColor" stroke-width="3" fill="none"/>
+    <path d="M56 12 L46 12 M56 12 L56 22" stroke="currentColor" stroke-width="3" fill="none"/>
+    <ellipse cx="14" cy="54" rx="8" ry="3" stroke="currentColor" stroke-width="2"/>
+    <path d="M6 54 v-4 c0-2 4-3 8-3 s8 1 8 3 v4" stroke="currentColor" stroke-width="2"/>
+    <ellipse cx="14" cy="50" rx="8" ry="3" stroke="currentColor" stroke-width="2"/>
+    <path d="M6 50 v-4 c0-2 4-3 8-3 s8 1 8 3 v4" stroke="currentColor" stroke-width="2"/>
+    <ellipse cx="14" cy="46" rx="8" ry="3" stroke="currentColor" stroke-width="2"/>
+    <circle cx="48" cy="48" r="10" stroke="currentColor" stroke-width="2"/>
+    <path d="M48 44 v8 M44 48 h8" stroke="currentColor" stroke-width="2"/> 
   </svg>`,
 
-  // C02: 寶劍
-  'C02':`<svg class="mc-image" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M14 50L46 18M10 54l8-8M6 58l4-4" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>
-    <path d="M42 22l4-4 8 8-4 4-8-8z" fill="currentColor" opacity="0.4"/>
-    <path d="M46 18l12-12" stroke="currentColor" stroke-width="2"/>
+  // C02 TW LSI: 燃燒的巨劍 (攻擊型)
+  'C02':`<svg class="mc-image" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+    <path d="M48 8 L16 40 L20 44 L52 12 Z" stroke="currentColor" stroke-width="3" fill="none"/>
+    <line x1="24" y1="32" x2="40" y2="16" stroke="currentColor" stroke-width="1"/>
+    <path d="M16 40 L12 44 L16 48 L20 44" stroke="currentColor" stroke-width="3" fill="none"/>
+    <line x1="12" y1="44" x2="6" y2="50" stroke="currentColor" stroke-width="3"/>
+    <path d="M48 8 Q56 0 60 10 Q64 2 54 2" stroke="currentColor" stroke-width="2" fill="none" opacity="0.7"/>
+    <path d="M10 50 Q0 60 10 64 Q20 60 10 50" stroke="currentColor" stroke-width="2" fill="none" opacity="0.7"/>
   </svg>`,
 
-  // C03: 股息
-  'C03':`<svg class="mc-image" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M32 10 L42 28 L24 28 Z" fill="currentColor" opacity="0.3"/>
-    <path d="M32 10 L42 28 L24 28 Z" stroke="currentColor" stroke-width="4"/>
-    <path d="M32 42v10M26 52h12" stroke="currentColor" stroke-width="3"/>
+  // C03 YIELD: 發光的搖錢樹
+  'C03':`<svg class="mc-image" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+    <path d="M32 56 L32 20" stroke="currentColor" stroke-width="3"/>
+    <path d="M32 40 Q16 30 16 20" stroke="currentColor" stroke-width="2" fill="none"/>
+    <path d="M32 30 Q48 20 48 10" stroke="currentColor" stroke-width="2" fill="none"/>
+    <circle cx="16" cy="20" r="6" stroke="currentColor" stroke-width="2"/>
+    <circle cx="48" cy="10" r="6" stroke="currentColor" stroke-width="2"/>
+    <circle cx="32" cy="14" r="6" stroke="currentColor" stroke-width="2"/>
+    <text x="32" y="16" font-size="8" text-anchor="middle" fill="currentColor" font-weight="bold">$</text>
+    <path d="M22 56 L42 56 L38 62 L26 62 Z" stroke="currentColor" stroke-width="2" fill="none"/>
   </svg>`,
 
-  // C04: 雙斧 (下移以置中)
-  'C04':`<svg class="mc-image" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M18 18 L26 26 L22 44 L14 52 L18 58 L26 50 L30 52 L22 60 L14 52 Z" fill="#ff9100" stroke="#ffb800" stroke-width="3"/>
-    <rect x="24" y="14" width="6" height="28" rx="3" fill="#333" stroke="#666" stroke-width="2"/>
-    <path d="M46 18 L38 26 L42 44 L50 52 L46 58 L38 50 L34 52 L42 60 L50 52 Z" fill="#ff9100" stroke="#ffb800" stroke-width="3"/>
-    <rect x="34" y="14" width="6" height="28" rx="3" fill="#333" stroke="#666" stroke-width="2"/>
-    <circle cx="32" cy="34" r="8" fill="#fff" opacity="0.9"/>
-    <circle cx="32" cy="34" r="14" stroke="#ff9100" stroke-width="3" opacity="0.6"/>
+  // C04 SEALED: 交叉雙斧 (封印/防禦)
+  'C04':`<svg class="mc-image" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+    <line x1="12" y1="52" x2="52" y2="12" stroke="currentColor" stroke-width="3"/>
+    <path d="M52 12 L46 6 Q56 -4 62 12 Q56 22 46 18 Z" stroke="currentColor" stroke-width="2" fill="none"/>
+    <path d="M52 12 L58 18" stroke="currentColor" stroke-width="2"/>
+    <line x1="52" y1="52" x2="12" y2="12" stroke="currentColor" stroke-width="3"/>
+    <path d="M12 12 L18 6 Q8 -4 2 12 Q8 22 18 18 Z" stroke="currentColor" stroke-width="2" fill="none"/>
+    <path d="M12 12 L6 18" stroke="currentColor" stroke-width="2"/>
+    <path d="M32 24 L40 30 V40 L32 46 L24 40 V30 Z" stroke="currentColor" stroke-width="2" fill="#000"/>
+    <path d="M32 30 L36 34 L30 40" stroke="currentColor" stroke-width="2" fill="none"/>
   </svg>`,
 
-  // C05: 地球儀
-  'C05':`<svg class="mc-image" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="32" cy="32" r="24" stroke="currentColor" stroke-width="4"/>
-    <ellipse cx="32" cy="32" rx="24" ry="10" stroke="currentColor" stroke-width="2"/>
-    <line x1="32" y1="8" x2="32" y2="56" stroke="currentColor" stroke-width="2"/>
+  // C05 US LSI: 薩諾斯手套 (掌握全球)
+  'C05':`<svg class="mc-image" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+    <rect x="20" y="20" width="24" height="30" rx="4" stroke="currentColor" stroke-width="3" fill="none"/>
+    <line x1="20" y1="30" x2="44" y2="30" stroke="currentColor" stroke-width="2"/>
+    <line x1="20" y1="40" x2="44" y2="40" stroke="currentColor" stroke-width="2"/>
+    <circle cx="32" cy="35" r="6" stroke="currentColor" stroke-width="3" fill="none"/>
+    <rect x="20" y="10" width="6" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+    <rect x="29" y="8" width="6" height="12" rx="2" stroke="currentColor" stroke-width="2"/>
+    <rect x="38" y="10" width="6" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+    <circle cx="32" cy="35" r="2" fill="currentColor"/>
   </svg>`,
 
-  // C06: 盾牌
-  'C06':`<svg class="mc-image" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M32 8l18 6v14c0 12-18 24-18 24S14 40 14 28V14l18-6z" stroke="currentColor" stroke-width="4" fill="none"/>
-    <circle cx="32" cy="26" r="8" fill="currentColor" opacity="0.3"/>
+  // C06 US DCA: 盾牌 + U型反轉
+  'C06':`<svg class="mc-image" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+    <path d="M32 6 L52 14 V28 C52 42 32 58 32 58 C32 58 12 42 12 28 V14 L32 6 Z" stroke="currentColor" stroke-width="3" fill="none"/>
+    <path d="M26 24 V34 C26 38 38 38 38 34 V24" stroke="currentColor" stroke-width="3" fill="none"/>
+    <path d="M38 24 L34 28 M38 24 L42 28" stroke="currentColor" stroke-width="3" fill="none"/>
   </svg>`,
 
-  // C07: 準心
-  'C07':`<svg class="mc-image" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="32" cy="32" r="22" stroke="currentColor" stroke-width="4"/>
-    <line x1="32" y1="6" x2="32" y2="20" stroke="currentColor" stroke-width="4"/>
-    <line x1="32" y1="44" x2="32" y2="58" stroke="currentColor" stroke-width="4"/>
-    <line x1="6" y1="32" x2="20" y2="32" stroke="currentColor" stroke-width="4"/>
-    <line x1="44" y1="32" x2="58" y2="32" stroke="currentColor" stroke-width="4"/>
-    <circle cx="32" cy="32" r="4" fill="currentColor"/>
+  // C07 AMBUSH: 忍者/刺客 + 準心
+  'C07':`<svg class="mc-image" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+    <path d="M32 10 Q12 10 12 30 V50 H52 V30 Q52 10 32 10" stroke="currentColor" stroke-width="3" fill="none"/>
+    <path d="M20 30 L26 34 L38 34 L44 30" stroke="currentColor" stroke-width="2" fill="none"/>
+    <circle cx="32" cy="32" r="16" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+    <line x1="32" y1="16" x2="32" y2="24" stroke="currentColor" stroke-width="2"/>
+    <line x1="32" y1="40" x2="32" y2="48" stroke="currentColor" stroke-width="2"/>
+    <line x1="16" y1="32" x2="24" y2="32" stroke="currentColor" stroke-width="2"/>
+    <line x1="40" y1="32" x2="48" y2="32" stroke="currentColor" stroke-width="2"/>
+    <circle cx="32" cy="32" r="2" fill="currentColor"/>
   </svg>`
 };
 
@@ -222,7 +269,7 @@ let cardsData = {}, portfolios = [];
 // 連線到 Google Sheet
 fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vQuNQc8E7BlYLR5E6WlYHVQ3l_ki95CqcEcpS8sNQESRKcg5yECE-e2bgMvLGU-Vx5HFuWo5OS1GUIT/pub?output=tsv')
 .then(r=>r.text()).then(t=>{parseSheetData(t);renderAll()})
-.catch(e=>document.getElementById('cardContainer').innerHTML=`<p style="color:red">連線失敗，請檢查網路</p>`);
+.catch(e=>document.getElementById('cardContainer').innerHTML=`<p style="color:red">連線失敗: ${e}</p>`);
 
 function parseSheetData(text){
   const rows = text.split('\n').map(r=>r.trim()).filter(r=>r);
@@ -230,7 +277,6 @@ function parseSheetData(text){
   for(let i=1;i<rows.length;i++){
     const c = rows[i].split('\t');
     if(c[0]==='代號'&&c[1]==='名稱'){isStrategy=true;continue;}
-    
     if(!isStrategy && c[0]?.startsWith('C')){
       cardsData[c[0]] = {code:c[0],type:c[1],target:c[3],skill:c[4],cost:+c[5]||0,current:+c[6]||0,strategy:c[7],sop:c[8],svg:cardAssets[c[0]]||cardAssets.C01};
     }else if(isStrategy && c[0]?.startsWith('P')){
@@ -272,38 +318,37 @@ function renderCards(){
 function renderArena(){
   const con=document.getElementById('arenaContainer');
   const g={tw:[],us:[],mix:[]};
-  
   portfolios.forEach(p=>{
     let tc=0,ta=0;
     const icons=p.deck.map(code=>{
       const c=cardsData[code];
-      let typeClass = c ? c.type : '';
-      return c ? `<span class="g-mini-icon ${typeClass}">${c.svg}</span>` : '';
+      return c ? `<span class="g-mini-icon ${c.type}">${c.svg}</span>` : '';
     }).join('');
     
     p.deck.forEach(d=>cardsData[d]&&(tc+=cardsData[d].cost,ta+=cardsData[d].current));
     const s=calc(tc,ta);
     
     const html=`
-      <div class="g-bar" onclick="this.classList.toggle('active')">
-        <div class="g-code">${p.code}</div>
-        <div class="g-info">
-          <span class="g-name" title="${p.name}">${p.name}</span>
-          <div class="g-deck-icons">${icons}</div>
+      <div class="g-bar-container">
+        <div class="g-bar" onclick="this.classList.toggle('active')">
+          <div class="g-code">${p.code}</div>
+          <div class="g-info">
+            <span class="g-name" title="${p.name}">${p.name}</span>
+            <div class="g-deck-icons">${icons}</div>
+          </div>
+          <div class="g-stats">
+            <span class="g-roi ${s.cls}">${s.arrow} ${s.sign}${s.roi}%</span>
+            <span class="g-val">$${ta}萬</span>
+          </div>
         </div>
-        <div class="g-stats">
-          <span class="g-roi ${s.cls}">${s.arrow} ${s.sign}${s.roi}%</span>
-          <span class="g-val">$${ta}萬</span>
-        </div>
-      </div>
-      <div class="g-details"><div class="highlight-content">亮點：${p.highlight||'無'}</div></div>`;
+        <div class="g-details"><div class="highlight-content">亮點：${p.highlight||'無'}</div></div>
+      </div>`;
     g[p.group].push(html);
   });
-  
   con.innerHTML=`
-    <div class="arena-group group-tw"><div class="group-header">TAIWAN LEAGUE</div>${g.tw.join('')}</div>
-    <div class="arena-group group-us"><div class="group-header">US LEAGUE</div>${g.us.join('')}</div>
-    <div class="arena-group group-mix"><div class="group-header">SPECIAL LEAGUE</div>${g.mix.join('')}</div>`;
+    <div class="arena-group group-tw"><div class="group-header">🇹🇼 TAIWAN LEAGUE</div>${g.tw.join('')}</div>
+    <div class="arena-group group-us"><div class="group-header">🇺🇸 US LEAGUE</div>${g.us.join('')}</div>
+    <div class="arena-group group-mix"><div class="group-header">🌐 SPECIAL LEAGUE</div>${g.mix.join('')}</div>`;
 }
 
 function openModal(k){
@@ -314,11 +359,11 @@ function openModal(k){
   document.getElementById('mStrategy').textContent=c.strategy;
   document.getElementById('mSop').textContent=c.sop;
   
-  const map={'type-tw':'--gold','type-us':'--us','type-yield':'--yield','type-ber':'--ber','type-trap':'--trap'};
+  const map={'type-tw':'--tw','type-us':'--us','type-yield':'--yield','type-ber':'--ber','type-trap':'--trap'};
   const color=getComputedStyle(document.documentElement).getPropertyValue(map[c.type]||'--gold').trim();
   document.querySelector('.modal-content').style.borderColor=color;
-  
   document.getElementById('cardModal').style.display='flex';
+  document.getElementById('cardModal').classList.add('modal-active');
 }
 
 function closeModal(){document.getElementById('cardModal').style.display='none'}
