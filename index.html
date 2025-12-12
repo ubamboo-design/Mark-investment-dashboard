@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PROJECT CAGE : 全局戰情版</title>
+<title>PROJECT CAGE : 精準戰情版</title>
 <style>
     :root {
         --bg: #050505; --card: #0a0a0c; --bar: #1a1a1e; --text: #e0e0e0; --mute: #888;
@@ -23,7 +23,6 @@
     .dashboard-panel { background: linear-gradient(180deg, rgba(20,20,25,0.9), rgba(5,5,5,0.95)); border: 1px solid #333; border-radius: 20px; padding: 25px; margin: 30px 0; box-shadow: 0 0 50px rgba(0,0,0,0.7); position: relative; overflow: hidden; backdrop-filter: blur(10px); }
     .dashboard-panel::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: linear-gradient(90deg, var(--tw), var(--gold), var(--us)); box-shadow: 0 0 15px var(--gold); }
     
-    /* Grid 調整：右側稍微加寬以容納更多資訊 */
     .dash-grid { display: grid; grid-template-columns: 1fr 1fr 1.4fr; gap: 20px; text-align: center; }
     .dash-group { display: flex; flex-direction: column; justify-content: center; background: rgba(255,255,255,0.03); border-radius: 12px; padding: 15px; border: 1px solid #222; }
     .dash-label { font-size: 0.75rem; color: #666; text-transform: uppercase; margin-bottom: 8px; font-weight: 700; letter-spacing: 1.5px; }
@@ -31,7 +30,6 @@
     .dash-roi-sub { font-size: 1.2rem; font-weight: 900; display: block; }
     .dash-value-main { font-family: 'Courier New', monospace; font-size: 2.8rem; font-weight: 900; color: #fff; text-shadow: 0 0 20px rgba(255,215,0,0.2); margin-top: 5px; line-height: 1; }
     
-    /* 新增：總成本顯示區塊 */
     .dash-cost-row { margin-top: 15px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); }
     .dash-cost-val { font-family: 'Courier New'; font-size: 1.4rem; font-weight: bold; color: #ccc; }
     .dash-cost-breakdown { font-size: 0.8rem; color: #777; margin-top: 4px; font-family: 'Courier New'; letter-spacing: 0.5px; }
@@ -142,7 +140,7 @@
 <body>
 <header>
   <h1>PROJECT CAGE</h1>
-  <div class="meta-info">v12.27 LIVE • NT$ 1,000 萬 • 2025-2031</div>
+  <div class="meta-info">v12.29 LIVE • NT$ 1,000 萬 • 2025-2031</div>
 </header>
 
 <div class="container">
@@ -209,6 +207,10 @@
 let currentRate = 32.5;
 let cardsData = {}, portfolios = {}, eventsData = [];
 
+// 定義資金池的卡牌清單 (對應 F2:F6+F9 和 F7+F8)
+const twdCodes = ['C01', 'C02', 'C02-1', 'C02-2', 'C03', 'C04', 'C07'];
+const usdCodes = ['C05', 'C06'];
+
 const cardAssets = {
     'C01': `<img src="https://ubamboo-design.github.io/Mark-investment-dashboard/C01.png" class="mc-media" alt="TW DCA">`,
     'C02': `<svg class="mc-media" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path d="M45 5 Q55 -5 60 8 Q65 0 50 0" fill="#ff2a2a" opacity="0.6"/><path d="M50 10 L18 42 L22 46 L54 14 Z" fill="#444" stroke="currentColor" stroke-width="2"/><line x1="26" y1="34" x2="46" y2="14" stroke="currentColor" stroke-width="1"/><path d="M18 42 L14 46 L18 50 L22 46" fill="currentColor"/><path d="M14 46 L8 52" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><circle cx="6" cy="54" r="3" fill="currentColor"/><path d="M10 50 Q20 40 30 50 T50 50" stroke="#ffd700" stroke-width="2" fill="none" stroke-dasharray="2 2"/><circle cx="20" cy="55" r="2" fill="#ffd700"/><circle cx="35" cy="58" r="3" fill="#ffd700"/></svg>`,
@@ -252,12 +254,16 @@ function parseSheetData(text){
   for(let i=1; i<rows.length; i++){
     const c = rows[i].split('\t');
     
+    // 標題行判斷
     if(c[0] === '事件簿') { isEvent = true; isStrategy = false; continue; }
     if(c[0] === '代號' && c[1] === '名稱') { isStrategy = true; isEvent = false; continue; }
 
+    // A. 解析事件簿 (修正為3欄位)
     if(isEvent && c[0]) {
+        // A欄:日期, B欄:狀態, C欄:內容
         eventsData.push({ date: c[0], status: c[1] || 'Info', content: c[2] || '' });
     }
+    // B. 解析卡牌資料 (C開頭)
     else if(!isStrategy && c[0]?.startsWith('C')){
       let skillName = c[4]; if(c[0] === 'C05') skillName = 'VT DCA';
       let costRaw = c[5] ? c[5].replace(/[NT$US,]/g, '') : '0';
@@ -266,12 +272,14 @@ function parseSheetData(text){
       let displayMedia = imgUrl.startsWith('http') 
           ? `<img src="${imgUrl}" class="mc-media" alt="${skillName}">` 
           : (cardAssets[c[0]] || cardAssets['C01']);
+      
       cardsData[c[0]] = {
           code: c[0], type: c[1], rpg: c[2], target: c[3], skill: skillName,
           cost: parseFloat(costRaw), current: parseFloat(currentRaw),
           strategy: c[7], sop: c[8], media: displayMedia
       };
     } 
+    // C. 解析策略與競技場
     else if(isStrategy){
       if(c[0].startsWith('P')){
           if(!portfolios[currentGroup]) portfolios[currentGroup] = [];
@@ -297,26 +305,45 @@ function renderAll(){ renderDashboard(); renderCards(); renderEvents(); renderAr
 
 function renderDashboard(){
   let tcTW=0, taTW=0, tcUS=0, taUS=0;
-  Object.values(cardsData).forEach(c=>{ 
-      if (c.type === 'type-tw') { tcTW += c.cost; taTW += c.current; } 
-      else { tcUS += c.cost; taUS += c.current; }
+  
+  // 遍歷所有卡牌，依照「代號清單」分配到 TW 或 US 資金池
+  Object.values(cardsData).forEach(c => { 
+      // 判斷是否為 TWD 組 (F2:F6+F9)
+      if (twdCodes.includes(c.code)) { 
+          tcTW += c.cost; 
+          taTW += c.current; 
+      } 
+      // 判斷是否為 USD 組 (F7+F8)
+      else if (usdCodes.includes(c.code)) { 
+          tcUS += c.cost; 
+          taUS += c.current; 
+      }
+      // 其他代號不計入，防止重複計算
   });
+
+  // 1. TWD 面板渲染
   const sTW = calc(tcTW, taTW);
   document.getElementById('costTW').textContent = '$' + (tcTW/10000).toFixed(0) + '萬';
   document.getElementById('roiTW').innerHTML = `<span class="${sTW.cls}">${sTW.arrow} ${sTW.sign}${sTW.roi}%</span>`;
+
+  // 2. USD 面板渲染
   const sUS = calc(tcUS, taUS);
   document.getElementById('costUS').textContent = '$' + (tcUS/10000).toFixed(0) + '萬';
   document.getElementById('roiUS').innerHTML = `<span class="${sUS.cls}">${sUS.arrow} ${sUS.sign}${sUS.roi}%</span>`;
   
+  // 3. 總資產計算 (TOTAL ASSET)
+  // 美金部分換算成台幣 + 台幣部分
   const totalAssetTWD = taTW + (taUS * currentRate);
-  const totalCostTWD = tcTW + (tcUS * currentRate); // 總成本 (台幣)
+  
+  // 總成本計算 (TOTAL COST)
+  const totalCostTWD = tcTW + (tcUS * currentRate); 
   
   const cur = document.getElementById('totalAsset'); 
   cur.textContent = 'NT$ ' + totalAssetTWD.toLocaleString(undefined, {maximumFractionDigits: 0});
   const sTotal = calc(totalCostTWD, totalAssetTWD);
   cur.className = 'dash-value-main ' + sTotal.cls;
 
-  // 渲染新增的總成本與細項
+  // 渲染總成本與細項
   document.getElementById('totalCostTWD').textContent = 'NT$ ' + totalCostTWD.toLocaleString(undefined, {maximumFractionDigits: 0});
   document.getElementById('costBreakdown').textContent = `(TW: $${(tcTW/10000).toFixed(0)}萬 + US: $${(tcUS/10000).toFixed(0)}萬)`;
 }
@@ -340,6 +367,7 @@ function renderEvents(){
         return;
     }
     con.innerHTML = '';
+    // 渲染事件卡片，包含日期、狀態、內容
     eventsData.forEach(e => {
         con.innerHTML += `
         <div class="event-card">
