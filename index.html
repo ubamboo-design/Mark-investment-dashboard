@@ -37,8 +37,11 @@
     .profit-block { margin-top: 15px; padding: 12px; background: rgba(0,0,0,0.3); border-radius: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
     .profit-main { font-family: 'Courier New'; font-size: 1.3rem; font-weight: 900; }
     .profit-sub { font-size: 0.9rem; font-weight: bold; }
-    .total-big-val { font-family: 'Courier New'; font-size: 2.6rem; font-weight: 900; color: #fff; text-align: right; margin: 10px 0; text-shadow: 0 0 20px rgba(255,215,0,0.3); line-height: 1.1; }
+    .total-big-val { font-family: 'Courier New'; font-size: 2.6rem; font-weight: 900; color: #fff; text-align: right; margin: 5px 0; text-shadow: 0 0 20px rgba(255,215,0,0.3); line-height: 1.1; }
+    .total-roi-display { font-family: 'Courier New'; font-size: 1.2rem; font-weight: bold; text-align: right; margin-bottom: 10px; opacity: 0.9; }
     .rate-display { font-family: 'Courier New'; font-size: 0.75rem; color: var(--gold); opacity: 0.7; text-align: right; margin-top: 5px; letter-spacing: 1px; }
+    
+    /* COLORS */
     .c-tw { color: var(--tw); text-shadow: 0 0 10px rgba(255,42,42,0.3); }
     .c-us { color: var(--us); text-shadow: 0 0 10px rgba(0,210,255,0.3); }
     .c-gold { color: var(--gold); text-shadow: 0 0 10px rgba(255,215,0,0.3); }
@@ -46,6 +49,7 @@
     .color-loss { color: var(--red)!important; text-shadow: 0 0 15px rgba(255,42,42,0.2); }
     .color-gold { color: var(--gold)!important; text-shadow: 0 0 20px rgba(255,215,0,0.6); } 
     .color-dead { color: var(--dark-purple)!important; text-shadow: 0 0 20px rgba(148,0,211,0.6); }
+    
     @media(max-width: 900px) { .dash-grid { grid-template-columns: 1fr; gap: 15px; } .total-big-val { font-size: 2rem; } header { flex-direction: column; gap: 15px; } .header-text { text-align: center; } }
 
     /* SECTIONS */
@@ -70,11 +74,9 @@
     .mc-cost-badge { display: inline-block; margin-top: 2px; padding: 3px 10px; border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; font-size: 0.7rem; color: #aaa; background: rgba(0,0,0,0.8); }
     svg.mc-media { fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
     img.mc-media { filter: drop-shadow(0 0 2px rgba(255,255,255,0.5)); }
-    .type-tw { border-color: var(--tw); } .type-tw:hover { box-shadow: 0 0 25px rgba(255,42,42,0.4); } .type-tw img.mc-media { filter: drop-shadow(0 0 5px var(--tw)); }
-    .type-us { border-color: var(--us); } .type-us:hover { box-shadow: 0 0 25px rgba(0,210,255,0.4); } .type-us img.mc-media { filter: drop-shadow(0 0 5px var(--us)); }
-    .type-yield { border-color: var(--yield); } .type-yield:hover { box-shadow: 0 0 25px rgba(0,255,106,0.4); } .type-yield img.mc-media { filter: drop-shadow(0 0 5px var(--yield)); }
-    .type-ber { border-color: var(--ber); } .type-ber:hover { box-shadow: 0 0 25px rgba(255,145,0,0.4); } .type-ber img.mc-media { filter: drop-shadow(0 0 5px var(--ber)); }
-    .type-trap { border-color: var(--trap); } .type-trap:hover { box-shadow: 0 0 25px rgba(189,0,255,0.4); } .type-trap img.mc-media { filter: drop-shadow(0 0 5px var(--trap)); }
+    .type-tw { border-color: var(--tw); } .type-us { border-color: var(--us); } .type-yield { border-color: var(--yield); } .type-ber { border-color: var(--ber); } .type-trap { border-color: var(--trap); }
+    .type-tw:hover { box-shadow: 0 0 25px rgba(255,42,42,0.4); } .type-us:hover { box-shadow: 0 0 25px rgba(0,210,255,0.4); }
+    .type-tw img.mc-media { filter: drop-shadow(0 0 5px var(--tw)); } .type-us img.mc-media { filter: drop-shadow(0 0 5px var(--us)); }
 
     /* EVENTS LOG */
     .event-list { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; padding-bottom: 10px; }
@@ -90,7 +92,7 @@
     @media(max-width: 768px) { .event-list { grid-template-columns: 1fr; } }
 
     /* ================================================================= */
-    /* ARENA: 2x2 QUADRANT LAYOUT WITH HORIZONTAL BARS                   */
+    /* ARENA: 2x2 QUADRANT LAYOUT WITH GRID BARS                         */
     /* ================================================================= */
     .arena-container { 
         display: grid; 
@@ -99,7 +101,6 @@
         width: 100%; 
     }
     
-    /* Quadrant Box (The Group) */
     .arena-group { 
         background: rgba(255,255,255,0.02); 
         border: 1px solid #222; 
@@ -110,13 +111,14 @@
     }
     .group-header { text-align: left; padding-bottom: 10px; border-bottom: 1px solid #333; font-weight: 900; font-size: 1.1rem; color: var(--gold); margin-bottom: 15px; letter-spacing: 2px; }
 
-    /* Horizontal Bar (The Strategy) */
     .g-bar-container { margin-bottom: 10px; width: 100%; }
     
+    /* THE BAR - USING CSS GRID FOR PERFECT ALIGNMENT */
     .g-bar { 
-        display: flex; 
+        display: grid; 
+        /* 定義 Grid: 代號(50px) | 名稱(自動伸展) | 圖示(100px) | ROI(100px) */
+        grid-template-columns: 50px 1fr 100px 100px;
         align-items: center; 
-        justify-content: space-between; /* Layout: PXX | Icons | ROI */
         background: var(--bar); 
         padding: 12px 15px; 
         border-radius: 8px; 
@@ -125,15 +127,16 @@
         transition: .2s; 
         position: relative; 
         border: 1px solid transparent; 
+        gap: 10px;
     }
     
     .g-bar:hover { background: #222; transform: translateX(5px); border-color: rgba(255,255,255,0.1); }
     .g-bar.active { background: #25252a; border-color: rgba(255,215,0,0.2); border-left-color: var(--gold) !important; }
     
-    /* Bar Elements */
-    .g-left { display: flex; align-items: center; gap: 15px; }
-    .g-code { font-family: 'Courier New'; font-weight: 900; color: #fff; font-size: 1rem; opacity: 0.6; width: 40px; }
-    .g-deck-icons { display: flex; align-items: center; gap: 5px; }
+    /* Grid Elements */
+    .g-code { font-family: 'Courier New'; font-weight: 900; color: #fff; font-size: 1rem; opacity: 0.6; }
+    .g-name-bar { font-size: 1rem; font-weight: 900; color: #fff; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; }
+    .g-deck-icons { display: flex; align-items: center; gap: 5px; justify-content: center; }
     
     .g-roi { font-family: 'Courier New'; font-weight: 900; font-size: 1.1rem; text-align: right; }
     /* ROI Colors */
@@ -142,19 +145,18 @@
     .g-roi.color-gold { color: var(--gold); text-shadow: 0 0 10px var(--gold); }
     .g-roi.color-dead { color: var(--dark-purple); text-shadow: 0 0 10px var(--dark-purple); }
 
-    /* Mini Icons inside Bar */
+    /* Icons */
     .g-mini-icon { width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; }
     .g-mini-icon svg { width: 100%!important; height: 100%!important; stroke-width: 3!important; } 
     .g-mini-icon img { width: 100%!important; height: 100%!important; object-fit: contain; }
     .g-mini-icon.type-tw { color: var(--tw); } .g-mini-icon.type-us { color: var(--us); } .g-mini-icon.type-yield { color: var(--yield); } .g-mini-icon.type-ber { color: var(--ber); } .g-mini-icon.type-trap { color: var(--trap); }
     .g-mini-icon.type-tw img { filter: drop-shadow(0 0 2px var(--tw)); } .g-mini-icon.type-us img { filter: drop-shadow(0 0 2px var(--us)); }
 
-    /* Expanded Details (Accordion) */
+    /* Details */
     .g-details { max-height: 0; overflow: hidden; transition: max-height .4s ease; background: rgba(0,0,0,0.3); border-radius: 0 0 8px 8px; width: 100%; }
     .g-bar.active + .g-details { max-height: 500px; border: 1px solid #333; border-top: none; }
     
     .highlight-content { padding: 20px; display: flex; flex-direction: column; gap: 15px; }
-    .strat-name-detail { font-size: 1.1rem; font-weight: 900; color: #fff; margin-bottom: 5px; }
     
     .ab-grid { display: flex; gap: 10px; margin-bottom: 5px; }
     .ab-box { background: rgba(255,255,255,0.05); border-radius: 4px; padding: 5px 10px; text-align: center; border: 1px solid rgba(255,255,255,0.1); min-width: 70px; }
@@ -168,7 +170,13 @@
     .d-text { color: #ccc; line-height: 1.4; font-size: 0.9rem; }
     .d-text.warn { color: #ff6b6b; }
 
-    @media(max-width: 900px) { .arena-container { grid-template-columns: 1fr; } }
+    @media(max-width: 900px) { 
+        .arena-container { grid-template-columns: 1fr; } 
+        /* Mobile Bar: stack vertically */
+        .g-bar { grid-template-columns: 50px 1fr auto; grid-template-rows: auto auto; }
+        .g-deck-icons { grid-column: 3; grid-row: 1; justify-content: flex-end; }
+        .g-roi { grid-column: 3; grid-row: 2; margin-top: 5px; }
+    }
     /* ================================================================= */
 
     /* FOOTER */
@@ -197,7 +205,7 @@
   <img id="pageLogo" src="" alt="Logo">
   <div class="header-text">
       <h1>PROJECT CAGE</h1>
-      <div class="meta-info">v12.42 LIVE • NT$ 1,000 萬 • 2025-2031</div>
+      <div class="meta-info">v12.43 LIVE • NT$ 1,000 萬 • 2025-2031</div>
   </div>
 </header>
 
@@ -219,6 +227,8 @@
       <div class="dash-group" style="border-color: rgba(255,215,0,0.3);">
         <div class="dash-header" style="justify-content: center;"><span class="dash-flag">🏆</span><span class="dash-title c-gold">TOTAL ASSET 總身價</span></div>
         <div class="total-big-val" id="totalAsset">...</div>
+        <div class="total-roi-display" id="totalROI">...</div>
+        
         <div class="data-row"><span class="data-label">總投入成本 (TWD)</span><span class="data-val" id="totalCostTWD">...</span></div>
         <div class="data-row"><span class="data-label">總帳面損益 (TWD)</span><span class="data-val" id="totalDiff">...</span></div>
         <div class="rate-display" id="rateInfo">Loading Rate...</div>
@@ -363,9 +373,9 @@ function calc(cost, cur){
   const roi = (roiRaw*100).toFixed(1);
   
   let cls = 'color-loss'; 
-  if (roiRaw >= 0.5) cls = 'color-gold'; // > 50%
+  if (roiRaw >= 0.5) cls = 'color-gold'; 
   else if (roiRaw >= 0) cls = 'color-profit'; 
-  else if (roiRaw <= -0.5) cls = 'color-dead'; // < -50%
+  else if (roiRaw <= -0.5) cls = 'color-dead'; 
   else cls = 'color-loss'; 
   
   return {roi, arrow: roi>=0 ? '▲' : '▼', sign: roi>=0 ? '+' : '', cls, diff};
@@ -429,6 +439,11 @@ function renderDashboard(){
   const elDiff = document.getElementById('totalDiff');
   elDiff.textContent = `${totalSign}$${(totalDiff/10000).toFixed(1)}萬`;
   elDiff.className = `data-val ${sTotal.cls}`;
+  
+  // 新增：顯示總報酬率 (Total ROI)
+  const elTotalROI = document.getElementById('totalROI');
+  elTotalROI.textContent = `${sTotal.arrow} ${sTotal.sign}${sTotal.roi}%`;
+  elTotalROI.className = `total-roi-display ${sTotal.cls}`;
 }
 
 function renderCards(){
@@ -503,16 +518,14 @@ function renderArena(){
         groupHtml += `
           <div class="g-bar-container">
             <div class="g-bar" onclick="toggleStrategy(this)">
-                <div class="g-left">
-                    <div class="g-code">${p.code}</div>
-                    <div class="g-deck-icons">${icons}</div>
-                </div>
+                <span class="g-code">${p.code}</span>
+                <span class="g-name-bar">${p.name}</span>
+                <div class="g-deck-icons">${icons}</div>
                 <div class="g-roi ${s.cls}">${s.sign}${s.roi}%</div>
             </div>
             
             <div class="g-details">
                 <div class="highlight-content">
-                    <div class="strat-name-detail">${p.name}</div>
                     <div class="ab-grid">
                         <div class="ab-box"><span class="ab-label">ALPHA</span><span class="ab-val alpha">${p.alpha}</span></div>
                         <div class="ab-box"><span class="ab-label">BETA</span><span class="ab-val beta">${p.beta}</span></div>
