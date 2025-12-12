@@ -37,10 +37,31 @@
     .section-title { font-size: 1.3rem; border-left: 5px solid var(--gold); padding-left: 15px; margin: 50px 0 25px; text-transform: uppercase; font-weight: 900; color: #fff; display: flex; align-items: center; letter-spacing: 2px; text-shadow: 0 0 10px rgba(0,0,0,0.5); }
     .section-title::after { content: ''; flex-grow: 1; height: 1px; background: #333; margin-left: 20px; }
 
-    /* DECK */
+    /* DECK (已修改為 8 欄佈局) */
     .deck-wrapper { overflow-x: auto; padding-bottom: 25px; padding-top: 10px; }
-    .deck-grid { display: grid; grid-template-columns: repeat(7, minmax(160px, 1fr)); gap: 20px; min-width: 1150px; }
-    .micro-card { background: var(--card); border: 2px solid #333; border-radius: 16px; padding: 15px; transition: all .3s cubic-bezier(0.25, 0.8, 0.25, 1); cursor: pointer; box-shadow: 0 10px 20px rgba(0,0,0,0.5); display: flex; flex-direction: column; min-height: 220px; position: relative; overflow: hidden; }
+    .deck-grid { 
+        display: grid; 
+        /* 修改點：改為 8 欄，縮小最小寬度至 110px */
+        grid-template-columns: repeat(8, minmax(110px, 1fr)); 
+        /* 修改點：間距縮小 */
+        gap: 10px; 
+        min-width: 1000px; 
+    }
+    .micro-card { 
+        background: var(--card); 
+        border: 2px solid #333; 
+        border-radius: 16px; 
+        /* 修改點：內距縮小 */
+        padding: 10px; 
+        transition: all .3s cubic-bezier(0.25, 0.8, 0.25, 1); 
+        cursor: pointer; 
+        box-shadow: 0 10px 20px rgba(0,0,0,0.5); 
+        display: flex; 
+        flex-direction: column; 
+        min-height: 200px; /* 稍微降低最小高度 */
+        position: relative; 
+        overflow: hidden; 
+    }
     .micro-card::after { content: ''; position: absolute; top: 6px; left: 6px; right: 6px; bottom: 6px; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; pointer-events: none; transition: all 0.3s; }
     .micro-card:hover { transform: translateY(-10px); z-index: 10; }
     
@@ -56,9 +77,9 @@
     .type-trap { border-color: var(--trap); box-shadow: 0 0 15px rgba(189,0,255,0.15), inset 0 0 20px rgba(189,0,255,0.05); } 
     .type-trap:hover { box-shadow: 0 0 25px rgba(189,0,255,0.4), inset 0 0 30px rgba(189,0,255,0.1); }
 
-    .mc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 0 5px; position: relative; z-index: 2; }
-    .mc-code { font-size: 0.9rem; font-weight: 900; color: #fff; opacity: 0.8; font-family: 'Arial Black'; }
-    .mc-target { font-size: 0.65rem; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 4px; color: #aaa; font-family: 'Courier New'; }
+    .mc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 0 5px; position: relative; z-index: 2; }
+    .mc-code { font-size: 0.8rem; font-weight: 900; color: #fff; opacity: 0.8; font-family: 'Arial Black'; } /* 縮小字體 */
+    .mc-target { font-size: 0.6rem; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); padding: 2px 4px; border-radius: 4px; color: #aaa; font-family: 'Courier New'; }
     .mc-image-container { flex-grow: 1; display: flex; align-items: center; justify-content: center; margin: 5px 0 15px; position: relative; z-index: 2; }
     
     /* ----------------------------------------------------- */
@@ -67,7 +88,7 @@
     
     /* 通用媒體樣式 (SVG 和 IMG 都適用) */
     .mc-media { 
-        width: 72px; height: 72px; 
+        width: 64px; height: 64px; /* 稍微縮小圖片以適應窄卡片 */
         object-fit: contain; /* 讓圖片保持比例 */
         transition: all .4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
     }
@@ -102,8 +123,8 @@
     /* ----------------------------------------------------- */
 
     .mc-footer { text-align: center; margin-top: auto; position: relative; z-index: 2; padding: 0 5px; }
-    .mc-name { font-size: 1.1rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; margin-bottom: 6px; text-shadow: 0 2px 10px rgba(0,0,0,1); }
-    .mc-cost-badge { display: inline-block; margin-top: 4px; padding: 4px 12px; border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; font-size: 0.8rem; color: #999; background: rgba(0,0,0,0.8); }
+    .mc-name { font-size: 0.9rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; margin-bottom: 6px; text-shadow: 0 2px 10px rgba(0,0,0,1); } /* 縮小字體 */
+    .mc-cost-badge { display: inline-block; margin-top: 4px; padding: 4px 10px; border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; font-size: 0.75rem; color: #999; background: rgba(0,0,0,0.8); }
 
     /* ARENA */
     .arena-container { display: flex; flex-direction: column; gap: 30px; margin-top: 20px; width: 100%; }
@@ -191,7 +212,7 @@
     </div>
   </div>
 
-  <div class="section-title">I. 七大技能卡牌 (THE 7 SKILL CARDS)</div>
+  <div class="section-title">I. 八大技能卡牌 (THE 8 SKILL CARDS)</div>
   <div class="deck-wrapper"><div class="deck-grid" id="cardContainer"><div class="loading">CONNECTING TO DATABASE...</div></div></div>
 
   <div class="section-title">II. 投資競技場</div>
@@ -219,9 +240,10 @@
 </div>
 
 <script>
-// SVG 備用資源 (如果 Sheet 沒填網址就用這些)
+// SVG 備用資源 (C01 已修改為您的 GitHub 連結)
 const cardAssets = {
-    'C01': `<svg class="mc-media" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path d="M12 52c0 3.3 8 6 18 6s18-2.7 18-6v-8c0 3.3-8 6-18 6s-18-2.7-18-6v8z" fill="#ffd700" opacity="0.8"/><path d="M12 42c0 3.3 8 6 18 6s18-2.7 18-6v-8c0 3.3-8 6-18 6s-18-2.7-18-6v8z" fill="#ffd700" opacity="0.8"/><ellipse cx="30" cy="34" rx="18" ry="6" fill="#ffd700" stroke="#b39700" stroke-width="2"/><ellipse cx="30" cy="44" rx="18" ry="6" fill="none" stroke="#b39700" stroke-width="2"/><ellipse cx="30" cy="54" rx="18" ry="6" fill="none" stroke="#b39700" stroke-width="2"/><circle cx="48" cy="48" r="10" fill="#0000aa" stroke="#fff" stroke-width="2"/><path d="M48 40 L50 46 H56 L51 50 L53 56 L48 52 L43 56 L45 50 L40 46 H46 Z" fill="#fff"/><path d="M40 20 L58 8 L58 24 M58 8 L42 8" stroke="#ff2a2a" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 30 L25 18 L35 28 L50 16" stroke="#ff2a2a" stroke-width="3" fill="none" stroke-linecap="round"/></svg>`,
+    // 這裡我直接放入了您的 GitHub Pages 連結，確保預設就顯示正確圖片
+    'C01': `<img src="https://ubamboo-design.github.io/Mark-investment-dashboard/C01.png" class="mc-media" alt="TW DCA">`,
     'C02': `<svg class="mc-media" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path d="M45 5 Q55 -5 60 8 Q65 0 50 0" fill="#ff2a2a" opacity="0.6"/><path d="M50 10 L18 42 L22 46 L54 14 Z" fill="#444" stroke="currentColor" stroke-width="2"/><line x1="26" y1="34" x2="46" y2="14" stroke="currentColor" stroke-width="1"/><path d="M18 42 L14 46 L18 50 L22 46" fill="currentColor"/><path d="M14 46 L8 52" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><circle cx="6" cy="54" r="3" fill="currentColor"/><path d="M10 50 Q20 40 30 50 T50 50" stroke="#ffd700" stroke-width="2" fill="none" stroke-dasharray="2 2"/><circle cx="20" cy="55" r="2" fill="#ffd700"/><circle cx="35" cy="58" r="3" fill="#ffd700"/></svg>`,
     'C03': `<svg class="mc-media" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path d="M22 52 L24 60 H40 L42 52 H22 Z" fill="none" stroke="currentColor" stroke-width="2"/><rect x="20" y="48" width="24" height="4" rx="2" fill="currentColor"/><path d="M32 48 L32 20" stroke="currentColor" stroke-width="3"/><circle cx="32" cy="14" r="8" fill="#000" stroke="currentColor" stroke-width="2"/><text x="32" y="17" font-size="10" text-anchor="middle" fill="currentColor" font-weight="bold">$</text><path d="M32 36 Q12 30 12 18" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="12" cy="18" r="6" fill="#000" stroke="currentColor" stroke-width="2"/><text x="12" y="21" font-size="8" text-anchor="middle" fill="currentColor">$</text><path d="M32 28 Q52 22 52 10" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="52" cy="10" r="6" fill="#000" stroke="currentColor" stroke-width="2"/><text x="52" y="13" font-size="8" text-anchor="middle" fill="currentColor">$</text></svg>`,
     'C04': `<svg class="mc-media" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><line x1="14" y1="50" x2="50" y2="14" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><line x1="50" y1="50" x2="14" y2="14" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><path d="M14 14 L8 8 Q4 18 14 24 Z" fill="currentColor"/><path d="M14 14 L20 8 Q10 4 4 14 Z" fill="currentColor"/><path d="M50 14 L56 8 Q60 18 50 24 Z" fill="currentColor"/><path d="M50 14 L44 8 Q54 4 60 14 Z" fill="currentColor"/><path d="M32 22 L42 28 V38 L32 44 L22 38 V28 Z" fill="#000" stroke="currentColor" stroke-width="2"/><path d="M32 26 L34 31 H39 L35 34 L36 39 L32 36 L28 39 L29 34 L25 31 H30 Z" fill="currentColor"/></svg>`,
@@ -264,7 +286,7 @@ function parseSheetData(text){
           // 有網址 -> 使用圖片
           displayMedia = `<img src="${imgUrl}" class="mc-media" alt="${skillName}">`;
       } else {
-          // 沒網址 -> 使用預設 SVG
+          // 沒網址 -> 使用預設 SVG (如果 C01 在上面有被替換成 img，這裡就會用到)
           displayMedia = cardAssets[c[0]] || cardAssets['C01'];
       }
 
