@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PROJECT CAGE : 霓虹戰略版 (全寬戰區)</title>
+<title>PROJECT CAGE : 雲端圖庫版</title>
 <style>
     :root {
         --bg: #050505; --card: #0a0a0c; --bar: #1a1a1e; --text: #e0e0e0; --mute: #888;
@@ -33,7 +33,7 @@
     @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.6; } }
     @media(max-width: 768px) { .dash-grid { grid-template-columns: 1fr; } }
 
-    /* SECTION TITLE */
+    /* SECTIONS */
     .section-title { font-size: 1.3rem; border-left: 5px solid var(--gold); padding-left: 15px; margin: 50px 0 25px; text-transform: uppercase; font-weight: 900; color: #fff; display: flex; align-items: center; letter-spacing: 2px; text-shadow: 0 0 10px rgba(0,0,0,0.5); }
     .section-title::after { content: ''; flex-grow: 1; height: 1px; background: #333; margin-left: 20px; }
 
@@ -43,93 +43,104 @@
     .micro-card { background: var(--card); border: 2px solid #333; border-radius: 16px; padding: 15px; transition: all .3s cubic-bezier(0.25, 0.8, 0.25, 1); cursor: pointer; box-shadow: 0 10px 20px rgba(0,0,0,0.5); display: flex; flex-direction: column; min-height: 220px; position: relative; overflow: hidden; }
     .micro-card::after { content: ''; position: absolute; top: 6px; left: 6px; right: 6px; bottom: 6px; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; pointer-events: none; transition: all 0.3s; }
     .micro-card:hover { transform: translateY(-10px); z-index: 10; }
-    .type-tw { border-color: var(--tw); box-shadow: 0 0 15px rgba(255,42,42,0.15), inset 0 0 20px rgba(255,42,42,0.05); } .type-tw:hover { box-shadow: 0 0 25px rgba(255,42,42,0.4), inset 0 0 30px rgba(255,42,42,0.1); }
-    .type-us { border-color: var(--us); box-shadow: 0 0 15px rgba(0,210,255,0.15), inset 0 0 20px rgba(0,210,255,0.05); } .type-us:hover { box-shadow: 0 0 25px rgba(0,210,255,0.4), inset 0 0 30px rgba(0,210,255,0.1); }
-    .type-yield { border-color: var(--yield); box-shadow: 0 0 15px rgba(0,255,106,0.15), inset 0 0 20px rgba(0,255,106,0.05); } .type-yield:hover { box-shadow: 0 0 25px rgba(0,255,106,0.4), inset 0 0 30px rgba(0,255,106,0.1); }
-    .type-ber { border-color: var(--ber); box-shadow: 0 0 15px rgba(255,145,0,0.15), inset 0 0 20px rgba(255,145,0,0.05); } .type-ber:hover { box-shadow: 0 0 25px rgba(255,145,0,0.4), inset 0 0 30px rgba(255,145,0,0.1); }
-    .type-trap { border-color: var(--trap); box-shadow: 0 0 15px rgba(189,0,255,0.15), inset 0 0 20px rgba(189,0,255,0.05); } .type-trap:hover { box-shadow: 0 0 25px rgba(189,0,255,0.4), inset 0 0 30px rgba(189,0,255,0.1); }
+    
+    /* Card Border Colors */
+    .type-tw { border-color: var(--tw); box-shadow: 0 0 15px rgba(255,42,42,0.15), inset 0 0 20px rgba(255,42,42,0.05); } 
+    .type-tw:hover { box-shadow: 0 0 25px rgba(255,42,42,0.4), inset 0 0 30px rgba(255,42,42,0.1); }
+    .type-us { border-color: var(--us); box-shadow: 0 0 15px rgba(0,210,255,0.15), inset 0 0 20px rgba(0,210,255,0.05); } 
+    .type-us:hover { box-shadow: 0 0 25px rgba(0,210,255,0.4), inset 0 0 30px rgba(0,210,255,0.1); }
+    .type-yield { border-color: var(--yield); box-shadow: 0 0 15px rgba(0,255,106,0.15), inset 0 0 20px rgba(0,255,106,0.05); } 
+    .type-yield:hover { box-shadow: 0 0 25px rgba(0,255,106,0.4), inset 0 0 30px rgba(0,255,106,0.1); }
+    .type-ber { border-color: var(--ber); box-shadow: 0 0 15px rgba(255,145,0,0.15), inset 0 0 20px rgba(255,145,0,0.05); } 
+    .type-ber:hover { box-shadow: 0 0 25px rgba(255,145,0,0.4), inset 0 0 30px rgba(255,145,0,0.1); }
+    .type-trap { border-color: var(--trap); box-shadow: 0 0 15px rgba(189,0,255,0.15), inset 0 0 20px rgba(189,0,255,0.05); } 
+    .type-trap:hover { box-shadow: 0 0 25px rgba(189,0,255,0.4), inset 0 0 30px rgba(189,0,255,0.1); }
+
     .mc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 0 5px; position: relative; z-index: 2; }
     .mc-code { font-size: 0.9rem; font-weight: 900; color: #fff; opacity: 0.8; font-family: 'Arial Black'; }
     .mc-target { font-size: 0.65rem; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 4px; color: #aaa; font-family: 'Courier New'; }
     .mc-image-container { flex-grow: 1; display: flex; align-items: center; justify-content: center; margin: 5px 0 15px; position: relative; z-index: 2; }
-    .mc-image { width: 72px; height: 72px; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: all .4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-    .micro-card:hover .mc-image { transform: scale(1.1); filter: drop-shadow(0 0 12px currentColor); }
-    .type-tw .mc-image { stroke: var(--tw); filter: drop-shadow(0 0 5px var(--tw)); }
-    .type-us .mc-image { stroke: var(--us); filter: drop-shadow(0 0 5px var(--us)); }
-    .type-yield .mc-image { stroke: var(--yield); filter: drop-shadow(0 0 5px var(--yield)); }
-    .type-ber .mc-image { stroke: var(--ber); filter: drop-shadow(0 0 5px var(--ber)); }
-    .type-trap .mc-image { stroke: var(--trap); filter: drop-shadow(0 0 5px var(--trap)); }
+    
+    /* ----------------------------------------------------- */
+    /* 關鍵修改：支援圖片的霓虹發光與 SVG 的共存 */
+    /* ----------------------------------------------------- */
+    
+    /* 通用媒體樣式 (SVG 和 IMG 都適用) */
+    .mc-media { 
+        width: 72px; height: 72px; 
+        object-fit: contain; /* 讓圖片保持比例 */
+        transition: all .4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+    }
+    
+    .micro-card:hover .mc-media { transform: scale(1.15); }
+
+    /* SVG 專用：使用 stroke 發光 */
+    svg.mc-media { fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .type-tw svg.mc-media { stroke: var(--tw); filter: drop-shadow(0 0 5px var(--tw)); }
+    .type-us svg.mc-media { stroke: var(--us); filter: drop-shadow(0 0 5px var(--us)); }
+    .type-yield svg.mc-media { stroke: var(--yield); filter: drop-shadow(0 0 5px var(--yield)); }
+    .type-ber svg.mc-media { stroke: var(--ber); filter: drop-shadow(0 0 5px var(--ber)); }
+    .type-trap svg.mc-media { stroke: var(--trap); filter: drop-shadow(0 0 5px var(--trap)); }
+    .micro-card:hover svg.mc-media { filter: drop-shadow(0 0 12px currentColor); }
+
+    /* IMG 專用：使用 drop-shadow 發光 (針對 PNG 去背圖) */
+    img.mc-media { filter: drop-shadow(0 0 2px rgba(255,255,255,0.5)); }
+    /* 根據不同類別給予不同顏色的圖片光暈 */
+    .type-tw img.mc-media { filter: drop-shadow(0 0 5px var(--tw)); }
+    .type-us img.mc-media { filter: drop-shadow(0 0 5px var(--us)); }
+    .type-yield img.mc-media { filter: drop-shadow(0 0 5px var(--yield)); }
+    .type-ber img.mc-media { filter: drop-shadow(0 0 5px var(--ber)); }
+    .type-trap img.mc-media { filter: drop-shadow(0 0 5px var(--trap)); }
+    
+    /* 圖片 Hover 增強發光 */
+    .type-tw:hover img.mc-media { filter: drop-shadow(0 0 20px var(--tw)); }
+    .type-us:hover img.mc-media { filter: drop-shadow(0 0 20px var(--us)); }
+    .type-yield:hover img.mc-media { filter: drop-shadow(0 0 20px var(--yield)); }
+    .type-ber:hover img.mc-media { filter: drop-shadow(0 0 20px var(--ber)); }
+    .type-trap:hover img.mc-media { filter: drop-shadow(0 0 20px var(--trap)); }
+
+    /* ----------------------------------------------------- */
+
     .mc-footer { text-align: center; margin-top: auto; position: relative; z-index: 2; padding: 0 5px; }
     .mc-name { font-size: 1.1rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; margin-bottom: 6px; text-shadow: 0 2px 10px rgba(0,0,0,1); }
     .mc-cost-badge { display: inline-block; margin-top: 4px; padding: 4px 12px; border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; font-size: 0.8rem; color: #999; background: rgba(0,0,0,0.8); }
 
-    /* --- ARENA (Modified for Full Width) --- */
-    .arena-container { 
-        display: flex;       /* 改用 Flex */
-        flex-direction: column; /* 垂直排列 */
-        gap: 30px;           /* 增加分區間距 */
-        margin-top: 20px; 
-        width: 100%;
-    }
-    
-    .arena-group { 
-        background: rgba(255,255,255,0.02); 
-        border: 1px solid #222; 
-        border-radius: 12px; 
-        padding: 20px; 
-        width: 100%; /* 佔滿整行 */
-    }
-    
-    .group-header { 
-        text-align: left; /* 改為靠左對齊，更有章節感 */
-        padding-bottom: 15px; 
-        border-bottom: 1px solid #333; 
-        font-weight: 900; 
-        font-size: 1.2rem; 
-        color: #eee; 
-        letter-spacing: 3px; 
-        margin-bottom: 20px; 
-        color: var(--gold); 
-        text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
-        padding-left: 10px;
-    }
+    /* ARENA */
+    .arena-container { display: flex; flex-direction: column; gap: 30px; margin-top: 20px; width: 100%; }
+    .arena-group { background: rgba(255,255,255,0.02); border: 1px solid #222; border-radius: 12px; padding: 20px; width: 100%; }
+    .group-header { text-align: left; padding-bottom: 15px; border-bottom: 1px solid #333; font-weight: 900; font-size: 1.2rem; color: #eee; letter-spacing: 3px; margin-bottom: 20px; color: var(--gold); text-shadow: 0 0 10px rgba(255, 215, 0, 0.3); padding-left: 10px; }
 
     .g-bar-container { margin-bottom: 10px; width: 100%; }
-    
-    .g-bar { 
-        display: flex; 
-        align-items: center; 
-        background: var(--bar); 
-        padding: 20px 25px; /* 增加高度與內距 */
-        border-radius: 8px; 
-        border-left: 5px solid #555; /* 加粗左側指示線 */
-        cursor: pointer; 
-        transition: .2s; 
-        position: relative; 
-        border: 1px solid transparent; 
-        width: 100%; /* 確保橫跨 */
-    }
+    .g-bar { display: flex; align-items: center; background: var(--bar); padding: 20px 25px; border-radius: 8px; border-left: 5px solid #555; cursor: pointer; transition: .2s; position: relative; border: 1px solid transparent; width: 100%; }
     .g-bar:hover { background: #222; transform: translateX(5px); border-color: rgba(255,255,255,0.1); }
     .g-bar::after { content: '▼'; position: absolute; right: 25px; color: #555; font-size: 0.8rem; transition: .3s; }
     .g-bar.active::after { transform: rotate(180deg); color: var(--gold); }
     .g-bar.active { background: #25252a; border-color: rgba(255,215,0,0.2); border-left-color: var(--gold) !important; }
 
     .g-code { font-family: 'Courier New'; font-weight: 900; color: #fff; width: 60px; font-size: 1.2rem; opacity: 0.7; }
-    
     .g-info { flex-grow: 1; padding: 0 20px; display: flex; align-items: center; gap: 20px; }
-    .g-name { 
-        width: 200px; /* 加寬名稱區塊 */
-        flex: 0 0 200px; 
-        font-size: 1.2rem; font-weight: 700; color: #eee; 
-        text-transform: uppercase; white-space: nowrap; 
-        overflow: hidden; text-overflow: ellipsis; 
-    }
-    
+    .g-name { width: 200px; flex: 0 0 200px; font-size: 1.2rem; font-weight: 700; color: #eee; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .g-deck-icons { display: flex; align-items: center; gap: 10px; }
+    
+    /* MINI ICONS (SVG & IMG Support) */
     .g-mini-icon { width: 42px; height: 42px; display: inline-flex; align-items: center; justify-content: center; transition: .2s; }
     .g-mini-icon svg { width: 100%!important; height: 100%!important; stroke-width: 2.5!important; } 
-    .g-mini-icon.type-tw { color: var(--tw); } .g-mini-icon.type-us { color: var(--us); } .g-mini-icon.type-yield { color: var(--yield); } .g-mini-icon.type-ber { color: var(--ber); } .g-mini-icon.type-trap { color: var(--trap); }
-    .g-mini-icon:hover { transform: scale(1.3); filter: drop-shadow(0 0 8px currentColor); }
+    .g-mini-icon img { width: 100%!important; height: 100%!important; object-fit: contain; }
+    
+    /* Mini Icon Colors (SVG uses color, IMG uses filter) */
+    .g-mini-icon.type-tw { color: var(--tw); } .g-mini-icon.type-us { color: var(--us); } 
+    .g-mini-icon.type-yield { color: var(--yield); } .g-mini-icon.type-ber { color: var(--ber); } .g-mini-icon.type-trap { color: var(--trap); }
+    
+    /* Mini Icon Hover Effects */
+    .g-mini-icon:hover { transform: scale(1.3); }
+    .g-mini-icon:hover svg { filter: drop-shadow(0 0 8px currentColor); }
+    
+    /* Specific Image Glows for Mini Icons */
+    .g-mini-icon.type-tw img { filter: drop-shadow(0 0 3px var(--tw)); }
+    .g-mini-icon.type-us img { filter: drop-shadow(0 0 3px var(--us)); }
+    .g-mini-icon.type-yield img { filter: drop-shadow(0 0 3px var(--yield)); }
+    .g-mini-icon.type-ber img { filter: drop-shadow(0 0 3px var(--ber)); }
+    .g-mini-icon.type-trap img { filter: drop-shadow(0 0 3px var(--trap)); }
 
     .g-stats { text-align: right; min-width: 120px; }
     .g-roi { font-family: 'Courier New'; font-weight: 900; font-size: 1.2rem; display: block; }
@@ -208,29 +219,27 @@
 </div>
 
 <script>
-// 2025 終極擬真版 SVG (加入填色與細節，模仿 AI 圖質感)
+// SVG 備用資源 (如果 Sheet 沒填網址就用這些)
 const cardAssets = {
-    'C01': `<svg class="mc-image" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path d="M12 52c0 3.3 8 6 18 6s18-2.7 18-6v-8c0 3.3-8 6-18 6s-18-2.7-18-6v8z" fill="#ffd700" opacity="0.8"/><path d="M12 42c0 3.3 8 6 18 6s18-2.7 18-6v-8c0 3.3-8 6-18 6s-18-2.7-18-6v8z" fill="#ffd700" opacity="0.8"/><ellipse cx="30" cy="34" rx="18" ry="6" fill="#ffd700" stroke="#b39700" stroke-width="2"/><ellipse cx="30" cy="44" rx="18" ry="6" fill="none" stroke="#b39700" stroke-width="2"/><ellipse cx="30" cy="54" rx="18" ry="6" fill="none" stroke="#b39700" stroke-width="2"/><circle cx="48" cy="48" r="10" fill="#0000aa" stroke="#fff" stroke-width="2"/><path d="M48 40 L50 46 H56 L51 50 L53 56 L48 52 L43 56 L45 50 L40 46 H46 Z" fill="#fff"/><path d="M40 20 L58 8 L58 24 M58 8 L42 8" stroke="#ff2a2a" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 30 L25 18 L35 28 L50 16" stroke="#ff2a2a" stroke-width="3" fill="none" stroke-linecap="round"/></svg>`,
-    'C02': `<svg class="mc-image" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path d="M45 5 Q55 -5 60 8 Q65 0 50 0" fill="#ff2a2a" opacity="0.6"/><path d="M50 10 L18 42 L22 46 L54 14 Z" fill="#444" stroke="currentColor" stroke-width="2"/><line x1="26" y1="34" x2="46" y2="14" stroke="currentColor" stroke-width="1"/><path d="M18 42 L14 46 L18 50 L22 46" fill="currentColor"/><path d="M14 46 L8 52" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><circle cx="6" cy="54" r="3" fill="currentColor"/><path d="M10 50 Q20 40 30 50 T50 50" stroke="#ffd700" stroke-width="2" fill="none" stroke-dasharray="2 2"/><circle cx="20" cy="55" r="2" fill="#ffd700"/><circle cx="35" cy="58" r="3" fill="#ffd700"/></svg>`,
-    'C03': `<svg class="mc-image" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path d="M22 52 L24 60 H40 L42 52 H22 Z" fill="none" stroke="currentColor" stroke-width="2"/><rect x="20" y="48" width="24" height="4" rx="2" fill="currentColor"/><path d="M32 48 L32 20" stroke="currentColor" stroke-width="3"/><circle cx="32" cy="14" r="8" fill="#000" stroke="currentColor" stroke-width="2"/><text x="32" y="17" font-size="10" text-anchor="middle" fill="currentColor" font-weight="bold">$</text><path d="M32 36 Q12 30 12 18" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="12" cy="18" r="6" fill="#000" stroke="currentColor" stroke-width="2"/><text x="12" y="21" font-size="8" text-anchor="middle" fill="currentColor">$</text><path d="M32 28 Q52 22 52 10" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="52" cy="10" r="6" fill="#000" stroke="currentColor" stroke-width="2"/><text x="52" y="13" font-size="8" text-anchor="middle" fill="currentColor">$</text></svg>`,
-    'C04': `<svg class="mc-image" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><line x1="14" y1="50" x2="50" y2="14" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><line x1="50" y1="50" x2="14" y2="14" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><path d="M14 14 L8 8 Q4 18 14 24 Z" fill="currentColor"/><path d="M14 14 L20 8 Q10 4 4 14 Z" fill="currentColor"/><path d="M50 14 L56 8 Q60 18 50 24 Z" fill="currentColor"/><path d="M50 14 L44 8 Q54 4 60 14 Z" fill="currentColor"/><path d="M32 22 L42 28 V38 L32 44 L22 38 V28 Z" fill="#000" stroke="currentColor" stroke-width="2"/><path d="M32 26 L34 31 H39 L35 34 L36 39 L32 36 L28 39 L29 34 L25 31 H30 Z" fill="currentColor"/></svg>`,
-    'C05': `<svg class="mc-image" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><rect x="22" y="24" width="20" height="26" rx="4" fill="#000" stroke="currentColor" stroke-width="2"/><rect x="22" y="12" width="5" height="12" rx="2" fill="currentColor"/><rect x="29" y="8" width="6" height="16" rx="2" fill="currentColor"/><rect x="37" y="10" width="5" height="14" rx="2" fill="currentColor"/><circle cx="32" cy="36" r="6" fill="#000" stroke="currentColor" stroke-width="2"/><circle cx="32" cy="36" r="3" fill="currentColor"/><rect x="42" y="44" width="16" height="10" rx="2" fill="#000" stroke="#fff" stroke-width="1"/><path d="M42 44 H58 V49 H42 Z" fill="#002868"/><path d="M42 49 H58 V54 H42 Z" fill="#bf0a30"/></svg>`,
-    'C06': `<svg class="mc-image" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path d="M32 4 L56 14 V28 C56 46 32 60 32 60 C32 60 8 46 8 28 V14 L32 4 Z" fill="none" stroke="currentColor" stroke-width="4"/><path d="M32 8 L52 16 V28 C52 42 32 54 32 54 C32 54 12 42 12 28 V16 L32 8 Z" stroke="currentColor" stroke-width="1" opacity="0.5" fill="none"/><path d="M24 24 V36 C24 42 40 42 40 36 V24" stroke="currentColor" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M40 24 L35 29 M40 24 L45 29" stroke="currentColor" stroke-width="4" stroke-linecap="round" fill="none"/></svg>`,
-    'C07': `<svg class="mc-image" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path d="M32 6 C18 6 10 20 10 36 L16 54 H48 L54 36 C54 20 46 6 32 6 Z" stroke="currentColor" stroke-width="3" fill="none"/><path d="M22 36 C22 28 26 22 32 22 C38 22 42 28 42 36 L32 46 L22 36 Z" fill="currentColor" opacity="0.8"/><path d="M26 34 L30 36 M38 34 L34 36" stroke="#000" stroke-width="2"/><circle cx="48" cy="48" r="10" stroke="#fff" stroke-width="2" fill="#000"/><line x1="48" y1="42" x2="48" y2="54" stroke="#fff" stroke-width="2"/><line x1="42" y1="48" x2="54" y2="48" stroke="#fff" stroke-width="2"/></svg>`
+    'C01': `<svg class="mc-media" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path d="M12 52c0 3.3 8 6 18 6s18-2.7 18-6v-8c0 3.3-8 6-18 6s-18-2.7-18-6v8z" fill="#ffd700" opacity="0.8"/><path d="M12 42c0 3.3 8 6 18 6s18-2.7 18-6v-8c0 3.3-8 6-18 6s-18-2.7-18-6v8z" fill="#ffd700" opacity="0.8"/><ellipse cx="30" cy="34" rx="18" ry="6" fill="#ffd700" stroke="#b39700" stroke-width="2"/><ellipse cx="30" cy="44" rx="18" ry="6" fill="none" stroke="#b39700" stroke-width="2"/><ellipse cx="30" cy="54" rx="18" ry="6" fill="none" stroke="#b39700" stroke-width="2"/><circle cx="48" cy="48" r="10" fill="#0000aa" stroke="#fff" stroke-width="2"/><path d="M48 40 L50 46 H56 L51 50 L53 56 L48 52 L43 56 L45 50 L40 46 H46 Z" fill="#fff"/><path d="M40 20 L58 8 L58 24 M58 8 L42 8" stroke="#ff2a2a" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 30 L25 18 L35 28 L50 16" stroke="#ff2a2a" stroke-width="3" fill="none" stroke-linecap="round"/></svg>`,
+    'C02': `<svg class="mc-media" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path d="M45 5 Q55 -5 60 8 Q65 0 50 0" fill="#ff2a2a" opacity="0.6"/><path d="M50 10 L18 42 L22 46 L54 14 Z" fill="#444" stroke="currentColor" stroke-width="2"/><line x1="26" y1="34" x2="46" y2="14" stroke="currentColor" stroke-width="1"/><path d="M18 42 L14 46 L18 50 L22 46" fill="currentColor"/><path d="M14 46 L8 52" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><circle cx="6" cy="54" r="3" fill="currentColor"/><path d="M10 50 Q20 40 30 50 T50 50" stroke="#ffd700" stroke-width="2" fill="none" stroke-dasharray="2 2"/><circle cx="20" cy="55" r="2" fill="#ffd700"/><circle cx="35" cy="58" r="3" fill="#ffd700"/></svg>`,
+    'C03': `<svg class="mc-media" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path d="M22 52 L24 60 H40 L42 52 H22 Z" fill="none" stroke="currentColor" stroke-width="2"/><rect x="20" y="48" width="24" height="4" rx="2" fill="currentColor"/><path d="M32 48 L32 20" stroke="currentColor" stroke-width="3"/><circle cx="32" cy="14" r="8" fill="#000" stroke="currentColor" stroke-width="2"/><text x="32" y="17" font-size="10" text-anchor="middle" fill="currentColor" font-weight="bold">$</text><path d="M32 36 Q12 30 12 18" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="12" cy="18" r="6" fill="#000" stroke="currentColor" stroke-width="2"/><text x="12" y="21" font-size="8" text-anchor="middle" fill="currentColor">$</text><path d="M32 28 Q52 22 52 10" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="52" cy="10" r="6" fill="#000" stroke="currentColor" stroke-width="2"/><text x="52" y="13" font-size="8" text-anchor="middle" fill="currentColor">$</text></svg>`,
+    'C04': `<svg class="mc-media" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><line x1="14" y1="50" x2="50" y2="14" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><line x1="50" y1="50" x2="14" y2="14" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><path d="M14 14 L8 8 Q4 18 14 24 Z" fill="currentColor"/><path d="M14 14 L20 8 Q10 4 4 14 Z" fill="currentColor"/><path d="M50 14 L56 8 Q60 18 50 24 Z" fill="currentColor"/><path d="M50 14 L44 8 Q54 4 60 14 Z" fill="currentColor"/><path d="M32 22 L42 28 V38 L32 44 L22 38 V28 Z" fill="#000" stroke="currentColor" stroke-width="2"/><path d="M32 26 L34 31 H39 L35 34 L36 39 L32 36 L28 39 L29 34 L25 31 H30 Z" fill="currentColor"/></svg>`,
+    'C05': `<svg class="mc-media" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><rect x="22" y="24" width="20" height="26" rx="4" fill="#000" stroke="currentColor" stroke-width="2"/><rect x="22" y="12" width="5" height="12" rx="2" fill="currentColor"/><rect x="29" y="8" width="6" height="16" rx="2" fill="currentColor"/><rect x="37" y="10" width="5" height="14" rx="2" fill="currentColor"/><circle cx="32" cy="36" r="6" fill="#000" stroke="currentColor" stroke-width="2"/><circle cx="32" cy="36" r="3" fill="currentColor"/><rect x="42" y="44" width="16" height="10" rx="2" fill="#000" stroke="#fff" stroke-width="1"/><path d="M42 44 H58 V49 H42 Z" fill="#002868"/><path d="M42 49 H58 V54 H42 Z" fill="#bf0a30"/></svg>`,
+    'C06': `<svg class="mc-media" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path d="M32 4 L56 14 V28 C56 46 32 60 32 60 C32 60 8 46 8 28 V14 L32 4 Z" fill="none" stroke="currentColor" stroke-width="4"/><path d="M32 8 L52 16 V28 C52 42 32 54 32 54 C32 54 12 42 12 28 V16 L32 8 Z" stroke="currentColor" stroke-width="1" opacity="0.5" fill="none"/><path d="M24 24 V36 C24 42 40 42 40 36 V24" stroke="currentColor" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M40 24 L35 29 M40 24 L45 29" stroke="currentColor" stroke-width="4" stroke-linecap="round" fill="none"/></svg>`,
+    'C07': `<svg class="mc-media" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path d="M32 6 C18 6 10 20 10 36 L16 54 H48 L54 36 C54 20 46 6 32 6 Z" stroke="currentColor" stroke-width="3" fill="none"/><path d="M22 36 C22 28 26 22 32 22 C38 22 42 28 42 36 L32 46 L22 36 Z" fill="currentColor" opacity="0.8"/><path d="M26 34 L30 36 M38 34 L34 36" stroke="#000" stroke-width="2"/><circle cx="48" cy="48" r="10" stroke="#fff" stroke-width="2" fill="#000"/><line x1="48" y1="42" x2="48" y2="54" stroke="#fff" stroke-width="2"/><line x1="42" y1="48" x2="54" y2="48" stroke="#fff" stroke-width="2"/></svg>`
 };
 
-let cardsData = {}, portfolios = {}; // 使用物件來儲存分組
+let cardsData = {}, portfolios = {};
 
 fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vQuNQc8E7BlYLR5E6WlYHVQ3l_ki95CqcEcpS8sNQESRKcg5yECE-e2bgMvLGU-Vx5HFuWo5OS1GUIT/pub?output=tsv')
 .then(r=>r.text()).then(t=>{parseSheetData(t);renderAll()})
 .catch(e=>document.getElementById('cardContainer').innerHTML=`<p style="color:red">連線失敗: ${e}</p>`);
 
 function parseSheetData(text){
-  console.log("Raw Data Loaded");
   const rows = text.split('\n').map(r=>r.trim()).filter(r=>r);
-  
   let isStrategy = false;
-  let currentGroup = '未分類'; // 預設分組
+  let currentGroup = '未分類';
 
   for(let i=1; i<rows.length; i++){
     const c = rows[i].split('\t');
@@ -241,19 +250,31 @@ function parseSheetData(text){
     }
 
     if(!isStrategy && c[0]?.startsWith('C')){
-      // 處理卡牌
+      // 處理卡牌資料 (包含圖片欄位)
       let skillName = c[4]; 
       if(c[0] === 'C05') skillName = 'VT DCA';
       let costRaw = c[5] ? c[5].replace(/[NT$US,]/g, '') : '0';
       let currentRaw = c[6] ? c[6].replace(/[NT$US,]/g, '') : '0';
+      
+      // 檢查 J 欄 (Index 9) 是否有圖片網址
+      let imgUrl = c[9] ? c[9].trim() : '';
+      let displayMedia = '';
+
+      if (imgUrl.startsWith('http')) {
+          // 有網址 -> 使用圖片
+          displayMedia = `<img src="${imgUrl}" class="mc-media" alt="${skillName}">`;
+      } else {
+          // 沒網址 -> 使用預設 SVG
+          displayMedia = cardAssets[c[0]] || cardAssets['C01'];
+      }
 
       cardsData[c[0]] = {
           code: c[0], type: c[1], rpg: c[2], target: c[3], skill: skillName,
           cost: parseFloat(costRaw), current: parseFloat(currentRaw),
-          strategy: c[7], sop: c[8], svg: cardAssets[c[0]] || cardAssets['C01']
+          strategy: c[7], sop: c[8], 
+          media: displayMedia // 統一存成 media 屬性
       };
     } else if(isStrategy){
-      // 處理策略與動態分組
       if(c[0].startsWith('P')){
           if(!portfolios[currentGroup]) portfolios[currentGroup] = [];
           portfolios[currentGroup].push({
@@ -261,9 +282,7 @@ function parseSheetData(text){
               highlight: c[3], persona: c[4], conflict: c[5]
           });
       } else if (c[0] && c[0].trim() !== '') {
-          // 遇到新的非 P 開頭行，視為新分組標題
           currentGroup = c[0].trim();
-          console.log("發現新分組:", currentGroup);
       }
     }
   }
@@ -295,7 +314,7 @@ function renderCards(){
     let costDisplay = (c.cost / 10000).toFixed(0); 
     con.innerHTML+=`<div class="micro-card ${c.type}" onclick="openModal('${c.code}')">
       <div class="mc-header"><span class="mc-code">${c.code}</span><span class="mc-target">${c.target}</span></div>
-      <div class="mc-image-container">${c.svg}</div>
+      <div class="mc-image-container">${c.media}</div>
       <div class="mc-footer"><div class="mc-name">${c.skill}</div><div class="mc-cost-badge">$${costDisplay}萬</div></div>
     </div>`;
   });
@@ -305,7 +324,6 @@ function renderArena(){
   const con=document.getElementById('arenaContainer');
   con.innerHTML = ''; 
 
-  // 動態渲染分組
   Object.keys(portfolios).forEach(groupName => {
       let groupHtml = `<div class="arena-group"><div class="group-header">${groupName}</div>`;
       
@@ -313,7 +331,8 @@ function renderArena(){
         let tc=0, ta=0;
         const icons=p.deck.map(code=>{
           const c=cardsData[code];
-          return c ? `<span class="g-mini-icon ${c.type}">${c.svg}</span>` : '';
+          // 這裡會自動判斷是 SVG 還是 IMG，並縮小顯示
+          return c ? `<span class="g-mini-icon ${c.type}">${c.media.replace('mc-media', '')}</span>` : '';
         }).join('');
         
         p.deck.forEach(d=>cardsData[d] && (tc+=cardsData[d].cost, ta+=cardsData[d].current));
