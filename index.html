@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PROJECT CAGE : 戰區指揮版</title>
+<title>PROJECT CAGE : 戰區指揮版 (Admin Mode)</title>
 <style>
     :root {
         --bg: #050505; --card: #0a0a0c; --bar: #1a1a1e; --text: #e0e0e0; --mute: #888;
@@ -252,10 +252,16 @@
 </head>
 <body>
 <header>
+  <div style="position:absolute; top:10px; left:10px; opacity:0.5;">
+    <button onclick="window.runDailyCheck()" style="background:#333; color:#fff; border:1px solid #555; padding:5px; cursor:pointer;">
+        ⚙️ TEST RUN (TODAY)
+    </button>
+  </div>
+
   <img id="pageLogo" src="" alt="Logo">
   <div class="header-text">
       <h1>PROJECT CAGE</h1>
-      <div class="meta-info">v13.0 BETA • LINKED DB • 2025-2031</div>
+      <div class="meta-info">v13.1 LIVE • FIREBASE SYNC • 2025-2031</div>
   </div>
   <div class="player-btn-container">
     <button class="cmd-btn" onclick="openPlayerModal()">
@@ -385,7 +391,10 @@
 // 1. FIREBASE CONFIGURATION (已填入您的金鑰)
 // -----------------------------------------------------
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { 
+    getFirestore, collection, addDoc, serverTimestamp, 
+    query, where, getDocs, writeBatch, doc 
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBTGxO2JnZiKaXpJnzhJNQNF2sUNwfjGPk",
@@ -558,7 +567,6 @@ function renderCards(){
     } else {
         costDisplay = (c.cost / 10000).toFixed(0) + '萬';
     }
-    // Added onclick to global window
     const div = document.createElement('div');
     div.className = `micro-card ${c.type}`;
     div.onclick = () => window.openModal(c.code);
@@ -613,7 +621,6 @@ window.openModal = function(k){
   const color=getComputedStyle(document.documentElement).getPropertyValue(map[c.type]||'--gold').trim();
   document.getElementById('cardModal').querySelector('.modal-content').style.borderColor=color;
   
-  // Only show config button for C01 initially
   const btn = document.getElementById('configBtn');
   if(k === 'C01') {
       btn.style.display = 'block';
@@ -632,12 +639,12 @@ window.closeModal = function(){
 // --- NEW: SETUP MODAL LOGIC (C01) ---
 
 window.openSetupModalFromCard = function() {
-    window.closeModal(); // Close info modal
-    window.openSetupModal(); // Open config modal
+    window.closeModal(); 
+    window.openSetupModal(); 
 }
 
 window.openSetupModal = function() {
-    window.setupDates = []; // Reset dates
+    window.setupDates = []; 
     renderDateGrid();
     document.getElementById('setupAmount').value = 3000;
     window.calculateTotal();
@@ -651,7 +658,6 @@ window.closeSetupModal = function() {
     document.getElementById('setupModal').style.display='none';
 }
 
-// Generate Date Grid 1-31
 function renderDateGrid() {
     const grid = document.getElementById('dateGrid');
     grid.innerHTML = '';
@@ -668,11 +674,9 @@ function renderDateGrid() {
 window.toggleDate = function(day) {
     const idx = window.setupDates.indexOf(day);
     if(idx > -1) {
-        // Remove
         window.setupDates.splice(idx, 1);
         document.getElementById(`day-${day}`).classList.remove('selected');
     } else {
-        // Add (Limit 3)
         if(window.setupDates.length >= 3) {
             alert('系統限制: 每月最多只能設定 3 個扣款日');
             return;
@@ -687,7 +691,6 @@ window.calculateTotal = function() {
     const amt = parseInt(document.getElementById('setupAmount').value) || 0;
     const freq = window.setupDates.length;
     const total = amt * freq * 84; // 7 years = 84 months
-    
     document.getElementById('setupTotal').textContent = `$ ${total.toLocaleString()}`;
     document.getElementById('setupFormula').textContent = `公式: ${amt} x ${freq}次 x 84個月`;
 }
@@ -700,7 +703,6 @@ async function saveStrategyToDB() {
         alert("資料庫連線失敗，請檢查 Firebase 設定。");
         return;
     }
-
     const amt = parseInt(document.getElementById('setupAmount').value);
     if(!amt || amt <= 0) {
         alert("錯誤: 請輸入有效的扣款金額");
@@ -710,14 +712,13 @@ async function saveStrategyToDB() {
         alert("錯誤: 請至少選擇一個扣款日");
         return;
     }
-
     const btn = document.getElementById('confirmSetupBtn');
     btn.textContent = "UPLOADING...";
     btn.disabled = true;
 
     try {
         const payload = {
-            user_id: "commander_001", // 暫時寫死
+            user_id: "commander_001", 
             strategy_code: "C01",
             target_symbol: "006208",
             amount: amt,
@@ -728,10 +729,8 @@ async function saveStrategyToDB() {
             },
             created_at: serverTimestamp()
         };
-
         const docRef = await addDoc(collection(db, "strategies"), payload);
         console.log("Written ID: ", docRef.id);
-        
         alert(`策略部署成功！\n\nID: ${docRef.id}\n每月扣款日: ${window.setupDates.join(', ')} 號`);
         window.closeSetupModal();
 
@@ -744,6 +743,69 @@ async function saveStrategyToDB() {
     }
 }
 
+// -----------------------------------------------------
+// 7. ADMIN / SIMULATION ENGINE (NEWLY ADDED)
+// -----------------------------------------------------
+window.runDailyCheck = async function(simulationDate = new Date()) {
+    console.log("⚡ 系統啟動：開始執行每日檢查...");
+    const day = simulationDate.getDate(); // 取得今天是幾號
+    
+    // 1. 從資料庫撈出所有「活躍中 (active)」的 C01 策略
+    const q = query(
+        collection(db, "strategies"), 
+        where("strategy_code", "==", "C01"),
+        where("status", "==", "active")
+    );
+
+    try {
+        const querySnapshot = await getDocs(q);
+        
+        if (querySnapshot.empty) {
+            alert(`📅 模擬日期：${day} 號\n沒有找到活躍的 C01 策略。`);
+            return;
+        }
+
+        let executedCount = 0;
+        const batch = writeBatch(db); // 使用 Batch 一次寫入多筆
+
+        querySnapshot.forEach((docSnapshot) => {
+            const strategy = docSnapshot.data();
+            // 2. 核心邏輯：檢查「今天」是否在使用者設定的「扣款日」清單中
+            if (strategy.trigger_config && strategy.trigger_config.dates.includes(day)) {
+                console.log(`✅ 觸發策略 ID: ${docSnapshot.id}`);
+                
+                const logRef = doc(collection(db, "execution_logs"));
+                const mockPrice = 92.5; // 模擬股價
+                const shares = (strategy.amount / mockPrice).toFixed(2);
+
+                batch.set(logRef, {
+                    strategy_id: docSnapshot.id,
+                    user_id: strategy.user_id,
+                    strategy_code: "C01",
+                    symbol: strategy.target_symbol,
+                    action: "BUY",
+                    execution_date: simulationDate.toISOString().split('T')[0], 
+                    price: mockPrice,
+                    amount: strategy.amount,
+                    shares: parseFloat(shares),
+                    note: `系統自動扣款 (設定日: ${day}號)`
+                });
+                executedCount++;
+            }
+        });
+
+        if (executedCount > 0) {
+            await batch.commit();
+            alert(`🎉 執行報告\n\n模擬日期：${day} 號\n成功觸發：${executedCount} 筆交易\n\n請去 Firestore 查看 'execution_logs' 集合。`);
+        } else {
+            alert(`📅 模擬日期：${day} 號\n檢查完畢，今日(${day}號)沒有策略需要執行。`);
+        }
+
+    } catch (error) {
+        console.error("執行失敗:", error);
+        alert("系統錯誤: " + error.message);
+    }
+};
 
 // --- COMMANDER / PLAYER PROFILE LOGIC ---
 let currentLoadout = [];
@@ -829,13 +891,10 @@ window.savePlayerProfile = function() {
     localStorage.setItem('cage_loadout', JSON.stringify(currentLoadout));
 
     alert(`COMMANDER DATA SAVED\n配置已更新: ${currentLoadout.length} 張卡牌`);
-    
-    // 立即更新參賽者名單
     renderPlayerRoster();
     window.closePlayerModal();
 }
 
-// 渲染參賽者列表 (New Function)
 function renderPlayerRoster() {
     const rosterContainer = document.getElementById('playerRoster');
     const pName = localStorage.getItem('cage_pName') || defaultProfile.name;
@@ -851,7 +910,6 @@ function renderPlayerRoster() {
         loadout.forEach(code => {
             const card = window.cardsData[code];
             if(card) {
-                // 使用 sc-img 樣式來重用圖片
                 const imgTag = card.media.replace('class="mc-media"', ''); 
                 deckHTML += `<div class="mini-card-icon" title="${card.skill}">${imgTag}</div>`;
             }
