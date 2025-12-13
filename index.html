@@ -305,4 +305,575 @@
 </div>
 
 <div id="cardModal" class="modal-overlay" onclick="closeModal()">
-  <div class="modal-
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div><span class="m-code" id="mCode"></span><span class="m-skill" id="mSkill"></span></div>
+      <span class="close-btn" onclick="closeModal()">&times;</span>
+    </div>
+    <div class="m-row"><span class="m-label">初始資金 (CAPITAL)</span><div class="m-value highlight" id="mCost"></div></div>
+    <div class="m-row"><span class="m-label">戰略定位 (STRATEGY)</span><div class="m-value" id="mStrategy"></div></div>
+    <div class="m-row"><span class="m-label">嚴格執行 SOP</span><div class="m-value" id="mSop" style="padding:15px;background:rgba(0,0,0,0.3);border-left:3px solid #555;border-radius:6px"></div></div>
+    <button class="config-btn" id="configBtn" onclick="openSetupModalFromCard()">INITIATE CONFIG // 啟動配置</button>
+  </div>
+</div>
+
+<div id="setupModal" class="modal-overlay" onclick="closeSetupModal()">
+    <div class="modal-content" onclick="event.stopPropagation()" style="border-color: var(--tw);">
+      <div class="modal-header">
+        <div><span class="m-code" style="color:var(--tw)">C01 CONFIG</span><span class="m-skill">定期定額設定</span></div>
+        <span class="close-btn" onclick="closeSetupModal()">&times;</span>
+      </div>
+      
+      <div class="form-group">
+          <label class="form-label">每次扣款金額 (AMOUNT)</label>
+          <input type="number" class="cyber-input" id="setupAmount" value="3000" oninput="calculateTotal()">
+      </div>
+
+      <div class="form-group">
+          <label class="form-label">每月扣款日 (DATE SELECTOR - MAX 3)</label>
+          <div class="date-grid" id="dateGrid">
+              </div>
+      </div>
+
+      <div class="setup-info-box">
+          <span class="si-label">PROJECTED CAPITAL (7 YEARS)</span>
+          <div class="si-val" id="setupTotal">$ 0</div>
+          <div class="si-sub" id="setupFormula">公式: 金額 x 次數 x 84</div>
+      </div>
+
+      <button class="save-btn" id="confirmSetupBtn">CONFIRM & DEPLOY</button>
+    </div>
+</div>
+
+<div id="playerModal" class="modal-overlay" onclick="closePlayerModal()">
+    <div class="modal-content" onclick="event.stopPropagation()" style="border-color: var(--us);">
+      <div class="modal-header">
+        <div><span class="m-code" style="color:var(--us)">PROFILE</span><span class="m-skill">指揮官資料</span></div>
+        <span class="close-btn" onclick="closePlayerModal()">&times;</span>
+      </div>
+      
+      <div class="form-group">
+          <label class="form-label">代號 (NAME)</label>
+          <input type="text" class="cyber-input" id="pName" placeholder="輸入玩家名稱...">
+      </div>
+  
+      <div class="form-group">
+          <label class="form-label">核心理念 (BIO)</label>
+          <textarea class="cyber-input" id="pBio" placeholder="輸入自我介紹或投資哲學..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <div class="loadout-header">
+            <label class="form-label">戰術配置 (LOADOUT)</label>
+            <span class="loadout-count" id="loadoutCounter">0 / 3</span>
+        </div>
+        <div class="loadout-grid" id="loadoutSelector">
+            </div>
+      </div>
+  
+      <div class="form-group">
+          <label class="form-label">交戰守則 (SOP)</label>
+          <textarea class="cyber-input" id="pRules" style="min-height:120px" placeholder="輸入進出規則..."></textarea>
+      </div>
+  
+      <button class="save-btn" onclick="savePlayerProfile()">SAVE DATA</button>
+    </div>
+</div>
+
+<script type="module">
+// -----------------------------------------------------
+// 1. FIREBASE CONFIGURATION (已填入您的金鑰)
+// -----------------------------------------------------
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBTGxO2JnZiKaXpJnzhJNQNF2sUNwfjGPk",
+  authDomain: "project-cage-980ed.firebaseapp.com",
+  projectId: "project-cage-980ed",
+  storageBucket: "project-cage-980ed.firebasestorage.app",
+  messagingSenderId: "1084859704396",
+  appId: "1:1084859704396:web:84bed3888c2f04952a80e9"
+};
+
+let db;
+try {
+    const app = initializeApp(firebaseConfig);
+    db = getFirestore(app);
+    console.log("Firebase initialized");
+} catch(e) {
+    console.warn("Firebase Config missing or invalid. DB features will be disabled.");
+}
+
+// -----------------------------------------------------
+// 2. GLOBAL VARIABLES
+// -----------------------------------------------------
+window.currentRate = 31.29; 
+window.cardsData = {};
+window.eventsData = [];
+window.logoUrl = ''; 
+window.currentCardCode = null; // Currently viewing card
+window.setupDates = []; // For C01 Setup
+
+// Define categories
+window.usdCodes = ['C05', 'C06'];
+window.twdCodes = ['C01', 'C02-1', 'C02-2', 'C03', 'C04', 'C07'];
+
+// Assets
+const cardAssets = {
+    'C01': `<img src="https://ubamboo-design.github.io/Mark-investment-dashboard/C01.png" class="mc-media" alt="TW DCA">`,
+    'C02': `<img src="https://ubamboo-design.github.io/Mark-investment-dashboard/C02.png" class="mc-media" alt="TW LSI">`,
+    'C03': `<img src="https://ubamboo-design.github.io/Mark-investment-dashboard/C03.png" class="mc-media" alt="YIELD">`,
+    'C04': `<img src="https://ubamboo-design.github.io/Mark-investment-dashboard/C04.png" class="mc-media" alt="SEALED">`,
+    'C05': `<img src="https://ubamboo-design.github.io/Mark-investment-dashboard/C05.png" class="mc-media" alt="GLOBAL DCA">`,
+    'C06': `<img src="https://ubamboo-design.github.io/Mark-investment-dashboard/C06.png" class="mc-media" alt="US DCA">`,
+    'C07': `<img src="https://ubamboo-design.github.io/Mark-investment-dashboard/C07.png" class="mc-media" alt="AMBUSH">`
+};
+
+// -----------------------------------------------------
+// 3. INITIALIZATION
+// -----------------------------------------------------
+init();
+
+async function init() {
+    try {
+        const rateRes = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+        const rateData = await rateRes.json();
+        if(rateData && rateData.rates && rateData.rates.TWD) {
+            window.currentRate = rateData.rates.TWD; 
+            document.getElementById('rateInfo').textContent = `USD/TWD: ${window.currentRate}`;
+        }
+    } catch (e) {
+        console.warn('Rate Fetch Error');
+        document.getElementById('rateInfo').textContent = `USD/TWD: ${window.currentRate} (Offline)`;
+    }
+
+    loadManualData();
+    renderAll();
+    
+    // Attach event listener for setup confirm
+    document.getElementById('confirmSetupBtn').addEventListener('click', saveStrategyToDB);
+}
+
+function loadManualData() {
+    window.cardsData['C01'] = { code:'C01', type:'type-tw', rpg:'平庸的定期定額', skill:'TW DCA', cost:2520000, current:2595945, strategy:'006208', sop:'每月5號扣款，不看盤', media: cardAssets['C01'] };
+    window.cardsData['C02-1'] = { code:'C02-1', type:'type-tw', rpg:'原型才是最強的', skill:'TW LSI', cost:500000, current:500000, strategy:'006208', sop:'有閒錢就投入', media: cardAssets['C02'] };
+    window.cardsData['C02-2'] = { code:'C02-2', type:'type-tw', rpg:'獎金給我她奶奶的all in', skill:'TW LSI', cost:1750000, current:1750000, strategy:'006208', sop:'收到獎金當日掛市價單', media: cardAssets['C02'] };
+    window.cardsData['C03'] = { code:'C03', type:'type-yield', rpg:'股息cover每一天', skill:'YIELD', cost:840000, current:840636, strategy:'00878', sop:'股息再投入', media: cardAssets['C03'] };
+    window.cardsData['C04'] = { code:'C04', type:'type-ber', rpg:'問就是正2', skill:'SEALED', cost:500000, current:50000, strategy:'00631L', sop:'波段操作', media: cardAssets['C04'] };
+    window.cardsData['C05'] = { code:'C05', type:'type-us', rpg:'要買就買全世界', skill:'GLOBAL DCA', cost:50000, current:50000, strategy:'VT', sop:'分散全球', media: cardAssets['C05'] };
+    window.cardsData['C06'] = { code:'C06', type:'type-us', rpg:'美國就是我爸爸', skill:'US DCA', cost:50000, current:50000, strategy:'VOO', sop:'相信美國國運', media: cardAssets['C06'] };
+    window.cardsData['C07'] = { code:'C07', type:'type-trap', rpg:'可以進場了嗎?', skill:'AMBUSH', cost:900000, current:900000, strategy:'CASH/006208', sop:'等待崩盤', media: cardAssets['C07'] };
+
+    window.eventsData = [
+        { date:'2025.12.13', status:'System', content:'指揮官模組上線 (Commander Profile Live)', isUrgent: false },
+        { date:'2025.12.13', status:'DB Link', content:'Firebase Connected.', isUrgent: false }
+    ];
+}
+
+// -----------------------------------------------------
+// 4. RENDERING FUNCTIONS
+// -----------------------------------------------------
+function calc(cost, cur){
+  if(cost===0) return {roi:0, arrow:'-', cls:'', diff: 0, sign: ''};
+  const diff = cur - cost;
+  const roiRaw = ((diff)/cost);
+  const roi = (roiRaw*100).toFixed(1);
+  let cls = 'color-loss'; 
+  if (roiRaw >= 0.5) cls = 'color-gold'; 
+  else if (roiRaw >= 0) cls = 'color-profit'; 
+  else if (roiRaw <= -0.5) cls = 'color-dead'; 
+  else cls = 'color-loss'; 
+  return {roi, arrow: roi>=0 ? '▲' : '▼', sign: roi>=0 ? '+' : '', cls, diff};
+}
+
+function renderAll(){ 
+    renderHeader();
+    renderDashboard(); 
+    renderCards(); 
+    renderEvents(); 
+    renderPlayerRoster();
+}
+
+function renderHeader() {
+    const logoImg = document.getElementById('pageLogo');
+    if (window.logoUrl && window.logoUrl.startsWith('http')) {
+        logoImg.src = window.logoUrl;
+        logoImg.style.display = 'block';
+    }
+}
+
+function renderDashboard(){
+  let tcTW=0, taTW=0, tcUS=0, taUS=0;
+  Object.values(window.cardsData).forEach(c => { 
+      if (window.usdCodes.includes(c.code)) { 
+          tcUS += c.cost; taUS += c.current; 
+      } else {
+          tcTW += c.cost; taTW += c.current; 
+      }
+  });
+
+  const sTW = calc(tcTW, taTW);
+  document.getElementById('costTW').textContent = '$' + (tcTW/10000).toFixed(0) + '萬';
+  document.getElementById('assetTW').textContent = '$' + (taTW/10000).toFixed(0) + '萬';
+  const plTW_val = (sTW.diff/10000).toFixed(1);
+  document.getElementById('plTW_val').textContent = `${sTW.sign}$${plTW_val}萬`;
+  document.getElementById('plTW_val').className = `profit-main ${sTW.cls}`;
+  document.getElementById('plTW_pct').textContent = `${sTW.arrow} ${sTW.roi}%`;
+  document.getElementById('plTW_pct').className = `profit-sub ${sTW.cls}`;
+
+  const sUS = calc(tcUS, taUS);
+  document.getElementById('costUS').textContent = '$' + (tcUS).toLocaleString(); 
+  document.getElementById('assetUS').textContent = '$' + (taUS).toLocaleString();
+  const plUS_val = (sUS.diff).toLocaleString();
+  document.getElementById('plUS_val').textContent = `${sUS.sign}$${plUS_val}`;
+  document.getElementById('plUS_val').className = `profit-main ${sUS.cls}`;
+  document.getElementById('plUS_pct').textContent = `${sUS.arrow} ${sUS.roi}%`;
+  document.getElementById('plUS_pct').className = `profit-sub ${sUS.cls}`;
+
+  const totalAssetTWD = taTW + (taUS * window.currentRate);
+  const totalCostTWD = tcTW + (tcUS * window.currentRate); 
+  const sTotal = calc(totalCostTWD, totalAssetTWD);
+  const cur = document.getElementById('totalAsset'); 
+  cur.textContent = 'NT$ ' + (totalAssetTWD/10000).toFixed(0) + '萬';
+  cur.className = 'total-big-val ' + sTotal.cls;
+  document.getElementById('totalCostTWD').textContent = '$' + (totalCostTWD/10000).toFixed(0) + '萬';
+  const totalDiff = totalAssetTWD - totalCostTWD;
+  const totalSign = totalDiff >= 0 ? '+' : '';
+  const elDiff = document.getElementById('totalDiff');
+  elDiff.textContent = `${totalSign}$${(totalDiff/10000).toFixed(1)}萬`;
+  elDiff.className = `data-val ${sTotal.cls}`;
+   
+  const elTotalROI = document.getElementById('totalROI');
+  elTotalROI.textContent = `${sTotal.arrow} ${sTotal.sign}${sTotal.roi}%`;
+  elTotalROI.className = `total-roi-display ${sTotal.cls}`;
+}
+
+function renderCards(){
+  const con=document.getElementById('cardContainer'); con.innerHTML='';
+  Object.values(window.cardsData).forEach(c=>{
+    let costDisplay = '';
+    if(window.usdCodes.includes(c.code)) {
+        costDisplay = (c.cost).toLocaleString();
+    } else {
+        costDisplay = (c.cost / 10000).toFixed(0) + '萬';
+    }
+    // Added onclick to global window
+    const div = document.createElement('div');
+    div.className = `micro-card ${c.type}`;
+    div.onclick = () => window.openModal(c.code);
+    div.innerHTML = `
+      <div class="mc-header"><span class="mc-code">${c.code}</span><span class="mc-target">ACTIVE</span></div>
+      <div class="mc-image-container">${c.media}</div>
+      <div class="mc-footer">
+        <div class="mc-chn-name">${c.rpg || ''}</div>
+        <div class="mc-eng-name">${c.skill}</div>
+        <div class="mc-cost-badge">$${costDisplay}</div>
+      </div>`;
+    con.appendChild(div);
+  });
+}
+
+function renderEvents(){
+    const con = document.getElementById('eventContainer');
+    const validEvents = window.eventsData.slice(0, 2); 
+    if(validEvents.length === 0) {
+        con.innerHTML = '<div style="padding:15px;color:#666">NO EVENTS LOGGED.</div>';
+        return;
+    }
+    con.innerHTML = '';
+    validEvents.forEach(e => {
+        const urgentClass = e.isUrgent ? ' emergency' : '';
+        con.innerHTML += `
+        <div class="event-card${urgentClass}">
+            <div class="event-header">
+                <span class="event-date">${e.date}</span>
+                <span class="event-status">${e.status}</span>
+            </div>
+            <div class="event-content">${e.content}</div>
+        </div>`;
+    });
+}
+
+// -----------------------------------------------------
+// 5. MODAL LOGIC (VIEW & SETUP)
+// -----------------------------------------------------
+window.openModal = function(k){
+  window.currentCardCode = k;
+  const c=window.cardsData[k];
+  document.getElementById('mCode').textContent=c.code;
+  document.getElementById('mSkill').textContent=c.skill;
+  let moneyPrefix = 'NT$ ';
+  if(window.usdCodes.includes(c.code)) moneyPrefix = 'US$ ';
+  document.getElementById('mCost').textContent=`${moneyPrefix}${c.cost.toLocaleString()}`;
+  document.getElementById('mStrategy').textContent=c.rpg; 
+  document.getElementById('mSop').textContent=c.sop || c.strategy;
+  
+  const map={'type-tw':'--tw','type-us':'--us','type-yield':'--yield','type-ber':'--ber','type-trap':'--trap'};
+  const color=getComputedStyle(document.documentElement).getPropertyValue(map[c.type]||'--gold').trim();
+  document.getElementById('cardModal').querySelector('.modal-content').style.borderColor=color;
+  
+  // Only show config button for C01 initially
+  const btn = document.getElementById('configBtn');
+  if(k === 'C01') {
+      btn.style.display = 'block';
+  } else {
+      btn.style.display = 'none';
+  }
+
+  document.getElementById('cardModal').style.display='flex';
+  document.getElementById('cardModal').classList.add('modal-active');
+}
+
+window.closeModal = function(){
+    document.getElementById('cardModal').style.display='none';
+}
+
+// --- NEW: SETUP MODAL LOGIC (C01) ---
+
+window.openSetupModalFromCard = function() {
+    window.closeModal(); // Close info modal
+    window.openSetupModal(); // Open config modal
+}
+
+window.openSetupModal = function() {
+    window.setupDates = []; // Reset dates
+    renderDateGrid();
+    document.getElementById('setupAmount').value = 3000;
+    window.calculateTotal();
+    
+    const modal = document.getElementById('setupModal');
+    modal.style.display = 'flex';
+    modal.classList.add('modal-active');
+}
+
+window.closeSetupModal = function() {
+    document.getElementById('setupModal').style.display='none';
+}
+
+// Generate Date Grid 1-31
+function renderDateGrid() {
+    const grid = document.getElementById('dateGrid');
+    grid.innerHTML = '';
+    for(let i=1; i<=31; i++) {
+        const div = document.createElement('div');
+        div.className = 'date-cell';
+        div.id = `day-${i}`;
+        div.textContent = i;
+        div.onclick = () => window.toggleDate(i);
+        grid.appendChild(div);
+    }
+}
+
+window.toggleDate = function(day) {
+    const idx = window.setupDates.indexOf(day);
+    if(idx > -1) {
+        // Remove
+        window.setupDates.splice(idx, 1);
+        document.getElementById(`day-${day}`).classList.remove('selected');
+    } else {
+        // Add (Limit 3)
+        if(window.setupDates.length >= 3) {
+            alert('系統限制: 每月最多只能設定 3 個扣款日');
+            return;
+        }
+        window.setupDates.push(day);
+        document.getElementById(`day-${day}`).classList.add('selected');
+    }
+    window.calculateTotal();
+}
+
+window.calculateTotal = function() {
+    const amt = parseInt(document.getElementById('setupAmount').value) || 0;
+    const freq = window.setupDates.length;
+    const total = amt * freq * 84; // 7 years = 84 months
+    
+    document.getElementById('setupTotal').textContent = `$ ${total.toLocaleString()}`;
+    document.getElementById('setupFormula').textContent = `公式: ${amt} x ${freq}次 x 84個月`;
+}
+
+// -----------------------------------------------------
+// 6. SAVE TO DB (CORE FUNCTION)
+// -----------------------------------------------------
+async function saveStrategyToDB() {
+    if(!db) {
+        alert("資料庫連線失敗，請檢查 Firebase 設定。");
+        return;
+    }
+
+    const amt = parseInt(document.getElementById('setupAmount').value);
+    if(!amt || amt <= 0) {
+        alert("錯誤: 請輸入有效的扣款金額");
+        return;
+    }
+    if(window.setupDates.length === 0) {
+        alert("錯誤: 請至少選擇一個扣款日");
+        return;
+    }
+
+    const btn = document.getElementById('confirmSetupBtn');
+    btn.textContent = "UPLOADING...";
+    btn.disabled = true;
+
+    try {
+        const payload = {
+            user_id: "commander_001", // 暫時寫死
+            strategy_code: "C01",
+            target_symbol: "006208",
+            amount: amt,
+            status: "active",
+            trigger_config: {
+                type: "fixed_date",
+                dates: window.setupDates.sort((a,b)=>a-b)
+            },
+            created_at: serverTimestamp()
+        };
+
+        const docRef = await addDoc(collection(db, "strategies"), payload);
+        console.log("Written ID: ", docRef.id);
+        
+        alert(`策略部署成功！\n\nID: ${docRef.id}\n每月扣款日: ${window.setupDates.join(', ')} 號`);
+        window.closeSetupModal();
+
+    } catch(e) {
+        console.error("Write Error: ", e);
+        alert("寫入失敗: " + e.message + "\n(請確認 Firestore 是否已開啟測試模式 Test Mode)");
+    } finally {
+        btn.textContent = "CONFIRM & DEPLOY";
+        btn.disabled = false;
+    }
+}
+
+
+// --- COMMANDER / PLAYER PROFILE LOGIC ---
+let currentLoadout = [];
+const MAX_LOADOUT = 3;
+const defaultProfile = {
+    name: "UBAMBOO",
+    bio: "長期主義者，專注於資產配置與自動化投資。",
+    rules: "1. 絕不賣出 (除非緊急需求)\n2. 每月定期定額\n3. 暴跌時加碼"
+};
+
+function renderLoadoutGrid() {
+    const container = document.getElementById('loadoutSelector');
+    container.innerHTML = '';
+    Object.values(window.cardsData).forEach(c => {
+        const div = document.createElement('div');
+        div.className = 'select-card';
+        div.id = `sel-${c.code}`;
+        div.onclick = () => toggleLoadout(c.code);
+        div.innerHTML = `
+            ${c.media.replace('class="mc-media"', 'class="sc-img"')}
+            <span class="sc-code">${c.code}</span>
+        `;
+        container.appendChild(div);
+    });
+}
+
+function toggleLoadout(code) {
+    const idx = currentLoadout.indexOf(code);
+    if (idx > -1) {
+        currentLoadout.splice(idx, 1);
+    } else {
+        if (currentLoadout.length >= MAX_LOADOUT) {
+            alert("系統警告: 裝備槽已滿 (MAX 3 SLOTS)");
+            return;
+        }
+        currentLoadout.push(code);
+    }
+    updateLoadoutVisuals();
+}
+
+function updateLoadoutVisuals() {
+    document.querySelectorAll('.select-card').forEach(el => el.classList.remove('active'));
+    currentLoadout.forEach(code => {
+        const el = document.getElementById(`sel-${code}`);
+        if(el) el.classList.add('active');
+    });
+    const counter = document.getElementById('loadoutCounter');
+    counter.textContent = `${currentLoadout.length} / ${MAX_LOADOUT}`;
+    counter.style.color = currentLoadout.length === MAX_LOADOUT ? 'var(--gold)' : '#666';
+}
+
+window.openPlayerModal = function() {
+    document.getElementById('pName').value = localStorage.getItem('cage_pName') || defaultProfile.name;
+    document.getElementById('pBio').value = localStorage.getItem('cage_pBio') || defaultProfile.bio;
+    document.getElementById('pRules').value = localStorage.getItem('cage_pRules') || defaultProfile.rules;
+    
+    renderLoadoutGrid();
+    const savedLoadout = localStorage.getItem('cage_loadout');
+    if (savedLoadout) {
+        currentLoadout = JSON.parse(savedLoadout);
+    } else {
+        currentLoadout = [];
+    }
+    updateLoadoutVisuals();
+
+    const modal = document.getElementById('playerModal');
+    modal.style.display = 'flex';
+    modal.classList.add('modal-active');
+}
+
+window.closePlayerModal = function() {
+    document.getElementById('playerModal').style.display = 'none';
+}
+
+window.savePlayerProfile = function() {
+    const name = document.getElementById('pName').value;
+    const bio = document.getElementById('pBio').value;
+    const rules = document.getElementById('pRules').value;
+
+    localStorage.setItem('cage_pName', name);
+    localStorage.setItem('cage_pBio', bio);
+    localStorage.setItem('cage_pRules', rules);
+    localStorage.setItem('cage_loadout', JSON.stringify(currentLoadout));
+
+    alert(`COMMANDER DATA SAVED\n配置已更新: ${currentLoadout.length} 張卡牌`);
+    
+    // 立即更新參賽者名單
+    renderPlayerRoster();
+    window.closePlayerModal();
+}
+
+// 渲染參賽者列表 (New Function)
+function renderPlayerRoster() {
+    const rosterContainer = document.getElementById('playerRoster');
+    const pName = localStorage.getItem('cage_pName') || defaultProfile.name;
+    const pBio = localStorage.getItem('cage_pBio') || defaultProfile.bio;
+    const loadoutStr = localStorage.getItem('cage_loadout');
+    let loadout = [];
+    
+    if(loadoutStr) loadout = JSON.parse(loadoutStr);
+
+    let deckHTML = '';
+    if(loadout.length > 0) {
+        deckHTML = '<div class="mini-deck">';
+        loadout.forEach(code => {
+            const card = window.cardsData[code];
+            if(card) {
+                // 使用 sc-img 樣式來重用圖片
+                const imgTag = card.media.replace('class="mc-media"', ''); 
+                deckHTML += `<div class="mini-card-icon" title="${card.skill}">${imgTag}</div>`;
+            }
+        });
+        deckHTML += '</div>';
+    } else {
+        deckHTML = '<div class="mini-deck" style="color:#555;font-size:0.8rem">NO LOADOUT</div>';
+    }
+
+    rosterContainer.innerHTML = `
+        <div class="player-row active-user">
+            <div class="player-avatar">👾</div>
+            <div class="player-info">
+                <div class="pi-name">${pName}</div>
+                <div class="pi-bio">${pBio}</div>
+            </div>
+            ${deckHTML}
+        </div>
+    `;
+}
+
+document.addEventListener('keydown',e=>e.key==='Escape'&& (window.closeModal() || window.closePlayerModal() || window.closeSetupModal()));
+</script>
+</body>
+</html>
