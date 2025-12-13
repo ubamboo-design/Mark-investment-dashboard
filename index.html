@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PROJECT CAGE : 最終修正版</title>
+<title>PROJECT CAGE : LIVE</title>
 <style>
     :root {
         --bg: #050505; --card: #0a0a0c; --bar: #1a1a1e; --text: #e0e0e0; --mute: #888;
@@ -178,7 +178,7 @@
   <img id="pageLogo" src="" alt="Logo">
   <div class="header-text">
       <h1>PROJECT CAGE</h1>
-      <div class="meta-info">v12.55 LIVE • NT$ 1,000 萬 • 2025-2031</div>
+      <div class="meta-info">v12.57 LIVE • NT$ 1,000 萬 • 2025-2031</div>
   </div>
 </header>
 
@@ -245,14 +245,37 @@
 
 <script>
 // =========================================================
-//  CONFIG: 這裡填入你的 Google Sheet URL (TSV)
+//  ✅ 您的正確網址已填入 (YOUR SHEET URL)
 // =========================================================
 const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQuNQc8E7BlYLR5E6WlYHVQ3l_ki95CqcEcpS8sNQESRKcg5yECE-e2bgMvLGU-Vx5HFuWo5OS1GUIT/pub?output=tsv';
-// =========================================================
+
+// === 備份資料 (FALLBACK) ===
+const FALLBACK_DATA = `
+A (code)	B (type)	C (rpg)	D (target)	E (skill)	F (cost)	G (current)	H (strategy)	I (sop)	J (image)
+C01	type-tw	平庸的涼涼戰艦	006208	TW DCA	NT$ 2,520,000	2,595,945	無腦持續買進台股	每月5,15,25號扣款	
+C02	type-tw	驚奇隊長	006208	TW LSI	NT$ 1,750,000	1,750,000	All-in策略	跌破年線買進	
+C03	type-yield	股息cover每一天	00878	YIELD	NT$ 840,000	840,636	現金流心理帳戶	每個月5號扣款	
+C04	type-ber	開核避正2	00631L	SEALED	NT$ 500,000	500,000	波動避險	股災發生時啟用	
+C05	type-us	麥哲倫與全世界	VT	GLOBAL DCA	$50,000.00	50,000	分散全世界	每月5號買600美金	
+C06	type-us	美國制霸	VOO	US DCA	$60,000.00	50,000	抗通膨	每月5號買600美金	
+C07	type-trap	可以抄底了嗎?	CASH/006208	AMBUSH	NT$ 900,000	900,000	等待大崩盤	盤整時投入	
+C02-1	type-tw	履歷才是最強Asset	006208	TW LSI	NT$ 500,000	500,000	人力資本轉換	加薪投入	
+	
+代號	名稱	觀點	投資人	情緒	學理	
+P01	台股定期定額	C01	單純簡單	路人	無心流	市場報酬	
+P02	台股核心	C01+C02-1+C02-2	重倉最大	積極	自信	核心衛星	
+P03	最強的盾	C03	息收穩定	保守	安心	現金流折現	
+P04	無限抄底之術	C07	大跌才有	完美主義	猶豫	擇時交易	
+	
+事件簿			
+2025/12/12	緊急	戰情室啟動		
+2025/12/24	預料日曆	聖誕節休市		
+`.trim();
 
 let currentRate = 32.5;
 let cardsData = {}, portfolios = {}, eventsData = [];
 let logoUrl = ''; 
+let isFallback = false;
 
 // ================= PULL TO REFRESH =================
 let touchStart = 0;
@@ -296,6 +319,7 @@ init();
 
 async function init() {
     cardsData = {}; portfolios = {}; eventsData = [];
+    isFallback = false;
     const con = document.getElementById('cardContainer');
     
     // 1. 抓匯率
@@ -308,53 +332,56 @@ async function init() {
         }
     } catch (e) { console.warn('Rate Fetch Error'); }
 
-    // 2. 抓 Google Sheet (加入錯誤檢查)
+    // 2. 抓 Google Sheet (加入備份機制)
     try {
         const sheetRes = await fetch(GOOGLE_SHEET_URL);
         if (!sheetRes.ok) throw new Error(`HTTP ${sheetRes.status}`);
         const sheetText = await sheetRes.text();
         
-        // DEBUG: 如果抓不到資料，顯示前100字
-        if(sheetText.length < 50 || sheetText.includes('<!DOCTYPE html>')) {
-            throw new Error('資料格式錯誤 (可能是HTML而非TSV，請檢查發布設定)');
+        // 檢查是否為 HTML 錯誤頁面
+        if(sheetText.length < 50 || sheetText.trim().startsWith('<')) {
+            throw new Error('格式錯誤，啟動備份模式');
         }
 
         parseSheetData(sheetText);
         renderAll();
 
     } catch(e) {
-        con.innerHTML = `<div style="color:red;padding:20px;border:1px solid red">
-            <h3>連線失敗 (CONNECTION FAILED)</h3>
-            <p>${e.message}</p>
-            <p style="color:#888;font-size:0.8rem">請確認：<br>1. Google Sheet 已發布 (檔案 > 共用 > 發布到網路)<br>2. 格式選「定位字元分隔值 (.tsv)」<br>3. 網址正確無誤</p>
-        </div>`;
+        console.warn('Connection failed, loading fallback data...');
+        isFallback = true;
+        // 如果連線失敗，使用手動輸入的備份資料
+        parseSheetData(FALLBACK_DATA);
+        renderAll();
+        
+        // 提示使用者目前是離線/備份模式
+        const meta = document.querySelector('.meta-info');
+        if(!meta.innerHTML.includes('OFFLINE')) {
+             meta.innerHTML += ` <span style="color:var(--tw)">[OFFLINE MODE]</span>`;
+        }
+        document.getElementById('rateInfo').textContent += ` (Fallback)`;
     }
 }
 
 function parseSheetData(text){
   const rows = text.split('\n').map(r=>r.trim()); 
   let currentGroup = '未分類';
-  let mode = 'CARDS'; // 預設先抓卡片 (因為卡片在上面)
+  let mode = 'CARDS'; 
 
   for(let i=0; i<rows.length; i++){
     if(!rows[i]) continue;
-    const c = rows[i].split('\t'); // Tab 分隔
+    const c = rows[i].split('\t'); 
 
-    // 依照截圖邏輯切換模式
     if(c[0] === '代號' && c[1] === '名稱') { mode = 'STRATEGIES'; continue; }
     if(c[0] === '事件簿') { mode = 'EVENTS'; continue; }
 
-    // 1. 卡片模式 (Row starts with C...)
+    // 1. 卡片模式
     if(c[0].startsWith('C')) {
         let skillName = c[4]; if(c[0] === 'C05') skillName = 'VT DCA';
-        // 強力清洗金額格式 (去掉 NT$, US$, 空格, 逗號)
         let costRaw = c[5] ? c[5].replace(/[NT$US,\s]/g, '') : '0';
         let currentRaw = c[6] ? c[6].replace(/[NT$US,\s]/g, '') : '0';
         
-        // 抓 Logo (Row 34左右)
         if (c[0] === 'logo' && c[1]) logoUrl = c[1];
 
-        // 圖片連結在 J欄 (Index 9)
         let imgUrl = c[9] ? c[9].trim() : '';
         let displayMedia = imgUrl.startsWith('http') 
             ? `<img src="${imgUrl}" class="mc-media" alt="${skillName}">` 
@@ -366,10 +393,9 @@ function parseSheetData(text){
             strategy: c[7], sop: c[8], media: displayMedia
         };
     } 
-    // 2. 策略模式 (Row starts with P...)
+    // 2. 策略模式
     else if(c[0].startsWith('P')){
           if(!portfolios[currentGroup]) portfolios[currentGroup] = [];
-          // 修正欄位對應: 代號(0), 名稱(1), 組合(2), 觀點(3), 人格(4), 衝突(5), 學理(6)
           portfolios[currentGroup].push({
               code: c[0], name: c[1], 
               deck: c[2] ? c[2].split('+').map(s=>s.trim()) : [],
@@ -381,10 +407,9 @@ function parseSheetData(text){
           });
     }
     else if (mode === 'STRATEGIES' && c[0] && !c[0].startsWith('P') && c[0] !== '代號') {
-        // 這行可能是群組名稱 (例如 "小散戶主打交響")
         if(c[0].length > 0) currentGroup = c[0].trim();
     }
-    // 3. 事件模式 (Row starts with date like 2025...)
+    // 3. 事件模式
     else if(mode === 'EVENTS' && c[0] && c[0].match(/^\d/)) {
         eventsData.push({ 
             date: c[0], 
@@ -478,7 +503,7 @@ function renderDashboard(){
 function renderCards(){
   const con=document.getElementById('cardContainer'); con.innerHTML='';
   if(Object.keys(cardsData).length === 0) {
-      con.innerHTML = '<div style="color:white;padding:20px;">NO DATA FOUND (請檢查C01~C07代號)</div>';
+      con.innerHTML = '<div style="color:white;padding:20px;">NO DATA FOUND</div>';
       return;
   }
   Object.values(cardsData).forEach(c=>{
