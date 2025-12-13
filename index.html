@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PROJECT CAGE : 深度解析版</title>
+<title>PROJECT CAGE : 最終修正版</title>
 <style>
     :root {
         --bg: #050505; --card: #0a0a0c; --bar: #1a1a1e; --text: #e0e0e0; --mute: #888;
@@ -178,7 +178,7 @@
   <img id="pageLogo" src="" alt="Logo">
   <div class="header-text">
       <h1>PROJECT CAGE</h1>
-      <div class="meta-info">v12.53 LIVE • NT$ 1,000 萬 • 2025-2031</div>
+      <div class="meta-info">v12.55 LIVE • NT$ 1,000 萬 • 2025-2031</div>
   </div>
 </header>
 
@@ -244,6 +244,12 @@
 </div>
 
 <script>
+// =========================================================
+//  CONFIG: 這裡填入你的 Google Sheet URL (TSV)
+// =========================================================
+const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQuNQc8E7BlYLR5E6WlYHVQ3l_ki95CqcEcpS8sNQESRKcg5yECE-e2bgMvLGU-Vx5HFuWo5OS1GUIT/pub?output=tsv';
+// =========================================================
+
 let currentRate = 32.5;
 let cardsData = {}, portfolios = {}, eventsData = [];
 let logoUrl = ''; 
@@ -289,11 +295,10 @@ const cardAssets = {
 init();
 
 async function init() {
-    // RESET DATA TO FIX DUPLICATION ON REFRESH
-    cardsData = {};
-    portfolios = {};
-    eventsData = [];
+    cardsData = {}; portfolios = {}; eventsData = [];
+    const con = document.getElementById('cardContainer');
     
+    // 1. 抓匯率
     try {
         const rateRes = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
         const rateData = await rateRes.json();
@@ -301,77 +306,92 @@ async function init() {
             currentRate = rateData.rates.TWD;
             document.getElementById('rateInfo').textContent = `USD/TWD: ${currentRate}`;
         }
-    } catch (e) {
-        console.warn('Rate Fetch Error');
-        document.getElementById('rateInfo').textContent = `USD/TWD: ${currentRate} (Offline)`;
-    }
+    } catch (e) { console.warn('Rate Fetch Error'); }
+
+    // 2. 抓 Google Sheet (加入錯誤檢查)
     try {
-        const sheetRes = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vQuNQc8E7BlYLR5E6WlYHVQ3l_ki95CqcEcpS8sNQESRKcg5yECE-e2bgMvLGU-Vx5HFuWo5OS1GUIT/pub?output=tsv');
+        const sheetRes = await fetch(GOOGLE_SHEET_URL);
+        if (!sheetRes.ok) throw new Error(`HTTP ${sheetRes.status}`);
         const sheetText = await sheetRes.text();
+        
+        // DEBUG: 如果抓不到資料，顯示前100字
+        if(sheetText.length < 50 || sheetText.includes('<!DOCTYPE html>')) {
+            throw new Error('資料格式錯誤 (可能是HTML而非TSV，請檢查發布設定)');
+        }
+
         parseSheetData(sheetText);
         renderAll();
+
     } catch(e) {
-        document.getElementById('cardContainer').innerHTML=`<p style="color:red">連線失敗: ${e}</p>`;
+        con.innerHTML = `<div style="color:red;padding:20px;border:1px solid red">
+            <h3>連線失敗 (CONNECTION FAILED)</h3>
+            <p>${e.message}</p>
+            <p style="color:#888;font-size:0.8rem">請確認：<br>1. Google Sheet 已發布 (檔案 > 共用 > 發布到網路)<br>2. 格式選「定位字元分隔值 (.tsv)」<br>3. 網址正確無誤</p>
+        </div>`;
     }
 }
 
 function parseSheetData(text){
   const rows = text.split('\n').map(r=>r.trim()); 
-  let isStrategy = false;
-  let isEvent = false;
   let currentGroup = '未分類';
+  let mode = 'CARDS'; // 預設先抓卡片 (因為卡片在上面)
 
   for(let i=0; i<rows.length; i++){
     if(!rows[i]) continue;
-    const c = rows[i].split('\t');
-    
-    if(i === 33 && c[0].startsWith('http')) { logoUrl = c[0]; } 
-    else if (i === 33 && c[0].toLowerCase() === 'logo' && c[1]) { logoUrl = c[1]; }
-    if (i === 33 && !logoUrl) logoUrl = c[0];
+    const c = rows[i].split('\t'); // Tab 分隔
 
-    if(c[0] === '事件簿') { isEvent = true; isStrategy = false; continue; }
-    if(c[0] === '代號' && c[1] === '名稱') { isStrategy = true; isEvent = false; continue; }
+    // 依照截圖邏輯切換模式
+    if(c[0] === '代號' && c[1] === '名稱') { mode = 'STRATEGIES'; continue; }
+    if(c[0] === '事件簿') { mode = 'EVENTS'; continue; }
 
-    if(isEvent && c[0] && c[0].match(/^\d/)) {
+    // 1. 卡片模式 (Row starts with C...)
+    if(c[0].startsWith('C')) {
+        let skillName = c[4]; if(c[0] === 'C05') skillName = 'VT DCA';
+        // 強力清洗金額格式 (去掉 NT$, US$, 空格, 逗號)
+        let costRaw = c[5] ? c[5].replace(/[NT$US,\s]/g, '') : '0';
+        let currentRaw = c[6] ? c[6].replace(/[NT$US,\s]/g, '') : '0';
+        
+        // 抓 Logo (Row 34左右)
+        if (c[0] === 'logo' && c[1]) logoUrl = c[1];
+
+        // 圖片連結在 J欄 (Index 9)
+        let imgUrl = c[9] ? c[9].trim() : '';
+        let displayMedia = imgUrl.startsWith('http') 
+            ? `<img src="${imgUrl}" class="mc-media" alt="${skillName}">` 
+            : (cardAssets[c[0]] || cardAssets['C01']);
+        
+        cardsData[c[0]] = {
+            code: c[0], type: c[1], rpg: c[2], target: c[3], skill: skillName,
+            cost: parseFloat(costRaw), current: parseFloat(currentRaw),
+            strategy: c[7], sop: c[8], media: displayMedia
+        };
+    } 
+    // 2. 策略模式 (Row starts with P...)
+    else if(c[0].startsWith('P')){
+          if(!portfolios[currentGroup]) portfolios[currentGroup] = [];
+          // 修正欄位對應: 代號(0), 名稱(1), 組合(2), 觀點(3), 人格(4), 衝突(5), 學理(6)
+          portfolios[currentGroup].push({
+              code: c[0], name: c[1], 
+              deck: c[2] ? c[2].split('+').map(s=>s.trim()) : [],
+              deckStr: c[2] || '',
+              mindset: c[3] || '-', 
+              persona: c[4] || '-',
+              conflict: c[5] || '-',
+              theory: c[6] || '-'
+          });
+    }
+    else if (mode === 'STRATEGIES' && c[0] && !c[0].startsWith('P') && c[0] !== '代號') {
+        // 這行可能是群組名稱 (例如 "小散戶主打交響")
+        if(c[0].length > 0) currentGroup = c[0].trim();
+    }
+    // 3. 事件模式 (Row starts with date like 2025...)
+    else if(mode === 'EVENTS' && c[0] && c[0].match(/^\d/)) {
         eventsData.push({ 
             date: c[0], 
             status: c[1] || 'Info', 
             content: c[2] || '',
             isUrgent: (c[1] || '').includes('緊急') 
         });
-    }
-    else if(!isStrategy && c[0]?.startsWith('C')){
-      let skillName = c[4]; if(c[0] === 'C05') skillName = 'VT DCA';
-      
-      // Cost in F(5), Current in G(6)
-      let costRaw = c[5] ? c[5].replace(/[NT$US,]/g, '') : '0';
-      let currentRaw = c[6] ? c[6].replace(/[NT$US,]/g, '') : '0';
-      let imgUrl = c[9] ? c[9].trim() : '';
-      let displayMedia = imgUrl.startsWith('http') 
-          ? `<img src="${imgUrl}" class="mc-media" alt="${skillName}">` 
-          : (cardAssets[c[0]] || cardAssets['C01']);
-      
-      cardsData[c[0]] = {
-          code: c[0], type: c[1], rpg: c[2], target: c[3], skill: skillName,
-          cost: parseFloat(costRaw), current: parseFloat(currentRaw),
-          strategy: c[7], sop: c[8], media: displayMedia
-      };
-    } 
-    else if(isStrategy){
-      if(c[0].startsWith('P')){
-          if(!portfolios[currentGroup]) portfolios[currentGroup] = [];
-          portfolios[currentGroup].push({
-              code: c[0], name: c[1], deck: c[2] ? c[2].split('+').map(s=>s.trim()) : [],
-              deckStr: c[2] || '',
-              // NEW MAPPING: D=Mindset(3), E=Persona(4), F=Conflict(5), G=Theory(6)
-              mindset: c[3] || '-', 
-              persona: c[4] || '-',
-              conflict: c[5] || '-',
-              theory: c[6] || '-'
-          });
-      } else if (c[0] && c[0].trim() !== '') {
-          currentGroup = c[0].trim();
-      }
     }
   }
 }
@@ -457,6 +477,10 @@ function renderDashboard(){
 
 function renderCards(){
   const con=document.getElementById('cardContainer'); con.innerHTML='';
+  if(Object.keys(cardsData).length === 0) {
+      con.innerHTML = '<div style="color:white;padding:20px;">NO DATA FOUND (請檢查C01~C07代號)</div>';
+      return;
+  }
   Object.values(cardsData).forEach(c=>{
     let costDisplay = (c.cost / 10000).toFixed(0); 
     con.innerHTML+=`<div class="micro-card ${c.type}" onclick="openModal('${c.code}')">
