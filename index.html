@@ -457,7 +457,7 @@ window.logoUrl = ''; 
 window.currentCardCode = null; 
 window.setupDates = []; 
 
-// ⚠️ GAS PRICE API URL: 使用您成功部署的網址
+// ⚠️ GAS PRICE API URL: 使用您成功部署的網址 (已更新為最新 URL)
 const GAS_PRICE_API_URL = "https://script.google.com/macros/s/AKfycbxcvmF1iy5L5l2hf2A2YtdlpNOaVnjaik_HWBupNVaceJ2VSN3nmGgswdCVeZ1KAXM/exec"; 
 
 // 核心：標的物配置表 (未來新增標的物，只需在這裡新增一筆即可)
@@ -538,7 +538,7 @@ function loadManualData() {
     // 使用 STRATEGY_TARGETS 表來定義卡牌和標的物的關係
     window.cardsData['C01'] = { code:'C01', type:'type-tw', rpg:'平庸的定期定額', skill:'TW DCA', cost:2520000, current:2595945, strategy: STRATEGY_TARGETS['C01'], sop:'每月5號扣款，不看盤', media: getMedia('C01') };
     window.cardsData['C02'] = { code:'C02', type:'type-tw', rpg:'獎金給我她奶奶的all in', skill:'TW LSI', cost:1750000, current:1750000, strategy: STRATEGY_TARGETS['C02'], sop:'跌幅觸發加碼', media: getMedia('C02') }; 
-    window.cardsData['C03'] = { code:'C03', type:'type-yield', rpg:'股息cover每一天', skill:'YIELD', cost:840000, current:840636, strategy: STRATEGY_TARGETS['C03'], sop:'股息再投入', media: getMedia('C03') };
+    window.cardsData['C03'] = { code:'C03', type:'type-yield', skill:'YIELD', cost:840000, current:840636, strategy: STRATEGY_TARGETS['C03'], sop:'股息再投入', media: getMedia('C03') };
     window.cardsData['C04'] = { code:'C04', type:'type-ber', rpg:'問就是正2', skill:'SEALED', cost:500000, current:50000, strategy: STRATEGY_TARGETS['C04'], sop:'波段操作', media: getMedia('C04') };
     window.cardsData['C05'] = { code:'C05', type:'type-us', rpg:'要買就買全世界', skill:'GLOBAL DCA', cost:50000, current:50000, strategy: STRATEGY_TARGETS['C05'], sop:'分散全球', media: getMedia('C05') };
     window.cardsData['C06'] = { code:'C06', type:'type-us', rpg:'美國就是我爸爸', skill:'US DCA', cost:50000, current:50000, strategy: STRATEGY_TARGETS['C06'], sop:'相信美國國運', media: getMedia('C06') };
@@ -1043,6 +1043,7 @@ async function fetchRealLogs() {
 
     } catch (e) {
         console.error("Error fetching logs:", e);
+        // 如果 Firebase 報錯通常是索引問題，提供提示
         logContainer.innerHTML = `<div style="padding:15px;color:var(--tw)">讀取失敗: 資料庫索引建立中或權限不足。<br><small>${e.message}</small></div>`;
     }
 }
