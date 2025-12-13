@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PROJECT CAGE : RELOADED v13.4</title>
+<title>PROJECT CAGE : RELOADED v13.5</title>
 <style>
     :root {
         --bg: #050505; --card: #0a0a0c; --bar: #1a1a1e; --text: #e0e0e0; --mute: #888;
@@ -111,7 +111,7 @@
     .event-card.emergency .event-status { color: var(--emergency); background: rgba(255, 0, 0, 0.15); }
     @media(max-width: 768px) { .event-list { grid-template-columns: 1fr; } }
 
-    /* ARENA - LARGE FONT VERSION */
+    /* ARENA */
     .arena-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; }
     .arena-group { background: rgba(255,255,255,0.02); border: 1px solid #222; border-radius: 12px; padding: 15px; display: flex; flex-direction: column; }
     .group-header { display: flex; align-items: center; text-align: center; font-weight: 900; font-size: 1.2rem; color: var(--gold); margin-bottom: 12px; letter-spacing: 2px; }
@@ -185,7 +185,7 @@
   <img id="pageLogo" src="" alt="Logo">
   <div class="header-text">
       <h1>PROJECT CAGE</h1>
-      <div class="meta-info">v13.4 LIVE • NT$ 1,000 萬 • 2025-2031</div>
+      <div class="meta-info">v13.5 LIVE • NT$ 1,000 萬 • 2025-2031</div>
   </div>
 </header>
 
@@ -256,7 +256,7 @@
 // =========================================================
 const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQuNQc8E7BlYLR5E6WlYHVQ3l_ki95CqcEcpS8sNQESRKcg5yECE-e2bgMvLGU-Vx5HFuWo5OS1GUIT/pub?output=tsv';
 
-// === 備份資料 (FALLBACK) - 嚴格對應 F2~F8 ===
+// === 備份資料 (FALLBACK) - 根據您最新的截圖更新 ===
 const FALLBACK_DATA = `
 A (code)	B (type)	C (rpg)	D (target)	E (skill)	F (cost)	G (current)	H (strategy)	I (sop)	J (image)
 C01	type-tw	平庸的定期定額	006208	TW DCA	NT$2,520,000	2,595,945	賣暢銷書賺到財富自由的大師們都推薦的平庸策略	每個月 5 ,15,25號：每次扣款 NT$10,000	https://ubamboo-design.github.io/Mark-investment-dashboard/C01.png
@@ -266,6 +266,7 @@ C04	type-ber	問就是正2	00631L	SEALED	NT$500,000	500,000		股票50:現金50 �
 C05	type-us	要買就買全世界	VT	GLOBAL DCA	$50,000.00	50,000	資產配置我好棒	每月 5 號買600美金，若1股超過則買1股(美金的換匯成本約1:30)	https://ubamboo-design.github.io/Mark-investment-dashboard/C05.png
 C06	type-us	美國就是我爸爸	VOO	US DCA	$50,000.00	50,000	我就舔	每月 5 號買600美金，若1股超過則買1股(美金的換匯成本約1:30)	https://ubamboo-design.github.io/Mark-investment-dashboard/C06.png
 C07	type-trap	可以進場了嗎?	CASH/006208	AMBUSH	NT$900,000	900,000	再等一等好了~然後就沒有然後了~	股市修正20%後進場9萬，每下跌10%加碼18/27/36	https://ubamboo-design.github.io/Mark-investment-dashboard/C07.png
+C02-1	type-tw	履歷才是最強Asset	006208	TW LSI	NT$500,000	500,000	等待大崩盤的那一天我就贏了?	2025/1/6 開盤抽(PK正2的50:50)，若比原策略強就加碼。(一種自我行銷是非對錯)	https://ubamboo-design.github.io/Mark-investment-dashboard/C01.png
 	
 代號	名稱	牌組	競技亮點	投資人格側寫	預期心理衝突	
 P01	台股定期定額	C01	單純驗證「大師們推薦的平庸策略」到底有多平庸。	佛系躺平族：相信大師，放棄思考。	最無心理負擔，但也最容易在多頭市場感到無聊而手癢亂動。	
@@ -273,7 +274,7 @@ P02	台股雙核心	C01+C02	當市場大漲時嫌 C01 慢，大跌時怪 C02 衝
 P03	最貴的安眠藥	C03	長期績效最差，但是心理最舒服，最適合焦慮睡不著的投資人	收租心態者：只在乎現金流，不在乎淨值。	熊市中最抗跌（心理上），但在牛市中會因跑輸大盤而焦慮。	
 P04	無限等待之術	C07	大機率會空手很久。驗證「擇時等待」是否會輸給「閉眼投入」。	完美主義者：試圖扮演上帝。	大機率長期空手，最終可能在受不了時高點追進。	
 	
-P05	大哥沒有輸	C02	是否能跑贏槓桿流。	沒人會這樣投資!!	資金效率壓滿，但是贏的路徑太單一，需承受巨大的單日損益波動，心臟強度需極高。	
+P05	大哥沒有輸	C02-1	是否能跑贏槓桿流。	沒人會這樣投資!!	資金效率壓滿，但是贏的路徑太單一，需承受巨大的單日損益波動，心臟強度需極高。	
 P06	槓桿投資法	C04	是封神還是風神?	數學賭徒用紀律駕馭槓桿波動。	在自動的扣寫機制下，逆價差與槓桿偏移能一直有效嗎?	
 	
 P07	全球雙核心	C05+C06	全球基本盤加美股加速器，也是「資產配置派」與「美股至上派」的流派。	資產配置派：既要分散又要績效。	內心的矛盾：VT 的拖累會讓其不斷質疑為何不全押 VOO。	
@@ -343,7 +344,9 @@ async function init() {
     } catch (e) { console.warn('Rate Fetch Error'); }
 
     try {
-        const sheetRes = await fetch(GOOGLE_SHEET_URL);
+        // 🔥 FORCE NEW DATA: Add cache buster timestamp
+        const cacheBuster = `&t=${Date.now()}`;
+        const sheetRes = await fetch(GOOGLE_SHEET_URL + cacheBuster);
         if (!sheetRes.ok) throw new Error(`HTTP ${sheetRes.status}`);
         const sheetText = await sheetRes.text();
         
@@ -379,8 +382,8 @@ function parseSheetData(text){
     if(c[0] === '代號' && c[1] === '名稱') { mode = 'STRATEGIES'; continue; }
     if(c[0] === '事件簿') { mode = 'EVENTS'; continue; }
 
-    // 1. 卡片模式 (排除 C02-1)
-    if(c[0].startsWith('C') && c[0] !== 'C02-1') {
+    // 1. 卡片模式 (允許 C02-1 讀入，但後續顯示會過濾)
+    if(c[0].startsWith('C')) {
         let skillName = c[4]; 
         let costRaw = c[5] ? c[5].replace(/[NT$US,\s]/g, '') : '0';
         let currentRaw = c[6] ? c[6].replace(/[NT$US,\s]/g, '') : '0';
@@ -403,7 +406,7 @@ function parseSheetData(text){
           if(!portfolios[currentGroup]) portfolios[currentGroup] = [];
           portfolios[currentGroup].push({
               code: c[0], name: c[1], 
-              deck: c[2] ? c[2].split('+').map(s=>s.trim()) : [], // 直接信任 C 欄
+              deck: c[2] ? c[2].split('+').map(s=>s.trim()) : [], 
               deckStr: c[2] || '',
               mindset: c[3] || '-',      
               persona: c[4] || '-',      
@@ -458,7 +461,8 @@ function renderHeader() {
 function renderDashboard(){
   let tcTW=0, taTW=0, tcUS=0, taUS=0;
   
-  // 核心修正：嚴格鎖定 F2-F8 (對應 C01-C07)
+  // 🔥 核心修正：嚴格鎖定白名單 (F2-F8)
+  // 排除 C02-1, 排除任何非 F2-F8 的代號
   const validTw = ['C01', 'C02', 'C03', 'C04', 'C07'];
   const validUs = ['C05', 'C06'];
 
@@ -515,7 +519,7 @@ function renderCards(){
       return;
   }
   Object.values(cardsData).forEach(c=>{
-    // C02-1 已經被源頭排除，這裡還是保留一個保險機制
+    // 這裡過濾 C02-1，不讓它顯示在上方 Deck，但資料仍保留給下方策略用
     if(c.code === 'C02-1') return;
 
     let costDisplay = (c.cost / 10000).toFixed(0); 
@@ -582,7 +586,6 @@ function renderArena(){
         }).join('');
         
         p.deck.forEach(d=>{ 
-            // 由於 C02-1 已刪除，如果牌組還殘留舊代號會自動忽略，只計算有效的
             if(cardsData[d]) { tc+=cardsData[d].cost; ta+=cardsData[d].current; } 
         });
         const s=calc(tc, ta);
