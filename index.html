@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PROJECT CAGE : RELOADED v14.0</title>
+<title>PROJECT CAGE : RELOADED v14.1 (Icon Fix)</title>
 <style>
     :root {
         --bg: #050505; --card: #0a0a0c; --bar: #1a1a1e; --text: #e0e0e0; --mute: #888;
@@ -134,9 +134,30 @@
     .g-roi.color-gold { color: var(--gold); text-shadow: 0 0 10px var(--gold); }
     .g-roi.color-dead { color: var(--dark-purple); text-shadow: 0 0 10px var(--dark-purple); }
 
-    .g-mini-icon { width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; }
-    .g-mini-icon svg { width: 100%!important; stroke-width: 3!important; } .g-mini-icon img { width: 100%!important; object-fit: contain; }
-    .g-mini-icon.type-tw img { filter: drop-shadow(0 0 5px var(--tw)); } .g-mini-icon.type-us img { filter: drop-shadow(0 0 5px var(--us)); }
+    /* ========================================================= */
+    /* ✅ 修正後的圖標 CSS (Fix for Icon Alignment) */
+    /* ========================================================= */
+    .g-mini-icon { 
+        width: 42px;       
+        height: 42px; 
+        display: inline-flex; 
+        align-items: center; 
+        justify-content: center; 
+        margin: 0 2px;
+    }
+    .g-mini-icon svg, 
+    .g-mini-icon img { 
+        width: auto !important;
+        height: auto !important;
+        max-width: 100% !important;
+        max-height: 100% !important;
+        object-fit: contain;
+        display: block;
+    }
+    .g-mini-icon svg { stroke-width: 3 !important; }
+    .g-mini-icon.type-tw img { filter: drop-shadow(0 0 5px var(--tw)); } 
+    .g-mini-icon.type-us img { filter: drop-shadow(0 0 5px var(--us)); }
+    /* ========================================================= */
 
     .g-details { max-height: 0; overflow: hidden; transition: max-height .4s ease; background: rgba(0,0,0,0.3); border-radius: 0 0 8px 8px; width: 100%; }
     .g-bar.active + .g-details { max-height: 800px; border: 1px solid #333; border-top: none; } 
@@ -185,7 +206,7 @@
   <img id="pageLogo" src="" alt="Logo">
   <div class="header-text">
       <h1>PROJECT CAGE</h1>
-      <div class="meta-info">v14.0 LIVE • NT$ 1,000 萬 • 2025-2031</div>
+      <div class="meta-info">v14.1 LIVE • NT$ 1,000 萬 • 2025-2031</div>
   </div>
 </header>
 
