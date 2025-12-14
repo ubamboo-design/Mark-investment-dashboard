@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PROJECT CAGE : RELOADED v14.3 (Dashboard Values Boosted)</title>
+<title>PROJECT CAGE : RELOADED v14.4 (Big Labels)</title>
 <style>
     :root {
         --bg: #050505; --card: #0a0a0c; --bar: #1a1a1e; --text: #e0e0e0; --mute: #888;
@@ -44,21 +44,36 @@
     .dash-header { display: flex; align-items: center; justify-content: flex-start; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
     .dash-title { font-size: 1.4rem; font-weight: 900; letter-spacing: 2px; color: #fff; text-transform: uppercase; }
     .data-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
-    .data-label { font-size: 0.85rem; color: #888; font-weight: bold; letter-spacing: 1px; }
     
-    /* ✅ [修改] 儀表板數值樣式：加大、加粗、增亮 */
+    /* ✅ [修改] 標籤文字：加大、加粗、增亮 */
+    .data-label { 
+        font-size: 1.1rem;      /* 加大 */
+        color: #ccc;            /* 增亮 */
+        font-weight: 800;       /* 加粗 */
+        letter-spacing: 1px; 
+    }
+
+    /* ✅ [修改] 儀表板數值樣式：加大、加粗、增亮 (保持上版設定) */
     .data-val { 
         font-family: 'Courier New', monospace; 
-        font-size: 1.6rem;       /* 加大字體 */
-        font-weight: 900;        /* 加粗字體 */
-        color: #fff;             /* 使用最亮的白色 */
-        text-shadow: 0 0 10px rgba(255, 255, 255, 0.3); /* 增加發光效果 */
+        font-size: 1.6rem;       
+        font-weight: 900;        
+        color: #fff;             
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.3); 
     }
-    .data-val .unit-tag { font-size: 0.8rem; color: #aaa; margin-left: 5px; font-weight: normal; }
+    
+    /* ✅ [修改] 單位標籤也稍微加大 */
+    .data-val .unit-tag { 
+        font-size: 0.9rem; 
+        color: #aaa; 
+        margin-left: 5px; 
+        font-weight: bold; 
+    }
+
     .data-val.asset { 
         color: #fff; 
-        font-size: 1.8rem;       /* 現值再稍微大一點 */
-        text-shadow: 0 0 15px rgba(255,255,255,0.5); /* 現值的光暈更強 */
+        font-size: 1.8rem;       
+        text-shadow: 0 0 15px rgba(255,255,255,0.5); 
     }
     
     .profit-block { margin-top: 15px; padding: 15px; background: rgba(0,0,0,0.4); border-radius: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.08); }
@@ -228,7 +243,7 @@
   <img id="pageLogo" src="" alt="Logo">
   <div class="header-text">
       <h1>PROJECT CAGE</h1>
-      <div class="meta-info">v14.3 LIVE • NT$ 1,000 萬 • 2025-2031</div>
+      <div class="meta-info">v14.4 LIVE • NT$ 1,000 萬 • 2025-2031</div>
   </div>
 </header>
 
