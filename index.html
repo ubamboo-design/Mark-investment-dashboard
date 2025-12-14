@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PROJECT CAGE : RELOADED v13.5</title>
+<title>PROJECT CAGE : RELOADED v14.0</title>
 <style>
     :root {
         --bg: #050505; --card: #0a0a0c; --bar: #1a1a1e; --text: #e0e0e0; --mute: #888;
@@ -185,7 +185,7 @@
   <img id="pageLogo" src="" alt="Logo">
   <div class="header-text">
       <h1>PROJECT CAGE</h1>
-      <div class="meta-info">v13.5 LIVE • NT$ 1,000 萬 • 2025-2031</div>
+      <div class="meta-info">v14.0 LIVE • NT$ 1,000 萬 • 2025-2031</div>
   </div>
 </header>
 
@@ -256,7 +256,7 @@
 // =========================================================
 const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQuNQc8E7BlYLR5E6WlYHVQ3l_ki95CqcEcpS8sNQESRKcg5yECE-e2bgMvLGU-Vx5HFuWo5OS1GUIT/pub?output=tsv';
 
-// === 備份資料 (FALLBACK) - 根據您最新的截圖更新 ===
+// === 備份資料 (FALLBACK) ===
 const FALLBACK_DATA = `
 A (code)	B (type)	C (rpg)	D (target)	E (skill)	F (cost)	G (current)	H (strategy)	I (sop)	J (image)
 C01	type-tw	平庸的定期定額	006208	TW DCA	NT$2,520,000	2,595,945	賣暢銷書賺到財富自由的大師們都推薦的平庸策略	每個月 5 ,15,25號：每次扣款 NT$10,000	https://ubamboo-design.github.io/Mark-investment-dashboard/C01.png
@@ -382,7 +382,7 @@ function parseSheetData(text){
     if(c[0] === '代號' && c[1] === '名稱') { mode = 'STRATEGIES'; continue; }
     if(c[0] === '事件簿') { mode = 'EVENTS'; continue; }
 
-    // 1. 卡片模式 (允許 C02-1 讀入，但後續顯示會過濾)
+    // 1. 卡片模式 (自動讀取所有 C 開頭的項目)
     if(c[0].startsWith('C')) {
         let skillName = c[4]; 
         let costRaw = c[5] ? c[5].replace(/[NT$US,\s]/g, '') : '0';
@@ -401,16 +401,16 @@ function parseSheetData(text){
             strategy: c[7], sop: c[8], media: displayMedia
         };
     } 
-    // 2. 策略模式 (直接讀取 C 欄牌組)
+    // 2. 策略模式 (直接讀取 P 開頭的牌組)
     else if(c[0].startsWith('P')){
           if(!portfolios[currentGroup]) portfolios[currentGroup] = [];
           portfolios[currentGroup].push({
               code: c[0], name: c[1], 
               deck: c[2] ? c[2].split('+').map(s=>s.trim()) : [], 
               deckStr: c[2] || '',
-              mindset: c[3] || '-',      
-              persona: c[4] || '-',      
-              conflict: c[5] || '-',     
+              mindset: c[3] || '-',       
+              persona: c[4] || '-',       
+              conflict: c[5] || '-',      
               theory: '-' 
           });
     }
@@ -461,21 +461,22 @@ function renderHeader() {
 function renderDashboard(){
   let tcTW=0, taTW=0, tcUS=0, taUS=0;
   
-  // 🔥 核心修正：嚴格鎖定白名單 (F2-F8)
-  // 排除 C02-1, 排除任何非 F2-F8 的代號
-  const validTw = ['C01', 'C02', 'C03', 'C04', 'C07'];
-  const validUs = ['C05', 'C06'];
-
-  validTw.forEach(code => {
-      const c = cardsData[code];
-      if(c) { tcTW += c.cost; taTW += c.current; }
+  // 🔥 [修正]：不再使用硬編碼的 'validTw' 或 'validUs' 陣列
+  // 🔥 改為遍歷所有讀取到的卡片，根據其 'type' 自動歸類
+  
+  Object.values(cardsData).forEach(c => {
+      // 判斷邏輯：若類型文字中包含 'us'，視為美金
+      // 其他所有類型 (tw, yield, ber, trap) 都視為台幣
+      if(c.type.includes('us')) {
+          tcUS += c.cost;
+          taUS += c.current;
+      } else {
+          tcTW += c.cost;
+          taTW += c.current;
+      }
   });
 
-  validUs.forEach(code => {
-      const c = cardsData[code];
-      if(c) { tcUS += c.cost; taUS += c.current; }
-  });
-
+  // TWD 區塊計算
   const sTW = calc(tcTW, taTW);
   document.getElementById('costTW').textContent = '$' + (tcTW/10000).toFixed(0) + '萬';
   document.getElementById('assetTW').textContent = '$' + (taTW/10000).toFixed(0) + '萬';
@@ -485,6 +486,7 @@ function renderDashboard(){
   document.getElementById('plTW_pct').textContent = `${sTW.arrow} ${sTW.roi}%`;
   document.getElementById('plTW_pct').className = `profit-sub ${sTW.cls}`;
 
+  // USD 區塊計算
   const sUS = calc(tcUS, taUS);
   document.getElementById('costUS').textContent = '$' + (tcUS/10000).toFixed(0) + '萬';
   document.getElementById('assetUS').textContent = '$' + (taUS/10000).toFixed(0) + '萬';
@@ -494,6 +496,7 @@ function renderDashboard(){
   document.getElementById('plUS_pct').textContent = `${sUS.arrow} ${sUS.roi}%`;
   document.getElementById('plUS_pct').className = `profit-sub ${sUS.cls}`;
 
+  // 總資產計算 (TWD + USD換算)
   const totalAssetTWD = taTW + (taUS * currentRate);
   const totalCostTWD = tcTW + (tcUS * currentRate); 
   const sTotal = calc(totalCostTWD, totalAssetTWD);
@@ -519,9 +522,8 @@ function renderCards(){
       return;
   }
   Object.values(cardsData).forEach(c=>{
-    // 這裡過濾 C02-1，不讓它顯示在上方 Deck，但資料仍保留給下方策略用
-    if(c.code === 'C02-1') return;
-
+    // 🔥 [修正]：移除 'C02-1' 的硬編碼過濾，現在如果 Sheet 裡有這一行，就會顯示
+    
     let costDisplay = (c.cost / 10000).toFixed(0); 
     con.innerHTML+=`<div class="micro-card ${c.type}" onclick="openModal('${c.code}')">
       <div class="mc-header"><span class="mc-code">${c.code}</span><span class="mc-target">${c.target}</span></div>
@@ -620,7 +622,7 @@ function openModal(k){
   const c=cardsData[k];
   document.getElementById('mCode').textContent=c.code;
   document.getElementById('mSkill').textContent=c.skill;
-  document.getElementById('mCost').textContent=`${c.type==='type-tw'?'NT$':'US$'} ${c.cost.toLocaleString()}`;
+  document.getElementById('mCost').textContent=`${c.type.includes('us')?'US$':'NT$'} ${c.cost.toLocaleString()}`;
   document.getElementById('mStrategy').textContent=c.strategy;
   document.getElementById('mSop').textContent=c.sop;
   const map={'type-tw':'--tw','type-us':'--us','type-yield':'--yield','type-ber':'--ber','type-trap':'--trap'};
