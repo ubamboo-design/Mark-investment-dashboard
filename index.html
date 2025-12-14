@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PROJECT CAGE : RELOADED v14.5 (HP Bar Mode)</title>
+<title>PROJECT CAGE : RELOADED v14.6 (Auto Sort)</title>
 <style>
     :root {
         --bg: #050505; --card: #0a0a0c; --bar: #1a1a1e; --text: #e0e0e0; --mute: #888;
@@ -46,68 +46,36 @@
     .dash-title { font-size: 1.4rem; font-weight: 900; letter-spacing: 2px; color: #fff; text-transform: uppercase; }
     .data-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
     
-    /* 標籤文字 */
     .data-label { font-size: 1.1rem; color: #ccc; font-weight: 800; letter-spacing: 1px; }
-
-    /* 儀表板數值 */
     .data-val { font-family: 'Courier New', monospace; font-size: 1.6rem; font-weight: 900; color: #fff; text-shadow: 0 0 10px rgba(255, 255, 255, 0.3); }
     .data-val .unit-tag { font-size: 0.9rem; color: #aaa; margin-left: 5px; font-weight: bold; }
     .data-val.asset { color: #fff; font-size: 1.8rem; text-shadow: 0 0 15px rgba(255,255,255,0.5); }
     
-    /* ========================================= */
-    /* 🔥 [新增] RPG 血條樣式 (HP BAR) */
-    /* ========================================= */
+    /* HP BAR */
     .hp-wrapper {
-        width: 100%;
-        height: 32px;
-        background: #111;
-        border: 2px solid #444;
-        border-radius: 4px;
-        position: relative;
-        margin-bottom: 15px;
-        overflow: hidden;
-        box-shadow: inset 0 0 15px #000;
+        width: 100%; height: 32px; background: #111; border: 2px solid #444; border-radius: 4px;
+        position: relative; margin-bottom: 15px; overflow: hidden; box-shadow: inset 0 0 15px #000;
     }
     .hp-fill {
-        height: 100%;
-        width: 0%; /* JS Control */
-        transition: width 1s cubic-bezier(0.25, 0.8, 0.25, 1), background-color 0.5s, box-shadow 0.5s;
-        position: relative;
-        z-index: 1;
+        height: 100%; width: 0%; transition: width 1s cubic-bezier(0.25, 0.8, 0.25, 1), background-color 0.5s, box-shadow 0.5s;
+        position: relative; z-index: 1;
     }
-    /* 血條斜紋質感 */
     .hp-fill::after {
         content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
         background: linear-gradient(45deg, rgba(255,255,255,.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.15) 50%, rgba(255,255,255,.15) 75%, transparent 75%, transparent);
-        background-size: 20px 20px;
-        animation: stripe-move 2s linear infinite;
+        background-size: 20px 20px; animation: stripe-move 2s linear infinite;
     }
     @keyframes stripe-move { 0% { background-position: 0 0; } 100% { background-position: 20px 20px; } }
-    
-    /* 血條上的文字 (HP 數值) */
     .hp-text {
-        position: absolute;
-        top: 0; left: 10px;
-        width: 100%; height: 100%;
-        display: flex; align-items: center;
-        color: #fff;
-        font-family: 'Courier New';
-        font-weight: 900;
-        font-size: 0.9rem;
-        z-index: 2;
-        text-shadow: 0 1px 3px #000;
-        letter-spacing: 1px;
+        position: absolute; top: 0; left: 10px; width: 100%; height: 100%; display: flex; align-items: center;
+        color: #fff; font-family: 'Courier New'; font-weight: 900; font-size: 0.9rem; z-index: 2;
+        text-shadow: 0 1px 3px #000; letter-spacing: 1px;
     }
-    /* 血條顏色狀態 */
     .hp-fill.healthy { background: var(--hp-full); box-shadow: 0 0 15px var(--hp-full); }
     .hp-fill.damaged { background: var(--hp-low); box-shadow: 0 0 15px var(--hp-low); }
     .hp-fill.overheal { background: var(--hp-over); box-shadow: 0 0 20px var(--hp-over); }
 
-    /* 總身價大字位置微調 */
     .total-big-val { font-family: 'Courier New'; font-size: 3rem; font-weight: 900; color: #fff; text-align: right; margin: 5px 0 10px; text-shadow: 0 0 25px rgba(255,215,0,0.4); line-height: 1; }
-
-    /* ========================================= */
-
     .profit-block { margin-top: 15px; padding: 15px; background: rgba(0,0,0,0.4); border-radius: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.08); }
     .profit-main { font-family: 'Courier New'; font-size: 1.5rem; font-weight: 900; }
     .profit-sub { font-size: 1rem; font-weight: bold; }
@@ -173,7 +141,17 @@
     /* ARENA */
     .arena-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; }
     .arena-group { background: rgba(255,255,255,0.02); border: 1px solid #222; border-radius: 12px; padding: 15px; display: flex; flex-direction: column; }
-    .group-header { display: flex; align-items: center; text-align: center; font-weight: 900; font-size: 1.2rem; color: var(--gold); margin-bottom: 12px; letter-spacing: 2px; }
+    
+    /* ✅ [修改] 競技場群組標題 (加大、增亮) */
+    .group-header { 
+        display: flex; align-items: center; text-align: center; 
+        font-weight: 900; 
+        font-size: 1.5rem; /* 加大字體 */
+        color: var(--gold); 
+        margin-bottom: 20px; /* 增加間距 */
+        letter-spacing: 2px; 
+        text-shadow: 0 0 20px rgba(255, 215, 0, 0.3); /* 增加光暈 */
+    }
     .group-header::before, .group-header::after { content: ''; flex: 1; border-bottom: 1px solid #333; }
     .group-header::before { margin-right: 15px; } .group-header::after { margin-left: 15px; }
 
@@ -272,7 +250,7 @@
   <img id="pageLogo" src="" alt="Logo">
   <div class="header-text">
       <h1>PROJECT CAGE 馬克投資．玩的就是真實</h1>
-      <div class="meta-info">v14.5 LIVE • NT$ 1,000 萬 • 2025-2031</div>
+      <div class="meta-info">v14.6 LIVE • NT$ 1,000 萬 • 2025-2031</div>
   </div>
 </header>
 
@@ -600,28 +578,22 @@ function renderDashboard(){
   elTotalROI.textContent = `${sTotal.arrow} ${sTotal.sign}${sTotal.roi}%`;
   elTotalROI.className = `total-roi-display ${sTotal.cls}`;
 
-  // 🔥 [新增] 血條邏輯 (HP Bar Logic)
+  // HP Bar Logic
   const hpBar = document.getElementById('hpBar');
   const hpText = document.getElementById('hpText');
   let hpPercent = (totalAssetTWD / totalCostTWD) * 100;
   
-  // 防止分母為0
   if(totalCostTWD <= 0) hpPercent = 100;
 
-  // 設定血條顯示
   hpText.textContent = `HP: ${totalAssetTWD.toLocaleString()} / ${totalCostTWD.toLocaleString()}`;
   
-  // 重置類別
   hpBar.className = 'hp-fill';
-  
   if(hpPercent >= 100) {
-      // 獲利狀態：血條全滿 + 特效
       hpBar.style.width = '100%';
-      hpBar.classList.add('overheal'); // 金色/綠色流光
+      hpBar.classList.add('overheal'); 
   } else {
-      // 虧損狀態：血條依照比例縮短
       hpBar.style.width = `${hpPercent}%`;
-      hpBar.classList.add('damaged'); // 紅色
+      hpBar.classList.add('damaged'); 
   }
 }
 
@@ -679,12 +651,26 @@ function toggleStrategy(element) {
 function renderArena(){
   const con=document.getElementById('arenaContainer'); con.innerHTML = ''; 
   Object.keys(portfolios).forEach(groupName => {
+      
+      // 🔥 [新增] 自動排序邏輯：根據 ROI 由高到低排序
+      const strategiesWithROI = portfolios[groupName].map(p => {
+          let tc = 0, ta = 0;
+          p.deck.forEach(d => {
+              if(cardsData[d]) { tc += cardsData[d].cost; ta += cardsData[d].current; }
+          });
+          const s = calc(tc, ta);
+          return { ...p, roiVal: parseFloat(s.roi), stats: s }; 
+      });
+
+      // 降冪排序 (ROI High -> Low)
+      strategiesWithROI.sort((a, b) => b.roiVal - a.roiVal);
+
+      // 開始渲染 HTML
       let groupHtml = `<div class="arena-group"><div class="group-header">${groupName}</div>`;
       
-      portfolios[groupName].forEach(p => {
-        let tc=0, ta=0;
-        const icons=p.deck.map(code=>{
-          const c=cardsData[code];
+      strategiesWithROI.forEach(p => {
+        const icons = p.deck.map(code => {
+          const c = cardsData[code];
           if(c && c.media.includes('<img')) {
              const srcMatch = c.media.match(/src="([^"]*)"/);
              const src = srcMatch ? srcMatch[1] : '';
@@ -695,10 +681,8 @@ function renderArena(){
           return '';
         }).join('');
         
-        p.deck.forEach(d=>{ 
-            if(cardsData[d]) { tc+=cardsData[d].cost; ta+=cardsData[d].current; } 
-        });
-        const s=calc(tc, ta);
+        // 使用已經算好的 p.stats
+        const s = p.stats;
         
         groupHtml += `
           <div class="g-bar-container">
