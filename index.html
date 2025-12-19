@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PROJECT CAGE : STICKMAN FINAL (v16.2)</title>
+<title>PROJECT COLOSSEUM v16.5</title>
 <style>
     /* =========================================
-       v16.2 STICKMAN STYLE (手繪風格)
+       v16.5 STICKMAN STYLE (嘲諷動畫版)
        ========================================= */
     :root {
         --bg: #000000; --text: #ffffff;
@@ -24,17 +24,15 @@
         line-height: 1.3; overflow-x: hidden; padding-bottom: 50px; 
     }
     
-    /* REFRESH */
     #refresh-indicator { position: fixed; top: 0; left: 0; width: 100%; height: 0; background: #fff; color: #000; display: flex; justify-content: center; align-items: center; overflow: hidden; transition: height 0.2s; z-index: 9999; }
     .spinner { width: 30px; height: 30px; border: 4px solid #000; border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 15px; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* HEADER */
     header { padding: 35px 20px; text-align: center; border-bottom: 2px solid #fff; position: relative; display: flex; flex-direction: column; align-items: center; gap: 10px; }
     header::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 100%; height: 2px; background: #fff; transform: rotate(0.3deg); }
     #pageLogo { height: 80px; width: auto; object-fit: contain; display: none; filter: grayscale(100%) contrast(150%); }
     
-    h1 { font-size: 2.8rem; text-transform: uppercase; font-weight: 900; margin: 0; letter-spacing: -1px; text-decoration: underline wavy var(--gold); }
+    h1 { font-size: 3rem; text-transform: uppercase; font-weight: 900; margin: 0; letter-spacing: 1px; text-decoration: underline wavy var(--gold); }
     .meta-info { font-family: monospace; color: #aaa; font-size: 0.9rem; margin-top: 5px; font-weight: bold; }
     .container { max-width: 1800px; margin: 0 auto; padding: 0 20px; }
     
@@ -57,9 +55,9 @@
     .data-val { font-family: monospace; font-size: 1.6rem; font-weight: 900; color: #fff; }
     .data-val .unit-tag { font-size: 0.9rem; color: #666; margin-left: 5px; font-weight: bold; }
     
-    .hp-wrapper { width: 100%; height: 32px; background: #222; border: 2px solid #fff; border-radius: var(--sketch-border); position: relative; margin-bottom: 15px; overflow: hidden; }
+    .hp-wrapper { width: 100%; height: 40px; background: #222; border: 2px solid #fff; border-radius: var(--sketch-border); position: relative; margin-bottom: 15px; overflow: hidden; }
     .hp-fill { height: 100%; width: 0%; transition: width 1s; border-right: 2px solid #fff; background: repeating-linear-gradient(45deg, #fff, #fff 10px, #000 10px, #000 20px); }
-    .hp-text { position: absolute; top: 0; left: 10px; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #fff; font-family: monospace; font-weight: 900; font-size: 0.9rem; mix-blend-mode: difference; }
+    .hp-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-1deg); background: #000; color: #fff; border: 2px solid #fff; padding: 2px 12px; font-family: monospace; font-weight: 900; font-size: 1rem; z-index: 10; white-space: nowrap; box-shadow: 3px 3px 0px rgba(255,255,255,0.2); border-radius: 4px; }
 
     .total-big-val { font-family: monospace; font-size: 3rem; font-weight: 900; text-align: right; margin: 5px 0 10px; text-shadow: 4px 4px 0px #333; }
     .profit-block { margin-top: 15px; padding: 15px; background: #000; border: 2px solid #fff; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 5px 5px 0px #333; }
@@ -79,19 +77,76 @@
     .section-title { font-size: 1.5rem; border: 2px solid #fff; padding: 10px 20px; margin: 50px 0 25px; text-transform: uppercase; font-weight: 900; display: inline-block; transform: rotate(-1deg); background: #000; }
     .section-container { text-align: center; }
 
-    .deck-wrapper { overflow-x: auto; padding-bottom: 25px; padding-top: 10px; }
+    .deck-wrapper { overflow-x: auto; padding-bottom: 25px; padding-top: 30px; }
     .deck-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 15px; min-width: 0; } 
-    .micro-card { background: #000; border: 2px solid #fff; border-radius: var(--sketch-border); padding: 12px 10px; cursor: pointer; display: flex; flex-direction: column; min-height: 240px; position: relative; }
-    @keyframes wiggle { 0% { transform: rotate(0deg); } 25% { transform: rotate(1deg); } 75% { transform: rotate(-1deg); } 100% { transform: rotate(0deg); } }
-    .micro-card:hover { animation: wiggle 0.2s infinite; border-color: var(--gold); z-index: 10; background: #111; }
     
-    .mc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    /* 🔥 CARD & MOCKERY STYLES 🔥 */
+    .micro-card { 
+        background: #000; border: 2px solid #fff; border-radius: var(--sketch-border);
+        padding: 12px 10px; cursor: pointer; display: flex; flex-direction: column; min-height: 240px; position: relative; 
+        /* 讓火柴人可以超出邊框顯示 */
+        overflow: visible !important; 
+        transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .micro-card:hover { 
+        border-color: var(--gold); 
+        background: #111; 
+        z-index: 100; /* 確保浮起來不會被旁邊遮住 */
+        transform: translateY(-5px);
+    }
+
+    /* 嘲諷火柴人容器 */
+    .taunt-wrapper {
+        position: absolute;
+        top: 0; 
+        right: 15px;
+        width: 60px;
+        height: 60px;
+        pointer-events: none; /* 讓滑鼠穿透，不要擋到點擊 */
+        opacity: 0;
+        transform: translateY(20px) rotate(0deg); /* 初始位置：藏在卡片裡面 */
+        transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); /* 彈跳效果 */
+        z-index: -1; /* 預設在卡片後面 */
+    }
+
+    /* 滑鼠懸停時觸發 */
+    .micro-card:hover .taunt-wrapper {
+        opacity: 1;
+        top: -55px; /* 彈出高度 */
+        transform: translateY(0) rotate(10deg); /* 稍微歪頭 */
+        z-index: 1; /* 跑到上面來 */
+    }
+
+    /* 舌頭動畫 */
+    .taunt-tongue {
+        fill: none;
+        stroke: #ff0000;
+        stroke-width: 4px;
+        stroke-linecap: round;
+        stroke-dasharray: 20;
+        stroke-dashoffset: 20; /* 初始縮回去 */
+        transition: stroke-dashoffset 0.2s;
+    }
+    
+    /* 懸停時吐舌頭 */
+    .micro-card:hover .taunt-tongue {
+        animation: lick 0.6s infinite alternate; /* 瘋狂吐舌頭 */
+    }
+
+    @keyframes lick {
+        0% { stroke-dashoffset: 20; } /* 收 */
+        100% { stroke-dashoffset: 0; } /* 吐 */
+    }
+
+    .taunt-body { fill: #000; stroke: #fff; stroke-width: 3px; stroke-linecap: round; }
+    
+    .mc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; position: relative; z-index: 2; }
     .mc-code { font-size: 1.1rem; font-weight: 900; border-bottom: 2px solid #fff; } 
     .mc-target { font-size: 0.75rem; background: #fff; color: #000; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-weight: bold; }
-    .mc-image-container { flex-grow: 1; display: flex; align-items: center; justify-content: center; margin: 2px 0 10px; }
+    .mc-image-container { flex-grow: 1; display: flex; align-items: center; justify-content: center; margin: 2px 0 10px; position: relative; z-index: 2; }
     .mc-media { width: 72px; height: 72px; object-fit: contain; filter: grayscale(100%) contrast(150%); }
     svg.mc-media { stroke: #fff; stroke-width: 3px; fill: none; }
-    .mc-footer { text-align: center; margin-top: auto; }
+    .mc-footer { text-align: center; margin-top: auto; position: relative; z-index: 2; }
     .mc-chn-name { font-size: 1.15rem; font-weight: 900; margin-bottom: 4px; line-height: 1.2; }
     .mc-eng-name { font-size: 0.75rem; font-weight: 700; color: #888; text-transform: uppercase; margin-bottom: 8px; }
     .mc-cost-badge { display: inline-block; padding: 4px 12px; border: 1px dashed #fff; border-radius: 20px; font-size: 0.85rem; color: #ccc; }
@@ -152,8 +207,8 @@
 <header>
   <img id="pageLogo" src="" alt="Logo">
   <div class="header-text">
-      <h1>PROJECT CAGE <br><span style="font-size:1.2rem;background:white;color:black;padding:2px 8px;">STICKMAN REBOOT</span></h1>
-      <div class="meta-info">v16.2 // NT$ 1,000 萬 // 2025-2031</div>
+      <h1>PROJECT COLOSSEUM</h1>
+      <div class="meta-info">v16.5 // NT$ 1,000 萬 // 2025-2031</div>
   </div>
 </header>
 
@@ -206,15 +261,15 @@
       <div><span class="m-code" id="mCode"></span><span class="m-skill" id="mSkill"></span></div>
       <span class="close-btn" onclick="closeModal()">&times;</span>
     </div>
-    <div class="m-row"><span class="m-label">初始資金 (CAPITAL)</span><div class="m-value highlight" id="mCost"></div></div>
-    <div class="m-row"><span class="m-label">戰略定位 (STRATEGY)</span><div class="m-value" id="mStrategy"></div></div>
+    <div class="m-row"><span class="m-label">初始資金</span><div class="m-value highlight" id="mCost"></div></div>
+    <div class="m-row"><span class="m-label">戰略定位</span><div class="m-value" id="mStrategy"></div></div>
     <div class="m-row"><span class="m-label">執行 SOP</span><div class="m-value" id="mSop" style="padding:15px;border:2px solid #fff;border-style:dashed;"></div></div>
   </div>
 </div>
 
 <script>
 // =========================================================
-//  ✅ FIX v16.2 : 防止空資料覆蓋 (Data Protection)
+//  ✅ v16.5 : The Mocking Stickman (嘲諷火柴人)
 // =========================================================
 const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQuNQc8E7BlYLR5E6WlYHVQ3l_ki95CqcEcpS8sNQESRKcg5yECE-e2bgMvLGU-Vx5HFuWo5OS1GUIT/pub?output=tsv';
 
@@ -222,12 +277,25 @@ let currentRate = 32.5;
 let cardsData = {}, portfolios = {}, eventsData = [];
 const defaultIconSVG = `<svg class="mc-media" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" r="24" stroke="white" stroke-width="4" fill="none"/></svg>`;
 
+// 🔥 嘲諷火柴人 SVG (Taunt Stickman) 🔥
+// 頭、手趴在牆上、嘴巴、以及一條紅色的舌頭
+const TAUNT_MAN_SVG = `
+<div class="taunt-wrapper">
+    <svg viewBox="0 0 100 100" class="taunt-svg">
+        <path class="taunt-body" d="M20 100 v-20 m60 20 v-20" />
+        <circle class="taunt-body" cx="50" cy="50" r="25" fill="#000" />
+        <path class="taunt-body" d="M40 45 L45 50 M45 45 L40 50 M60 45 L55 50 M55 45 L60 50" stroke-width="2" />
+        <path class="taunt-body" d="M40 65 q10 5 20 0" fill="none" />
+        <path class="taunt-tongue" d="M50 70 v15" />
+    </svg>
+</div>
+`;
+
 init();
 
 async function init() {
     cardsData = {}; portfolios = {}; eventsData = [];
     
-    // 1. 抓取匯率
     try {
         const rateRes = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
         const rateData = await rateRes.json();
@@ -237,17 +305,13 @@ async function init() {
         }
     } catch (e) { console.warn("Rate Fetch Error"); }
 
-    // 2. 抓取 Google Sheet
     try {
         const sheetRes = await fetch(GOOGLE_SHEET_URL);
         if (!sheetRes.ok) throw new Error(`HTTP ${sheetRes.status}`);
         const sheetText = await sheetRes.text();
-        
         parseSheetData(sheetText);
         renderAll();
-
     } catch(e) {
-        console.error(e);
         document.getElementById('cardContainer').innerHTML = `<div style="color:red;padding:20px;">ERROR: ${e.message}</div>`;
     }
 }
@@ -259,8 +323,6 @@ function parseSheetData(text){
 
   for(let i=0; i<rows.length; i++){
     if(!rows[i]) continue;
-    
-    // Auto-detect Tab or Comma
     let c = rows[i].split('\t');
     if(c.length < 2) c = rows[i].split(',');
 
@@ -268,19 +330,11 @@ function parseSheetData(text){
     if(c[0] === '事件簿') { mode = 'EVENTS'; continue; }
 
     if(c[0].startsWith('C')) {
-        // 🔥 【關鍵修復】防止殘缺資料覆蓋有效資料 🔥
-        // 如果這一行資料少於 5 欄 (例如只有 C01, undefined...)，直接跳過，不存入
-        if(c.length < 5) {
-            console.warn(`⚠️ 跳過殘缺資料: ${c[0]} (Cols: ${c.length})`);
-            continue;
-        }
-
+        if(c.length < 5) continue;
         let skillName = c[4]; 
         let costRaw = c[5] ? c[5].replace(/[NT$US,\s]/g, '') : '0';
         let currentRaw = c[6] ? c[6].replace(/[NT$US,\s]/g, '') : '0';
         
-        if (c[0] === 'Logo' && c[1]) logoUrl = c[1];
-
         let imgUrl = c[9] ? c[9].trim() : '';
         let displayMedia = imgUrl.startsWith('http') ? `<img src="${imgUrl}" class="mc-media">` : defaultIconSVG;
         
@@ -292,20 +346,14 @@ function parseSheetData(text){
     } 
     else if(c[0].startsWith('P')){
           if(!portfolios[currentGroup]) portfolios[currentGroup] = [];
-          portfolios[currentGroup].push({
-              code: c[0], name: c[1], 
-              deck: c[2] ? c[2].split('+').map(s=>s.trim()) : [], 
-              deckStr: c[2] || '',
-              mindset: c[3] || '-', persona: c[4] || '-', conflict: c[5] || '-'
-          });
+          portfolios[currentGroup].push({ code: c[0], name: c[1], deck: c[2] ? c[2].split('+').map(s=>s.trim()) : [], deckStr: c[2] || '', mindset: c[3] || '-', persona: c[4] || '-', conflict: c[5] || '-' });
     }
     else if (mode === 'STRATEGIES' && c[0] && !c[0].startsWith('P') && c[0] !== '代號' && c.length < 5) {
-        if(c[0].length > 0) currentGroup = c[0].trim();
+        currentGroup = c[0].trim();
     }
     else if(mode === 'EVENTS' && c[0] && c[0].match(/^\d/)) {
         eventsData.push({ date: c[0], status: c[1] || 'Info', content: c[2] || '', isUrgent: (c[1] || '').includes('緊急') });
     }
-    if(c[0] === 'Logo' && c[1]) logoUrl = c[1];
   }
 }
 
@@ -322,19 +370,10 @@ function calc(cost, cur){
 }
 
 function renderAll(){ 
-    renderHeader();
     renderDashboard(); 
     renderCards(); 
     renderEvents(); 
     renderArena(); 
-}
-
-function renderHeader() {
-    const logoImg = document.getElementById('pageLogo');
-    if (logoUrl && logoUrl.startsWith('http')) {
-        logoImg.src = logoUrl;
-        logoImg.style.display = 'block';
-    }
 }
 
 function renderDashboard(){
@@ -391,7 +430,9 @@ function renderCards(){
   if(Object.keys(cardsData).length === 0) return;
   Object.values(cardsData).forEach(c=>{
     let costDisplay = (c.cost / 10000).toFixed(0); 
+    // 🔥 注入嘲諷火柴人 HTML
     con.innerHTML+=`<div class="micro-card ${c.type}" onclick="openModal('${c.code}')">
+      ${TAUNT_MAN_SVG} 
       <div class="mc-header"><span class="mc-code">${c.code}</span><span class="mc-target">${c.target}</span></div>
       <div class="mc-image-container">${c.media}</div>
       <div class="mc-footer">
