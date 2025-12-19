@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PROJECT CAGE : DIAGNOSTIC v16.1</title>
+<title>PROJECT CAGE : STICKMAN FINAL (v16.2)</title>
 <style>
     /* =========================================
-       v16.1 STICKMAN STYLE (保留手繪風格)
+       v16.2 STICKMAN STYLE (手繪風格)
        ========================================= */
     :root {
         --bg: #000000; --text: #ffffff;
@@ -21,7 +21,7 @@
     body { 
         background-color: var(--bg); color: var(--text); 
         font-family: 'Comic Sans MS', 'Chalkboard SE', 'Marker Felt', sans-serif; 
-        line-height: 1.3; overflow-x: hidden; padding-bottom: 250px; /* 預留底部空間給偵錯框 */
+        line-height: 1.3; overflow-x: hidden; padding-bottom: 50px; 
     }
     
     /* REFRESH */
@@ -144,18 +144,6 @@
     .m-label { display: block; font-size: 0.75rem; color: #888; text-transform: uppercase; margin-bottom: 5px; font-weight: bold; }
     .m-value { font-size: 1.1rem; line-height: 1.5; font-family: 'Comic Sans MS'; }
     .m-value.highlight { font-size: 1.6rem; font-weight: 900; color: var(--gold); text-decoration: underline wavy; }
-
-    /* 🔍 DEBUG INSPECTOR PANEL (數據檢測面板) */
-    #debug-console {
-        position: fixed; bottom: 0; left: 0; width: 100%; height: 180px;
-        background: rgba(255, 235, 59, 0.95); /* 鮮豔黃色 */
-        color: #000; border-top: 4px solid #000;
-        font-family: monospace; font-size: 0.9rem;
-        padding: 10px; overflow-y: auto; z-index: 10000;
-        box-shadow: 0 -5px 20px rgba(0,0,0,0.5);
-    }
-    .debug-title { font-weight: 900; font-size: 1.1rem; margin-bottom: 5px; border-bottom: 2px solid #000; padding-bottom: 5px; }
-    .debug-row { margin-bottom: 5px; border-bottom: 1px dashed #444; padding-bottom: 2px; }
 </style>
 </head>
 <body>
@@ -164,8 +152,8 @@
 <header>
   <img id="pageLogo" src="" alt="Logo">
   <div class="header-text">
-      <h1>PROJECT CAGE <br><span style="font-size:1.2rem;background:white;color:black;padding:2px 8px;">INSPECTOR EDITION</span></h1>
-      <div class="meta-info">v16.1 // NT$ 1,000 萬 // 2025-2031</div>
+      <h1>PROJECT CAGE <br><span style="font-size:1.2rem;background:white;color:black;padding:2px 8px;">STICKMAN REBOOT</span></h1>
+      <div class="meta-info">v16.2 // NT$ 1,000 萬 // 2025-2031</div>
   </div>
 </header>
 
@@ -196,10 +184,10 @@
     </div>
   </div>
 
-  <div class="section-container"><div class="section-title">I. 八大技能卡牌</div></div>
+  <div class="section-container"><div class="section-title">I. 八大技能卡牌 (THE DECK)</div></div>
   <div class="deck-wrapper"><div class="deck-grid" id="cardContainer"><div class="loading">CONNECTING...</div></div></div>
 
-  <div class="section-container"><div class="section-title">II. 事件簿</div></div>
+  <div class="section-container"><div class="section-title">II. 事件簿 (LOGS)</div></div>
   <div class="event-list" id="eventContainer"><div class="loading">CHECKING LOGS...</div></div>
 
   <div class="section-container"><div class="section-title">III. 投資競技場</div></div>
@@ -207,13 +195,9 @@
 
   <div class="footer-grid">
     <div class="info-box"><span class="info-title">🔒 資金封閉鐵律</span>1,000 萬只進不出。</div>
+    <div class="info-box"><span class="info-title">⚖️ 全面公開鐵律</span>投資金額、報酬、對帳單全公開。</div>
     <div class="info-box refresh-btn" onclick="triggerRefresh()">↻ REFRESH DATA (刷新資料)</div>
   </div>
-</div>
-
-<div id="debug-console">
-    <div class="debug-title">🔍 DATA INSPECTOR (數據檢測器)</div>
-    <div id="debug-content">Waiting for data...</div>
 </div>
 
 <div id="cardModal" class="modal-overlay" onclick="closeModal()">
@@ -222,15 +206,15 @@
       <div><span class="m-code" id="mCode"></span><span class="m-skill" id="mSkill"></span></div>
       <span class="close-btn" onclick="closeModal()">&times;</span>
     </div>
-    <div class="m-row"><span class="m-label">初始資金</span><div class="m-value highlight" id="mCost"></div></div>
-    <div class="m-row"><span class="m-label">戰略定位</span><div class="m-value" id="mStrategy"></div></div>
+    <div class="m-row"><span class="m-label">初始資金 (CAPITAL)</span><div class="m-value highlight" id="mCost"></div></div>
+    <div class="m-row"><span class="m-label">戰略定位 (STRATEGY)</span><div class="m-value" id="mStrategy"></div></div>
     <div class="m-row"><span class="m-label">執行 SOP</span><div class="m-value" id="mSop" style="padding:15px;border:2px solid #fff;border-style:dashed;"></div></div>
   </div>
 </div>
 
 <script>
 // =========================================================
-//  ✅ INSPECTOR CORE (資料檢測版)
+//  ✅ FIX v16.2 : 防止空資料覆蓋 (Data Protection)
 // =========================================================
 const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQuNQc8E7BlYLR5E6WlYHVQ3l_ki95CqcEcpS8sNQESRKcg5yECE-e2bgMvLGU-Vx5HFuWo5OS1GUIT/pub?output=tsv';
 
@@ -238,17 +222,9 @@ let currentRate = 32.5;
 let cardsData = {}, portfolios = {}, eventsData = [];
 const defaultIconSVG = `<svg class="mc-media" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" r="24" stroke="white" stroke-width="4" fill="none"/></svg>`;
 
-// DEBUG FUNCTION
-function logDebug(msg) {
-    const el = document.getElementById('debug-content');
-    el.innerHTML += `<div class="debug-row">${msg}</div>`;
-}
-
 init();
 
 async function init() {
-    document.getElementById('debug-content').innerHTML = ''; // Clear debug
-    logDebug("🚀 System Starting...");
     cardsData = {}; portfolios = {}; eventsData = [];
     
     // 1. 抓取匯率
@@ -258,26 +234,21 @@ async function init() {
         if(rateData && rateData.rates && rateData.rates.TWD) {
             currentRate = rateData.rates.TWD;
             document.getElementById('rateInfo').textContent = `USD/TWD: ${currentRate}`;
-            logDebug(`✅ Rate Found: ${currentRate}`);
         }
-    } catch (e) { logDebug("⚠️ Rate Fetch Failed"); }
+    } catch (e) { console.warn("Rate Fetch Error"); }
 
     // 2. 抓取 Google Sheet
     try {
-        logDebug(`📡 Fetching: ${GOOGLE_SHEET_URL.substring(0, 30)}...`);
         const sheetRes = await fetch(GOOGLE_SHEET_URL);
-        
         if (!sheetRes.ok) throw new Error(`HTTP ${sheetRes.status}`);
         const sheetText = await sheetRes.text();
-        
-        logDebug(`📄 Data Received: ${sheetText.length} bytes`);
         
         parseSheetData(sheetText);
         renderAll();
 
     } catch(e) {
-        logDebug(`❌ ERROR: ${e.message}`);
         console.error(e);
+        document.getElementById('cardContainer').innerHTML = `<div style="color:red;padding:20px;">ERROR: ${e.message}</div>`;
     }
 }
 
@@ -285,9 +256,6 @@ function parseSheetData(text){
   const rows = text.split('\n').map(r=>r.trim()); 
   let currentGroup = '未分類';
   let mode = 'CARDS'; 
-  
-  // DEBUG: 顯示第一行數據
-  logDebug(`📊 Rows Found: ${rows.length}`);
 
   for(let i=0; i<rows.length; i++){
     if(!rows[i]) continue;
@@ -300,21 +268,19 @@ function parseSheetData(text){
     if(c[0] === '事件簿') { mode = 'EVENTS'; continue; }
 
     if(c[0].startsWith('C')) {
-        // === CRITICAL DEBUG ===
-        // 抓到第一筆卡片資料時，印出所有欄位給你看
-        if(c[0] === 'C01') {
-            logDebug(`🎯 <b>[C01 INSPECTION]</b>`);
-            logDebug(`Col[0]Code: ${c[0]}`);
-            logDebug(`Col[4]Skill: ${c[4]} (Expect: TW DCA)`);
-            logDebug(`Col[5]Cost: ${c[5]} (Expect: Number)`);
-            logDebug(`Col[6]Val: ${c[6]} (Expect: Number)`);
-            logDebug(`Total Cols: ${c.length}`);
+        // 🔥 【關鍵修復】防止殘缺資料覆蓋有效資料 🔥
+        // 如果這一行資料少於 5 欄 (例如只有 C01, undefined...)，直接跳過，不存入
+        if(c.length < 5) {
+            console.warn(`⚠️ 跳過殘缺資料: ${c[0]} (Cols: ${c.length})`);
+            continue;
         }
 
         let skillName = c[4]; 
         let costRaw = c[5] ? c[5].replace(/[NT$US,\s]/g, '') : '0';
         let currentRaw = c[6] ? c[6].replace(/[NT$US,\s]/g, '') : '0';
         
+        if (c[0] === 'Logo' && c[1]) logoUrl = c[1];
+
         let imgUrl = c[9] ? c[9].trim() : '';
         let displayMedia = imgUrl.startsWith('http') ? `<img src="${imgUrl}" class="mc-media">` : defaultIconSVG;
         
@@ -339,6 +305,7 @@ function parseSheetData(text){
     else if(mode === 'EVENTS' && c[0] && c[0].match(/^\d/)) {
         eventsData.push({ date: c[0], status: c[1] || 'Info', content: c[2] || '', isUrgent: (c[1] || '').includes('緊急') });
     }
+    if(c[0] === 'Logo' && c[1]) logoUrl = c[1];
   }
 }
 
@@ -355,10 +322,19 @@ function calc(cost, cur){
 }
 
 function renderAll(){ 
+    renderHeader();
     renderDashboard(); 
     renderCards(); 
     renderEvents(); 
     renderArena(); 
+}
+
+function renderHeader() {
+    const logoImg = document.getElementById('pageLogo');
+    if (logoUrl && logoUrl.startsWith('http')) {
+        logoImg.src = logoUrl;
+        logoImg.style.display = 'block';
+    }
 }
 
 function renderDashboard(){
@@ -399,6 +375,8 @@ function renderDashboard(){
   const elTotalROI = document.getElementById('totalROI');
   elTotalROI.textContent = `${sTotal.arrow} ${sTotal.sign}${sTotal.roi}%`;
   elTotalROI.className = `total-roi-display ${sTotal.cls}`;
+  document.getElementById('totalDiff').textContent = `${sTotal.sign}$${((totalAssetTWD-totalCostTWD)/10000).toFixed(1)}萬`;
+  document.getElementById('totalDiff').className = `data-val ${sTotal.cls}`;
 
   const hpBar = document.getElementById('hpBar');
   const hpText = document.getElementById('hpText');
@@ -432,7 +410,10 @@ function renderEvents(){
         const urgentClass = e.isUrgent ? ' emergency' : '';
         con.innerHTML += `
         <div class="event-card${urgentClass}">
-            <div class="event-header"><span class="event-date">${e.date}</span><span class="event-status">${e.status}</span></div>
+            <div class="event-header">
+                <span class="event-date">${e.date}</span>
+                <span class="event-status">${e.status}</span>
+            </div>
             <div class="event-content">${e.content}</div>
         </div>`;
     });
