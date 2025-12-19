@@ -3,21 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PROJECT CAGE : STICKMAN REBOOT (v16.0)</title>
+<title>PROJECT CAGE : DIAGNOSTIC v16.1</title>
 <style>
     /* =========================================
-       v16.0 STICKMAN STYLE (手繪風格外殼)
+       v16.1 STICKMAN STYLE (保留手繪風格)
        ========================================= */
     :root {
         --bg: #000000; --text: #ffffff;
         --gold: #ffeb3b; --green: #00ff00; --red: #ff0000; --dark-purple: #ff00ff;
-        /* 保留 v14.6 的變數名以確保相容性 */
         --tw: #ffffff; --us: #ffffff; --yield: #ffffff; --ber: #ffffff; --trap: #ffffff;
-        --hp-full: #ffffff; --hp-low: #ff0000; --hp-over: #ffff00;
-        --cyan: #00ffff; --emergency: #ff0000;
-        
-        /* 手繪邊框參數 */
         --sketch-border: 255px 15px 225px 15px / 15px 225px 15px 255px;
+        --hp-full: #ffffff; --hp-low: #ff0000; --hp-over: #ffff00;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -25,7 +21,7 @@
     body { 
         background-color: var(--bg); color: var(--text); 
         font-family: 'Comic Sans MS', 'Chalkboard SE', 'Marker Felt', sans-serif; 
-        line-height: 1.3; overflow-x: hidden; padding-bottom: 80px; 
+        line-height: 1.3; overflow-x: hidden; padding-bottom: 250px; /* 預留底部空間給偵錯框 */
     }
     
     /* REFRESH */
@@ -42,7 +38,7 @@
     .meta-info { font-family: monospace; color: #aaa; font-size: 0.9rem; margin-top: 5px; font-weight: bold; }
     .container { max-width: 1800px; margin: 0 auto; padding: 0 20px; }
     
-    /* DASHBOARD (保留 v14.6 結構 class，但套用手繪樣式) */
+    /* DASHBOARD */
     .dashboard-panel { margin: 30px 0; }
     .dash-grid { display: grid; grid-template-columns: 1fr 1fr 1.4fr; gap: 25px; }
     
@@ -59,21 +55,11 @@
     .data-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
     .data-label { font-size: 1.1rem; color: #888; font-weight: 800; }
     .data-val { font-family: monospace; font-size: 1.6rem; font-weight: 900; color: #fff; }
-    .data-val .unit-tag { font-size: 0.9rem; color: #666; margin-left: 5px; font-weight: bold; } /* 保留 v14.6 結構 */
+    .data-val .unit-tag { font-size: 0.9rem; color: #666; margin-left: 5px; font-weight: bold; }
     
-    /* HP BAR */
-    .hp-wrapper {
-        width: 100%; height: 32px; background: #222; border: 2px solid #fff; border-radius: var(--sketch-border);
-        position: relative; margin-bottom: 15px; overflow: hidden;
-    }
-    .hp-fill {
-        height: 100%; width: 0%; transition: width 1s; border-right: 2px solid #fff;
-        background: repeating-linear-gradient(45deg, #fff, #fff 10px, #000 10px, #000 20px);
-    }
-    .hp-text {
-        position: absolute; top: 0; left: 10px; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
-        color: #fff; font-family: monospace; font-weight: 900; font-size: 0.9rem; mix-blend-mode: difference;
-    }
+    .hp-wrapper { width: 100%; height: 32px; background: #222; border: 2px solid #fff; border-radius: var(--sketch-border); position: relative; margin-bottom: 15px; overflow: hidden; }
+    .hp-fill { height: 100%; width: 0%; transition: width 1s; border-right: 2px solid #fff; background: repeating-linear-gradient(45deg, #fff, #fff 10px, #000 10px, #000 20px); }
+    .hp-text { position: absolute; top: 0; left: 10px; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #fff; font-family: monospace; font-weight: 900; font-size: 0.9rem; mix-blend-mode: difference; }
 
     .total-big-val { font-family: monospace; font-size: 3rem; font-weight: 900; text-align: right; margin: 5px 0 10px; text-shadow: 4px 4px 0px #333; }
     .profit-block { margin-top: 15px; padding: 15px; background: #000; border: 2px solid #fff; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 5px 5px 0px #333; }
@@ -82,7 +68,6 @@
     .total-roi-display { font-family: monospace; font-size: 1.5rem; font-weight: 900; text-align: right; margin-bottom: 15px; }
     .rate-display { font-family: monospace; font-size: 0.75rem; color: #666; text-align: right; margin-top: 5px; }
     
-    /* Colors */
     .c-tw, .c-us, .c-gold { color: #fff; }
     .color-profit { color: var(--green)!important; }
     .color-loss { color: var(--red)!important; text-decoration: line-through; }
@@ -91,17 +76,12 @@
     
     @media(max-width: 900px) { .dash-grid { grid-template-columns: 1fr; gap: 15px; } .total-big-val { font-size: 2.2rem; } }
 
-    /* SECTIONS */
     .section-title { font-size: 1.5rem; border: 2px solid #fff; padding: 10px 20px; margin: 50px 0 25px; text-transform: uppercase; font-weight: 900; display: inline-block; transform: rotate(-1deg); background: #000; }
     .section-container { text-align: center; }
 
-    /* DECK */
     .deck-wrapper { overflow-x: auto; padding-bottom: 25px; padding-top: 10px; }
     .deck-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 15px; min-width: 0; } 
-    .micro-card { 
-        background: #000; border: 2px solid #fff; border-radius: var(--sketch-border);
-        padding: 12px 10px; cursor: pointer; display: flex; flex-direction: column; min-height: 240px; position: relative; 
-    }
+    .micro-card { background: #000; border: 2px solid #fff; border-radius: var(--sketch-border); padding: 12px 10px; cursor: pointer; display: flex; flex-direction: column; min-height: 240px; position: relative; }
     @keyframes wiggle { 0% { transform: rotate(0deg); } 25% { transform: rotate(1deg); } 75% { transform: rotate(-1deg); } 100% { transform: rotate(0deg); } }
     .micro-card:hover { animation: wiggle 0.2s infinite; border-color: var(--gold); z-index: 10; background: #111; }
     
@@ -121,10 +101,7 @@
 
     /* EVENT LOG */
     .event-list { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; }
-    .event-card { 
-        background: #000; border: 2px solid #fff; border-radius: 3px 20px 4px 30px; 
-        padding: 20px; height: 100%; display: flex; flex-direction: column; 
-    }
+    .event-card { background: #000; border: 2px solid #fff; border-radius: 3px 20px 4px 30px; padding: 20px; height: 100%; display: flex; flex-direction: column; }
     .event-header { display: flex; justify-content: space-between; margin-bottom: 12px; font-family: monospace; border-bottom: 1px dashed #555; padding-bottom: 8px; }
     .event-date { color: #888; }
     .event-status { color: #000; font-weight: bold; background: #fff; padding: 2px 8px; border-radius: 4px; }
@@ -133,10 +110,7 @@
     /* ARENA */
     .arena-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; }
     .arena-group { border: 2px solid #fff; border-radius: 12px; padding: 15px; display: flex; flex-direction: column; }
-    .group-header { 
-        text-align: center; font-weight: 900; font-size: 1.5rem; color: #000; background: #fff;
-        margin-bottom: 20px; padding: 5px; transform: rotate(-1deg); display: inline-block; width: 100%;
-    }
+    .group-header { text-align: center; font-weight: 900; font-size: 1.5rem; color: #000; background: #fff; margin-bottom: 20px; padding: 5px; transform: rotate(-1deg); display: inline-block; width: 100%; }
     .g-bar { display: grid; grid-template-columns: 60px 1fr 120px 110px; align-items: center; border: 2px solid #555; padding: 15px; border-radius: 8px; cursor: pointer; margin-bottom: 10px; }
     .g-bar:hover { background: #111; border-color: #fff; }
     .g-bar.active { border-color: var(--gold); border-style: dashed; }
@@ -146,7 +120,6 @@
     .g-deck-icons { display: flex; gap: 5px; justify-content: center; }
     .g-mini-icon img { filter: grayscale(100%); width: 32px; height: 32px; }
     .g-roi { font-family: monospace; font-weight: 900; font-size: 1.4rem; text-align: right; }
-    
     .g-details { max-height: 0; overflow: hidden; transition: max-height .4s ease; border-left: 2px dashed #fff; margin-left: 10px; }
     .g-bar.active + .g-details { max-height: 800px; padding: 15px; border-bottom: 2px dashed #fff; }
     .d-row { display: flex; gap: 15px; border-bottom: 1px dashed #333; padding-bottom: 8px; margin-bottom: 8px; }
@@ -172,12 +145,17 @@
     .m-value { font-size: 1.1rem; line-height: 1.5; font-family: 'Comic Sans MS'; }
     .m-value.highlight { font-size: 1.6rem; font-weight: 900; color: var(--gold); text-decoration: underline wavy; }
 
-    /* DEBUG BAR (狀態列) */
-    #status-bar { 
-        position: fixed; bottom: 0; left: 0; width: 100%; background: #ffd700; color: #000; 
-        font-family: monospace; font-weight: bold; padding: 5px 10px; font-size: 0.8rem; 
-        z-index: 10000; text-align: center; border-top: 2px solid #000;
+    /* 🔍 DEBUG INSPECTOR PANEL (數據檢測面板) */
+    #debug-console {
+        position: fixed; bottom: 0; left: 0; width: 100%; height: 180px;
+        background: rgba(255, 235, 59, 0.95); /* 鮮豔黃色 */
+        color: #000; border-top: 4px solid #000;
+        font-family: monospace; font-size: 0.9rem;
+        padding: 10px; overflow-y: auto; z-index: 10000;
+        box-shadow: 0 -5px 20px rgba(0,0,0,0.5);
     }
+    .debug-title { font-weight: 900; font-size: 1.1rem; margin-bottom: 5px; border-bottom: 2px solid #000; padding-bottom: 5px; }
+    .debug-row { margin-bottom: 5px; border-bottom: 1px dashed #444; padding-bottom: 2px; }
 </style>
 </head>
 <body>
@@ -186,8 +164,8 @@
 <header>
   <img id="pageLogo" src="" alt="Logo">
   <div class="header-text">
-      <h1>PROJECT CAGE <br><span style="font-size:1.2rem;background:white;color:black;padding:2px 8px;">STICKMAN REBOOT</span></h1>
-      <div class="meta-info">v16.0 // NT$ 1,000 萬 // 2025-2031</div>
+      <h1>PROJECT CAGE <br><span style="font-size:1.2rem;background:white;color:black;padding:2px 8px;">INSPECTOR EDITION</span></h1>
+      <div class="meta-info">v16.1 // NT$ 1,000 萬 // 2025-2031</div>
   </div>
 </header>
 
@@ -206,47 +184,37 @@
         <div class="data-row"><span class="data-label">總現值 ASSET</span><span class="data-val asset" id="assetUS">...<span class="unit-tag">美金</span></span></div>
         <div class="profit-block"><span class="profit-main" id="plUS_val">...</span><span class="profit-sub" id="plUS_pct">...</span></div>
       </div>
-      
       <div class="dash-group total-style">
         <div class="dash-header" style="justify-content: center;"><span class="dash-title c-gold">TOTAL ASSET 總身價</span></div>
-        
-        <div class="hp-wrapper">
-            <div class="hp-fill" id="hpBar"></div>
-            <div class="hp-text" id="hpText">HP: LOADING...</div>
-        </div>
-
+        <div class="hp-wrapper"><div class="hp-fill" id="hpBar"></div><div class="hp-text" id="hpText">LOADING...</div></div>
         <div class="total-big-val" id="totalAsset">...</div>
-        <div class="total-roi-block">
-            <div class="total-roi-display" id="totalROI">...</div>
-        </div>
-        <div class="data-row"><span class="data-label">總投入成本 (TWD)</span><span class="data-val" id="totalCostTWD">...</span></div>
-        <div class="data-row"><span class="data-label">總帳面損益 (TWD)</span><span class="data-val" id="totalDiff">...</span></div>
-        <div class="rate-display" id="rateInfo">Loading Rate...</div>
+        <div class="total-roi-block"><div class="total-roi-display" id="totalROI">...</div></div>
+        <div class="data-row"><span class="data-label">總投入成本</span><span class="data-val" id="totalCostTWD">...</span></div>
+        <div class="data-row"><span class="data-label">總帳面損益</span><span class="data-val" id="totalDiff">...</span></div>
+        <div class="rate-display" id="rateInfo">Rate...</div>
       </div>
     </div>
   </div>
 
-  <div class="section-container"><div class="section-title">I. 八大技能卡牌 (THE DECK)</div></div>
-  <div class="deck-wrapper"><div class="deck-grid" id="cardContainer"><div class="loading">CONNECTING TO DATABASE...</div></div></div>
+  <div class="section-container"><div class="section-title">I. 八大技能卡牌</div></div>
+  <div class="deck-wrapper"><div class="deck-grid" id="cardContainer"><div class="loading">CONNECTING...</div></div></div>
 
-  <div class="section-container"><div class="section-title">II. 事件簿 (EVENT LOG)</div></div>
-  <div class="event-list" id="eventContainer">
-      <div class="loading" style="padding:10px; color:#666">CHECKING LOGS...</div>
-  </div>
+  <div class="section-container"><div class="section-title">II. 事件簿</div></div>
+  <div class="event-list" id="eventContainer"><div class="loading">CHECKING LOGS...</div></div>
 
   <div class="section-container"><div class="section-title">III. 投資競技場</div></div>
   <div class="arena-container" id="arenaContainer"><div class="loading">LOADING STRATEGIES...</div></div>
 
   <div class="footer-grid">
-    <div class="info-box"><span class="info-title">🔒 資金封閉鐵律</span>1,000 萬只進不出。僅能在定存、活存、證券戶間流動，嚴禁消費。</div>
-    <div class="info-box"><span class="info-title">⚖️ 全面公開鐵律</span>投資金額(TWD & USD)、投資報酬(%)、對帳單 。</div>
-    <div class="info-box"><span class="info-title">🔄 配息再投入鐵律</span>股息 100% 留倉再投入，視為淨值一部分，維持複利效應。</div>
-    <div class="info-box"><span class="info-title">🏆 紀律執行鐵律</span>每一張卡牌的策略都嚴格執行進出SOP。</div>
+    <div class="info-box"><span class="info-title">🔒 資金封閉鐵律</span>1,000 萬只進不出。</div>
     <div class="info-box refresh-btn" onclick="triggerRefresh()">↻ REFRESH DATA (刷新資料)</div>
   </div>
 </div>
 
-<div id="status-bar">System Ready.</div>
+<div id="debug-console">
+    <div class="debug-title">🔍 DATA INSPECTOR (數據檢測器)</div>
+    <div id="debug-content">Waiting for data...</div>
+</div>
 
 <div id="cardModal" class="modal-overlay" onclick="closeModal()">
   <div class="modal-content" onclick="event.stopPropagation()">
@@ -254,103 +222,34 @@
       <div><span class="m-code" id="mCode"></span><span class="m-skill" id="mSkill"></span></div>
       <span class="close-btn" onclick="closeModal()">&times;</span>
     </div>
-    <div class="m-row"><span class="m-label">初始資金 (CAPITAL)</span><div class="m-value highlight" id="mCost"></div></div>
-    <div class="m-row"><span class="m-label">戰略定位 (STRATEGY)</span><div class="m-value" id="mStrategy"></div></div>
-    <div class="m-row"><span class="m-label">嚴格執行 SOP</span><div class="m-value" id="mSop" style="padding:15px;border:2px solid #fff;border-style:dashed;"></div></div>
+    <div class="m-row"><span class="m-label">初始資金</span><div class="m-value highlight" id="mCost"></div></div>
+    <div class="m-row"><span class="m-label">戰略定位</span><div class="m-value" id="mStrategy"></div></div>
+    <div class="m-row"><span class="m-label">執行 SOP</span><div class="m-value" id="mSop" style="padding:15px;border:2px solid #fff;border-style:dashed;"></div></div>
   </div>
 </div>
 
 <script>
 // =========================================================
-//  ✅ 嚴格使用 v14.6 原始邏輯 (Cyberpunk Version Core)
-//  完全不做任何變數名稱修改，確保邏輯一致
+//  ✅ INSPECTOR CORE (資料檢測版)
 // =========================================================
 const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQuNQc8E7BlYLR5E6WlYHVQ3l_ki95CqcEcpS8sNQESRKcg5yECE-e2bgMvLGU-Vx5HFuWo5OS1GUIT/pub?output=tsv';
 
-// 備份資料 (僅作為最終手段，格式與 v14.6 完全一致)
-const FALLBACK_DATA = `
-A (code)	B (type)	C (rpg)	D (target)	E (skill)	F (cost)	G (current)	H (strategy)	I (sop)	J (image)
-C01	type-tw	平庸的定期定額	006208	TW DCA	NT$2,520,000	2,595,945	賣暢銷書賺到財富自由的大師們都推薦的平庸策略	每個月 5 ,15,25號：每次扣款 NT$10,000	https://ubamboo-design.github.io/Mark-investment-dashboard/C01.png
-C02	type-tw	QQQ獎金給我她奶奶的all in	006208	TW LSI	NT$1,750,000	1,750,000	獎金就是他奶奶的用來all in的	年終過完年後首週五加碼 NT$15 萬	https://ubamboo-design.github.io/Mark-investment-dashboard/C02.png
-C03	type-yield	股息cover每一天	00878	YIELD	NT$840,000	840,636	最滿足心理帳戶的坑爹的策略	每月 5 號：扣款 NT$10,000	https://ubamboo-design.github.io/Mark-investment-dashboard/C03.png
-C04	type-ber	問就是正2	00631L	SEALED	NT$500,000	500,000	股票50:現金50 ，當股票資產偏離 >75% 或 <50% 強制再平衡	https://ubamboo-design.github.io/Mark-investment-dashboard/C04.png
-C05	type-us	要買就買全世界	VT	GLOBAL DCA	$50,000.00	50,000	資產配置我好棒	每月 5 號買600美金	https://ubamboo-design.github.io/Mark-investment-dashboard/C05.png
-C06	type-us	美國就是我爸爸	VOO	US DCA	$50,000.00	50,000	我就舔	每月 5 號買600美金	https://ubamboo-design.github.io/Mark-investment-dashboard/C06.png
-C07	type-trap	可以進場了嗎?	CASH/006208	AMBUSH	NT$900,000	900,000	再等一等好了~然後就沒有然後了~	股市修正20%後進場9萬	https://ubamboo-design.github.io/Mark-investment-dashboard/C07.png
-C02-1	type-tw	履歷才是最強Asset	006208	TW LSI	NT$500,000	500,000	等待大崩盤的那一天我就贏了?	2025/1/6 開盤抽	https://ubamboo-design.github.io/Mark-investment-dashboard/C01.png
-	
-代號	名稱	牌組	競技亮點	投資人格側寫	預期心理衝突	
-P01	台股定期定額	C01	單純驗證「大師們推薦的平庸策略」到底有多平庸。	佛系躺平族：相信大師，放棄思考。	最無心理負擔。	
-P02	台股雙核心	C01+C02	當市場大漲時嫌 C01 慢，大跌時怪 C02 衝太快。	穩健進取型：試圖在平庸與激進間取得平衡。	單筆投入的條件是不能離場。	
-P03	最貴的安眠藥	C03	長期績效最差，但是心理最舒服	收租心態者：只在乎現金流，不在乎淨值。	熊市中最抗跌（心理上）。	
-P04	無限等待之術	C07	大機率會空手很久。驗證「擇時等待」是否會輸給「閉眼投入」。	完美主義者：試圖扮演上帝。	大機率長期空手。	
-	
-P05	大哥沒有輸	C02-1	是否能跑贏槓桿流。	沒人會這樣投資!!	資金效率壓滿，但是贏的路徑太單一。	
-P06	槓桿投資法	C04	是封神還是風神?	數學賭徒用紀律駕馭槓桿波動。	在自動的扣寫機制下，逆價差與槓桿偏移能一直有效嗎?	
-	
-P07	全球雙核心	C05+C06	全球基本盤加美股加速器。	資產配置派：既要分散又要績效。	內心的矛盾：VT 的拖累會讓其不斷質疑為何不全押 VOO。	
-P08	全球資產配置	C05	小孩子才做選擇	懷疑論者：不相信任何單一國家能長盛不衰。	極度考驗耐心，需對抗 FOMO。	
-P09	帝國信仰者	C06	簡單暴力的「舔狗」策略，賭的就是美國的霸權。	帝國主義者：賭美國國運。	在美元走弱或美股回調時，信仰崩塌的風險最大。	
-	
-P10	台美暴力型	C02+C06	台股重壓 + 美股重壓。	科技信徒：看好台美科技連動。	進攻性最強，波動最劇烈。	
-P11	選擇障礙型	C01+C05+C06	大師說什麼好我就跟	雖然我不知道什麼好，反正都給我來一點	
-P12	真的好無聊型	C01+C03+C05	理論上波動最小。	學院派：理論上最正確的組合。	「好無聊」是最大的敵人。	
-P13	跨國槓鈴策略	C03+C06	台灣複委託投資人中相當普遍	心理帳戶的平衡（槓鈴結構）	投資人會陷入「後悔」的迴圈。
-	
-事件簿	狀態	內容	
-2025/12/12	緊急	聯準會降息	
-2025/12/24	風和日麗	聖誕節	
-	
-Logo	https://ubamboo-design.github.io/Mark-investment-dashboard/Mark_Investment_LOGO1.png
-`.trim();
-
 let currentRate = 32.5;
 let cardsData = {}, portfolios = {}, eventsData = [];
-let logoUrl = ''; 
-let isFallback = false;
+const defaultIconSVG = `<svg class="mc-media" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" r="24" stroke="white" stroke-width="4" fill="none"/></svg>`;
 
-// 預設圖示 (火柴人風格)
-const defaultIcons = {
-    'C01': `<svg class="mc-media" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" r="24" stroke="white" stroke-width="4" fill="none"/></svg>`
-};
-
-// 狀態列工具
-function logStatus(msg) {
-    document.getElementById('status-bar').textContent = msg;
-    console.log('[SYSTEM]', msg);
+// DEBUG FUNCTION
+function logDebug(msg) {
+    const el = document.getElementById('debug-content');
+    el.innerHTML += `<div class="debug-row">${msg}</div>`;
 }
 
-// 啟動
 init();
 
-// ================= PULL TO REFRESH =================
-let touchStart = 0;
-let touchEnd = 0;
-const refreshIndicator = document.getElementById('refresh-indicator');
-const spinner = document.querySelector('.spinner');
-
-document.addEventListener('touchstart', e => { if(window.scrollY === 0) touchStart = e.changedTouches[0].screenY; });
-document.addEventListener('touchmove', e => {
-    if(window.scrollY === 0) {
-        touchEnd = e.changedTouches[0].screenY;
-        if(touchEnd > touchStart && (touchEnd - touchStart) < 200) refreshIndicator.style.height = (touchEnd - touchStart) + 'px';
-    }
-});
-document.addEventListener('touchend', async e => {
-    if(window.scrollY === 0 && (touchEnd - touchStart) > 100) triggerRefresh(true);
-    else refreshIndicator.style.height = '0px';
-});
-async function triggerRefresh(keepOpen = false) {
-    if(!keepOpen) refreshIndicator.style.height = '60px';
-    spinner.style.display = 'block';
-    await init();
-    setTimeout(() => { refreshIndicator.style.height = '0px'; spinner.style.display = 'none'; }, 800);
-}
-
 async function init() {
-    logStatus("Starting connection...");
+    document.getElementById('debug-content').innerHTML = ''; // Clear debug
+    logDebug("🚀 System Starting...");
     cardsData = {}; portfolios = {}; eventsData = [];
-    isFallback = false;
     
     // 1. 抓取匯率
     try {
@@ -359,39 +258,26 @@ async function init() {
         if(rateData && rateData.rates && rateData.rates.TWD) {
             currentRate = rateData.rates.TWD;
             document.getElementById('rateInfo').textContent = `USD/TWD: ${currentRate}`;
+            logDebug(`✅ Rate Found: ${currentRate}`);
         }
-    } catch (e) { console.warn('Rate Fetch Error'); }
+    } catch (e) { logDebug("⚠️ Rate Fetch Failed"); }
 
-    // 2. 抓取 Google Sheet (使用最原始的 Fetch)
+    // 2. 抓取 Google Sheet
     try {
+        logDebug(`📡 Fetching: ${GOOGLE_SHEET_URL.substring(0, 30)}...`);
         const sheetRes = await fetch(GOOGLE_SHEET_URL);
-        logStatus(`HTTP Response: ${sheetRes.status}`);
         
         if (!sheetRes.ok) throw new Error(`HTTP ${sheetRes.status}`);
         const sheetText = await sheetRes.text();
         
-        // 檢查是不是 HTML 錯誤頁面
-        if(sheetText.length < 50 || sheetText.trim().startsWith('<')) {
-            throw new Error('Format Error (Received HTML)');
-        }
+        logDebug(`📄 Data Received: ${sheetText.length} bytes`);
         
-        logStatus("Parsing Data...");
         parseSheetData(sheetText);
-        logStatus("Rendering...");
         renderAll();
-        logStatus("System Online (Connected)");
 
     } catch(e) {
-        console.warn('Connection failed, loading fallback data...', e);
-        logStatus(`Connection Failed: ${e.message}. Using Backup.`);
-        isFallback = true;
-        parseSheetData(FALLBACK_DATA);
-        renderAll();
-        
-        const meta = document.querySelector('.meta-info');
-        if(!meta.innerHTML.includes('OFFLINE')) {
-             meta.innerHTML += ` <span style="color:red">[OFFLINE MODE]</span>`;
-        }
+        logDebug(`❌ ERROR: ${e.message}`);
+        console.error(e);
     }
 }
 
@@ -399,11 +285,14 @@ function parseSheetData(text){
   const rows = text.split('\n').map(r=>r.trim()); 
   let currentGroup = '未分類';
   let mode = 'CARDS'; 
+  
+  // DEBUG: 顯示第一行數據
+  logDebug(`📊 Rows Found: ${rows.length}`);
 
   for(let i=0; i<rows.length; i++){
     if(!rows[i]) continue;
     
-    // 自動偵測 Tab 或 Comma
+    // Auto-detect Tab or Comma
     let c = rows[i].split('\t');
     if(c.length < 2) c = rows[i].split(',');
 
@@ -411,16 +300,23 @@ function parseSheetData(text){
     if(c[0] === '事件簿') { mode = 'EVENTS'; continue; }
 
     if(c[0].startsWith('C')) {
+        // === CRITICAL DEBUG ===
+        // 抓到第一筆卡片資料時，印出所有欄位給你看
+        if(c[0] === 'C01') {
+            logDebug(`🎯 <b>[C01 INSPECTION]</b>`);
+            logDebug(`Col[0]Code: ${c[0]}`);
+            logDebug(`Col[4]Skill: ${c[4]} (Expect: TW DCA)`);
+            logDebug(`Col[5]Cost: ${c[5]} (Expect: Number)`);
+            logDebug(`Col[6]Val: ${c[6]} (Expect: Number)`);
+            logDebug(`Total Cols: ${c.length}`);
+        }
+
         let skillName = c[4]; 
         let costRaw = c[5] ? c[5].replace(/[NT$US,\s]/g, '') : '0';
         let currentRaw = c[6] ? c[6].replace(/[NT$US,\s]/g, '') : '0';
         
-        if (c[0] === 'Logo' && c[1]) logoUrl = c[1];
-
         let imgUrl = c[9] ? c[9].trim() : '';
-        let displayMedia = imgUrl.startsWith('http') 
-            ? `<img src="${imgUrl}" class="mc-media" alt="${skillName}">` 
-            : (defaultIcons['C01']);
+        let displayMedia = imgUrl.startsWith('http') ? `<img src="${imgUrl}" class="mc-media">` : defaultIconSVG;
         
         cardsData[c[0]] = {
             code: c[0], type: c[1], rpg: c[2], target: c[3], skill: skillName,
@@ -434,24 +330,15 @@ function parseSheetData(text){
               code: c[0], name: c[1], 
               deck: c[2] ? c[2].split('+').map(s=>s.trim()) : [], 
               deckStr: c[2] || '',
-              mindset: c[3] || '-',        
-              persona: c[4] || '-',        
-              conflict: c[5] || '-',      
-              theory: '-' 
+              mindset: c[3] || '-', persona: c[4] || '-', conflict: c[5] || '-'
           });
     }
     else if (mode === 'STRATEGIES' && c[0] && !c[0].startsWith('P') && c[0] !== '代號' && c.length < 5) {
         if(c[0].length > 0) currentGroup = c[0].trim();
     }
     else if(mode === 'EVENTS' && c[0] && c[0].match(/^\d/)) {
-        eventsData.push({ 
-            date: c[0], 
-            status: c[1] || 'Info', 
-            content: c[2] || '',
-            isUrgent: (c[1] || '').includes('緊急') 
-        });
+        eventsData.push({ date: c[0], status: c[1] || 'Info', content: c[2] || '', isUrgent: (c[1] || '').includes('緊急') });
     }
-    if(c[0] === 'Logo' && c[1]) logoUrl = c[1];
   }
 }
 
@@ -464,40 +351,24 @@ function calc(cost, cur){
   if (roiRaw >= 0.5) cls = 'color-gold'; 
   else if (roiRaw >= 0) cls = 'color-profit'; 
   else if (roiRaw <= -0.5) cls = 'color-dead'; 
-  else cls = 'color-loss'; 
   return {roi, arrow: roi>=0 ? '▲' : '▼', sign: roi>=0 ? '+' : '', cls, diff};
 }
 
 function renderAll(){ 
-    renderHeader();
     renderDashboard(); 
     renderCards(); 
     renderEvents(); 
     renderArena(); 
 }
 
-function renderHeader() {
-    const logoImg = document.getElementById('pageLogo');
-    if (logoUrl && logoUrl.startsWith('http')) {
-        logoImg.src = logoUrl;
-        logoImg.style.display = 'block';
-    }
-}
-
 function renderDashboard(){
   let tcTW=0, taTW=0, tcUS=0, taUS=0;
   Object.values(cardsData).forEach(c => {
-      if(c.type.includes('us')) {
-          tcUS += c.cost;
-          taUS += c.current;
-      } else {
-          tcTW += c.cost;
-          taTW += c.current;
-      }
+      if(c.type && c.type.includes('us')) { tcUS += c.cost; taUS += c.current; } 
+      else { tcTW += c.cost; taTW += c.current; }
   });
 
   const sTW = calc(tcTW, taTW);
-  // 使用最安全的 innerHTML 賦值方式，避免破壞 span 結構
   document.getElementById('costTW').innerHTML = '$' + (tcTW/10000).toFixed(0) + '萬<span class="unit-tag">台幣</span>';
   document.getElementById('assetTW').innerHTML = '$' + (taTW/10000).toFixed(0) + '萬<span class="unit-tag">台幣</span>';
   
@@ -517,7 +388,6 @@ function renderDashboard(){
   document.getElementById('plUS_pct').textContent = `${sUS.arrow} ${sUS.roi}%`;
   document.getElementById('plUS_pct').className = `profit-sub ${sUS.cls}`;
 
-  // 總資產計算
   const totalAssetTWD = taTW + (taUS * currentRate);
   const totalCostTWD = tcTW + (tcUS * currentRate); 
   const sTotal = calc(totalCostTWD, totalAssetTWD);
@@ -525,35 +395,22 @@ function renderDashboard(){
   cur.textContent = 'NT$ ' + totalAssetTWD.toLocaleString(undefined, {maximumFractionDigits: 0});
   cur.className = 'total-big-val ' + sTotal.cls;
   document.getElementById('totalCostTWD').textContent = '$' + (totalCostTWD/10000).toFixed(0) + '萬';
-  const totalDiff = totalAssetTWD - totalCostTWD;
-  const totalSign = totalDiff >= 0 ? '+' : '';
-  const elDiff = document.getElementById('totalDiff');
-  elDiff.textContent = `${totalSign}$${(totalDiff/10000).toFixed(1)}萬`;
-  elDiff.className = `data-val ${sTotal.cls}`;
   
   const elTotalROI = document.getElementById('totalROI');
   elTotalROI.textContent = `${sTotal.arrow} ${sTotal.sign}${sTotal.roi}%`;
   elTotalROI.className = `total-roi-display ${sTotal.cls}`;
 
-  // HP Bar Logic
   const hpBar = document.getElementById('hpBar');
   const hpText = document.getElementById('hpText');
   let hpPercent = (totalAssetTWD / totalCostTWD) * 100;
-  
   if(totalCostTWD <= 0) hpPercent = 100;
-
   hpText.textContent = `HP: ${totalAssetTWD.toLocaleString()} / ${totalCostTWD.toLocaleString()}`;
-  
-  hpBar.className = 'hp-fill';
   hpBar.style.width = hpPercent >= 100 ? '100%' : `${hpPercent}%`;
 }
 
 function renderCards(){
   const con=document.getElementById('cardContainer'); con.innerHTML='';
-  if(Object.keys(cardsData).length === 0) {
-      con.innerHTML = '<div style="color:white;padding:20px;">NO DATA FOUND</div>';
-      return;
-  }
+  if(Object.keys(cardsData).length === 0) return;
   Object.values(cardsData).forEach(c=>{
     let costDisplay = (c.cost / 10000).toFixed(0); 
     con.innerHTML+=`<div class="micro-card ${c.type}" onclick="openModal('${c.code}')">
@@ -570,20 +427,12 @@ function renderCards(){
 
 function renderEvents(){
     const con = document.getElementById('eventContainer');
-    const validEvents = eventsData.slice(0, 2); 
-    if(validEvents.length === 0) {
-        con.innerHTML = '<div style="padding:15px;color:#666">NO EVENTS LOGGED.</div>';
-        return;
-    }
     con.innerHTML = '';
-    validEvents.forEach(e => {
+    eventsData.slice(0, 2).forEach(e => {
         const urgentClass = e.isUrgent ? ' emergency' : '';
         con.innerHTML += `
         <div class="event-card${urgentClass}">
-            <div class="event-header">
-                <span class="event-date">${e.date}</span>
-                <span class="event-status">${e.status}</span>
-            </div>
+            <div class="event-header"><span class="event-date">${e.date}</span><span class="event-status">${e.status}</span></div>
             <div class="event-content">${e.content}</div>
         </div>`;
     });
@@ -592,47 +441,24 @@ function renderEvents(){
 function renderArena(){
   const con=document.getElementById('arenaContainer'); con.innerHTML = ''; 
   Object.keys(portfolios).forEach(groupName => {
-      
-      const strategiesWithROI = portfolios[groupName].map(p => {
+      const strategies = portfolios[groupName].map(p => {
           let tc = 0, ta = 0;
-          p.deck.forEach(d => {
-              if(cardsData[d]) { tc += cardsData[d].cost; ta += cardsData[d].current; }
-          });
-          const s = calc(tc, ta);
-          return { ...p, roiVal: parseFloat(s.roi), stats: s }; 
-      });
-
-      strategiesWithROI.sort((a, b) => b.roiVal - a.roiVal);
+          p.deck.forEach(d => { if(cardsData[d]) { tc += cardsData[d].cost; ta += cardsData[d].current; } });
+          return { ...p, stats: calc(tc, ta) }; 
+      }).sort((a, b) => parseFloat(b.stats.roi) - parseFloat(a.stats.roi));
 
       let groupHtml = `<div class="arena-group"><div class="group-header">${groupName}</div>`;
-      
-      strategiesWithROI.forEach(p => {
-        const icons = p.deck.map(code => {
-          const c = cardsData[code];
-          if(c && c.media.includes('<img')) {
-             const srcMatch = c.media.match(/src="([^"]*)"/);
-             const src = srcMatch ? srcMatch[1] : '';
-             return `<span class="g-mini-icon ${c.type}"><img src="${src}"></span>`;
-          } else if(c) {
-             return `<span class="g-mini-icon ${c.type}">${c.media.replace('mc-media', '')}</span>`;
-          }
-          return '';
-        }).join('');
-        
+      strategies.forEach(p => {
+        const icons = p.deck.map(d => cardsData[d] ? `<span class="g-mini-icon">${cardsData[d].media.includes('<img') ? '<img src="'+cardsData[d].media.match(/src="([^"]*)"/)[1]+'">' : cardsData[d].media}</span>` : '').join('');
         const s = p.stats;
-        
         groupHtml += `
           <div class="g-bar-container">
             <div class="g-bar" onclick="this.classList.toggle('active')">
                 <span class="g-code">${p.code}</span>
-                <div class="g-name-group">
-                    <span class="g-name-bar">${p.name}</span>
-                    <span class="g-deck-str">${p.deckStr}</span>
-                </div>
+                <div class="g-name-group"><span class="g-name-bar">${p.name}</span><span class="g-deck-str">${p.deckStr}</span></div>
                 <div class="g-deck-icons">${icons}</div>
                 <div class="g-roi ${s.cls}">${s.sign}${s.roi}%</div>
             </div>
-            
             <div class="g-details">
                 <div class="highlight-content">
                     <div class="d-row"><span class="d-label">✨ 亮點</span><span class="d-text">${p.mindset}</span></div>
@@ -654,12 +480,20 @@ function openModal(k){
   document.getElementById('mCost').textContent=`${c.type.includes('us')?'US$':'NT$'} ${c.cost.toLocaleString()}`;
   document.getElementById('mStrategy').textContent=c.strategy;
   document.getElementById('mSop').textContent=c.sop;
-  document.querySelector('.modal-content').style.borderColor='#fff';
   document.getElementById('cardModal').style.display='flex';
   document.getElementById('cardModal').classList.add('modal-active');
 }
 function closeModal(){document.getElementById('cardModal').style.display='none'}
 document.addEventListener('keydown',e=>e.key==='Escape'&&closeModal());
+
+// Refresh Logic
+let touchStart = 0, touchEnd = 0;
+const refreshIndicator = document.getElementById('refresh-indicator');
+const spinner = document.querySelector('.spinner');
+document.addEventListener('touchstart', e => { if(window.scrollY === 0) touchStart = e.changedTouches[0].screenY; });
+document.addEventListener('touchmove', e => { if(window.scrollY === 0) { touchEnd = e.changedTouches[0].screenY; if(touchEnd > touchStart && (touchEnd - touchStart) < 200) refreshIndicator.style.height = (touchEnd - touchStart) + 'px'; } });
+document.addEventListener('touchend', async e => { if(window.scrollY === 0 && (touchEnd - touchStart) > 100) triggerRefresh(true); else refreshIndicator.style.height = '0px'; });
+async function triggerRefresh(keepOpen = false) { if(!keepOpen) refreshIndicator.style.height = '60px'; spinner.style.display = 'block'; await init(); setTimeout(() => { refreshIndicator.style.height = '0px'; spinner.style.display = 'none'; }, 800); }
 </script>
 </body>
 </html>
