@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PROJECT CAGE : RELOADED v15.3 (Stable Restore)</title>
+<title>PROJECT CAGE : RELOADED v15.8 (Scroll & 13 Bars)</title>
 <style>
     :root {
         --bg: #050505; --card: #0a0a0c; --bar: #1a1a1e; --text: #e0e0e0; --mute: #888;
@@ -20,7 +20,7 @@
     .spinner { width: 20px; height: 20px; border: 3px solid rgba(0,247,255,0.3); border-radius: 50%; border-top-color: var(--cyan); animation: spin 1s ease-in-out infinite; display: none; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* HEADER - 極簡版 */
+    /* HEADER */
     header { padding: 10px 20px 5px 20px; background: transparent; position: relative; display: flex; align-items: center; justify-content: center; gap: 10px; }
     #pageLogo { height: 40px; width: auto; object-fit: contain; display: none; filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.3)); }
     .header-text { text-align: left; display: flex; flex-direction: column; justify-content: center; }
@@ -28,12 +28,12 @@
     .meta-info { font-family: 'Courier New', monospace; color: var(--gold); margin-top: 2px; font-size: 0.7rem; opacity: 0.8; letter-spacing: 1px; }
     .container { max-width: 1800px; margin: 0 auto; padding: 0 20px; }
     
-    /* 🔥 DASHBOARD - MINI HUD MODE (極致緊湊) 🔥 */
+    /* DASHBOARD (v15.3 Mini HUD Style) */
     .dashboard-panel { 
         background: linear-gradient(180deg, rgba(20,20,25,0.9), rgba(5,5,5,0.95)); 
         border: 1px solid #333; 
         border-radius: 10px; 
-        padding: 10px; /* 極小內距 */
+        padding: 10px; 
         margin: 5px 0 20px 0; 
         box-shadow: 0 0 20px rgba(0,0,0,0.5); 
         position: relative; 
@@ -47,7 +47,7 @@
         display: flex; flex-direction: column; 
         background: rgba(255,255,255,0.02); 
         border-radius: 6px; 
-        padding: 8px 12px; /* 緊湊內距 */
+        padding: 8px 12px; 
         border: 1px solid #333; 
         position: relative; 
         height: 100%; 
@@ -66,12 +66,10 @@
     .data-val .unit-tag { font-size: 0.6rem; color: #666; margin-left: 2px; }
     .data-val.asset { color: #fff; font-size: 1.2rem; }
 
-    /* 獲利區塊極簡化 */
     .profit-block { margin-top: 5px; padding: 4px 8px; background: rgba(0,0,0,0.3); border-radius: 4px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
     .profit-main { font-family: 'Courier New'; font-size: 1rem; font-weight: 900; }
     .profit-sub { font-size: 0.8rem; font-weight: bold; }
 
-    /* 總資產大字再次縮小 */
     .total-big-val { font-family: 'Courier New'; font-size: 1.8rem; font-weight: 900; color: #fff; text-align: right; margin: 0; text-shadow: 0 0 15px rgba(255,215,0,0.3); line-height: 1.1; }
     .total-roi-display { font-family: 'Courier New'; font-size: 1.1rem; font-weight: 900; text-align: right; margin-bottom: 5px; opacity: 1; }
     .rate-display { font-family: 'Courier New'; font-size: 0.65rem; color: var(--gold); opacity: 0.7; text-align: right; margin-top: 2px; }
@@ -133,20 +131,20 @@
     @media(max-width: 768px) { .event-list { grid-template-columns: 1fr; } }
 
     /* ========================================= */
-    /* 🔥 COMPACT ARENA STYLES (v15.3) 🔥 */
+    /* 🔥 UPDATED ARENA STYLES (v15.8) 🔥 */
     /* ========================================= */
     .arena-container { width: 100%; }
 
-    /* 雙欄佈局容器 - 高度大幅降低 */
+    /* 雙欄佈局容器 - 高度 300px */
     .arena-dashboard-v15 {
         display: grid;
         grid-template-columns: 320px 1fr; 
         gap: 15px;
-        height: 300px; /* 🔥 高度縮減至 300px，適配 TOP 5 */
+        height: 300px; 
         margin-bottom: 20px;
     }
 
-    /* --- 左側：排行榜面板 --- */
+    /* 左側：排行榜面板 (可滾動) */
     .leaderboard-panel {
         background: linear-gradient(180deg, rgba(20,20,25,0.9), rgba(5,5,5,0.95));
         border: 1px solid #333;
@@ -173,6 +171,7 @@
     }
     .lb-header-sub { font-size: 0.7rem; color: #888; font-weight: normal; font-family: 'Courier New'; }
     
+    /* 這裡設定 scroll */
     .lb-list {
         flex-grow: 1;
         overflow-y: auto; 
@@ -194,40 +193,11 @@
     }
     .lb-row:hover { background: rgba(255, 255, 255, 0.05); }
     
-    .lb-rank { 
-        width: 25px; 
-        font-weight: 900; 
-        color: #555; 
-        font-family: 'Courier New'; 
-        font-size: 0.9rem;
-        text-align: center;
-    }
-    .lb-info {
-        flex-grow: 1;
-        padding: 0 8px;
-        overflow: hidden;
-    }
-    .lb-name { 
-        color: #e0e0e0; 
-        font-weight: bold; 
-        font-size: 0.85rem; 
-        white-space: nowrap; 
-        overflow: hidden; 
-        text-overflow: ellipsis; 
-        margin-bottom: 1px;
-    }
-    .lb-code {
-        font-size: 0.7rem;
-        color: #888;
-        font-family: 'Courier New';
-    }
-    .lb-val { 
-        font-family: 'Courier New', monospace;
-        font-weight: 900; 
-        font-size: 1rem;
-        text-align: right; 
-        min-width: 70px;
-    }
+    .lb-rank { width: 25px; font-weight: 900; color: #555; font-family: 'Courier New'; font-size: 0.9rem; text-align: center; }
+    .lb-info { flex-grow: 1; padding: 0 8px; overflow: hidden; }
+    .lb-name { color: #e0e0e0; font-weight: bold; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 1px; }
+    .lb-code { font-size: 0.7rem; color: #888; font-family: 'Courier New'; }
+    .lb-val { font-family: 'Courier New', monospace; font-weight: 900; font-size: 1rem; text-align: right; min-width: 70px; }
 
     .lb-row.rank-1 { background: linear-gradient(90deg, rgba(255, 215, 0, 0.1), transparent); }
     .lb-row.rank-1 .lb-rank { color: var(--gold); text-shadow: 0 0 10px var(--gold); font-size: 1.1rem; }
@@ -240,17 +210,17 @@
         background: rgba(0,0,0,0.5);
         border: 1px solid #333;
         border-radius: 10px;
-        padding: 30px 15px 20px 15px; /* 上方Padding減少 */
+        padding: 30px 10px 20px 10px; /* Reduced side padding */
         position: relative;
         display: flex;
         align-items: flex-end; 
         justify-content: space-evenly; 
-        gap: 15px; /* 間距拉大，因為只有5根 */
+        gap: 5px; /* Tighter gap for 13 bars */
         backdrop-filter: blur(5px);
         overflow: hidden;
     }
     .chart-panel::before {
-        content: 'TOP 5 PERFORMANCE (ROI %)';
+        content: 'TOP 13 PERFORMANCE (ROI %)';
         position: absolute;
         top: 10px; left: 15px;
         font-family: 'Arial Black';
@@ -281,11 +251,11 @@
         align-items: center;
         position: relative;
         z-index: 1;
-        max-width: 60px; /* 稍微加寬，因為只有5根 */
-        min-width: 30px;
+        max-width: 40px; /* Reduced max width */
+        min-width: 15px; /* Allowed to shrink */
     }
     .bar-fill {
-        width: 70%;
+        width: 80%;
         background: linear-gradient(0deg, rgba(255, 145, 0, 0.3) 0%, var(--gold) 100%);
         border-top: 2px solid #fff;
         border-radius: 4px 4px 0 0;
@@ -303,7 +273,7 @@
         top: -20px;
         left: 50%;
         transform: translateX(-50%);
-        font-size: 0.75rem;
+        font-size: 0.65rem; /* Smaller font */
         color: #fff;
         font-weight: 900;
         font-family: 'Courier New';
@@ -312,7 +282,7 @@
     }
     .bar-label-bottom {
         margin-top: 6px;
-        font-size: 0.7rem;
+        font-size: 0.6rem; /* Smaller font */
         color: #aaa;
         text-align: center;
         font-family: 'Courier New';
@@ -328,7 +298,7 @@
         .arena-dashboard-v15 { grid-template-columns: 1fr; height: auto; gap: 15px; }
         .leaderboard-panel { height: 280px; } 
         .chart-panel { height: 250px; padding: 30px 10px 10px 10px; }
-        .bar-val-top { font-size: 0.65rem; top: -16px; }
+        .bar-val-top { font-size: 0.6rem; top: -16px; }
     }
 
     /* FOOTER */
@@ -449,7 +419,7 @@
 
 <script>
 // =========================================================
-//  ✅ CORRECT LINK RESTORED
+//  ✅ 您的正確網址 (TSV)
 // =========================================================
 const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQuNQc8E7BlYLR5E6WlYHVQ3l_ki95CqcEcpS8sNQESRKcg5yECE-e2bgMvLGU-Vx5HFuWo5OS1GUIT/pub?output=tsv';
 
@@ -457,7 +427,7 @@ const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQuNQc
 const FALLBACK_DATA = `
 A (code)	B (type)	C (rpg)	D (target)	E (skill)	F (cost)	G (current)	H (strategy)	I (sop)	J (image)
 Title	PROJECT CAGE : RELOADED	
-Meta	v15.3 (Restored) • 2025-2031	
+Meta	v15.8 (13 Bars) • 2025-2031	
 L01	🔒 資金封閉鐵律	1,000 萬只進不出。僅能在定存、活存、證券戶間流動，嚴禁消費。
 L02	⚖️ 歸一化競技鐵律	績效起點皆為 100%。不比金額大小，只比策略報酬率 (%)。
 L03	🔄 配息再投入鐵律	股息 100% 留倉再投入，視為淨值一部分，維持複利效應。
@@ -558,7 +528,7 @@ init();
 // 🔄 UPDATED INIT FUNCTION
 // =========================================================
 async function init() {
-    uiLog('=== SYSTEM START (v15.3 RESTORE) ===');
+    uiLog('=== SYSTEM START (v15.8) ===');
     uiLog(`Fetching Data from: ${GOOGLE_SHEET_URL.substring(0, 50)}...`);
     
     cardsData = {}; portfolios = {}; eventsData = []; lawsData = [];
@@ -782,7 +752,7 @@ function renderEvents(){
 }
 
 // =========================================================
-// 🔥 NEW ARENA RENDER FUNCTION (v15.3 - TOP 5 + COMPACT) 🔥
+// 🔥 NEW ARENA RENDER FUNCTION (v15.8 - SCROLL LIST + 13 BARS) 🔥
 // =========================================================
 function renderArena(){
     const con = document.getElementById('arenaContainer'); 
@@ -812,22 +782,23 @@ function renderArena(){
     // 2. 排序：ROI 由高到低
     allStrategies.sort((a, b) => b.roiNum - a.roiNum);
     
-    // 🔥 只取前 5 名 🔥
-    const topStrategies = allStrategies.slice(0, 5);
+    // 🔥 圖表只取前 13 名 (但列表顯示全部) 🔥
+    const top13Strategies = allStrategies.slice(0, 13);
 
     // 3. 準備 HTML 結構
     let html = `<div class="arena-dashboard-v15">`;
 
-    // --- 左側：排行榜 (Leaderboard) ---
+    // --- 左側：排行榜 (Leaderboard - Scrollable) ---
     html += `
     <div class="leaderboard-panel">
         <div class="lb-header">
             <span>LIVE BATTLE</span>
-            <span class="lb-header-sub">TOP ${topStrategies.length}</span>
+            <span class="lb-header-sub">${allStrategies.length} ENTRIES</span>
         </div>
         <div class="lb-list">`;
     
-    topStrategies.forEach((s, index) => {
+    // 渲染所有參賽者
+    allStrategies.forEach((s, index) => {
         const rankClass = `rank-${index + 1}`;
         html += `
             <div class="lb-row ${rankClass}">
@@ -841,21 +812,21 @@ function renderArena(){
     });
     html += `</div></div>`; // End leaderboard-panel
 
-    // --- 右側：長條圖 (Bar Chart) ---
+    // --- 右側：長條圖 (Bar Chart - Top 13) ---
     html += `<div class="chart-panel"><div class="chart-grid"></div>`;
     
     // 找出最大 ROI 用於設定圖表比例
-    let maxROI = Math.max(...topStrategies.map(s => s.roiNum));
+    let maxROI = Math.max(...top13Strategies.map(s => s.roiNum));
     if (maxROI < 10) maxROI = 10;
     if (maxROI <= 0) maxROI = 1; 
 
-    topStrategies.forEach(s => {
+    top13Strategies.forEach(s => {
         // 計算高度百分比
         let heightPct = (s.roiNum / maxROI) * 100;
-        if (heightPct < 4 && s.roiNum > -99) heightPct = 4; // 稍微拉高最小值，讓圖表好看
+        if (heightPct < 4 && s.roiNum > -99) heightPct = 4; // 稍微拉高最小值
         if (s.roiNum <= -99) heightPct = 0; 
         
-        // 根據 ROI 動態改變顏色 (金/綠/紅)
+        // 根據 ROI 動態改變顏色
         let barColorBg = 'linear-gradient(0deg, rgba(255, 145, 0, 0.3) 0%, var(--gold) 100%)';
         let shadowColor = 'rgba(255, 215, 0, 0.6)';
         if(s.cls.includes('profit')) {
@@ -868,7 +839,7 @@ function renderArena(){
 
         html += `
             <div class="bar-wrapper">
-                <div class="bar-fill" style="height: ${heightPct}%; background: ${barColorBg}; box-shadow: 0 0 20px ${shadowColor};">
+                <div class="bar-fill" style="height: ${heightPct}%; background: ${barColorBg}; box-shadow: 0 0 15px ${shadowColor};">
                     <span class="bar-val-top">${s.roiStr}%</span>
                 </div>
                 <div class="bar-label-bottom">${s.code}</div>
