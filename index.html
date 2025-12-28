@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PROJECT CAGE : RELOADED v15.7 (Link Fixed)</title>
+<title>PROJECT CAGE : RELOADED v15.3 (Stable Restore)</title>
 <style>
     :root {
         --bg: #050505; --card: #0a0a0c; --bar: #1a1a1e; --text: #e0e0e0; --mute: #888;
@@ -20,59 +20,61 @@
     .spinner { width: 20px; height: 20px; border: 3px solid rgba(0,247,255,0.3); border-radius: 50%; border-top-color: var(--cyan); animation: spin 1s ease-in-out infinite; display: none; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* HEADER */
-    header { padding: 10px 20px 0 20px; background: transparent; position: relative; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 5px; }
-    #pageLogo { height: 36px; width: auto; object-fit: contain; display: none; filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.3)); }
+    /* HEADER - 極簡版 */
+    header { padding: 10px 20px 5px 20px; background: transparent; position: relative; display: flex; align-items: center; justify-content: center; gap: 10px; }
+    #pageLogo { height: 40px; width: auto; object-fit: contain; display: none; filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.3)); }
     .header-text { text-align: left; display: flex; flex-direction: column; justify-content: center; }
-    h1 { font-size: 1.2rem; letter-spacing: 2px; text-transform: uppercase; color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.1); font-weight: 900; margin: 0; font-family: 'Arial Black', sans-serif; line-height: 1; }
-    .meta-info { font-family: 'Courier New', monospace; color: var(--gold); margin-top: 1px; font-size: 0.65rem; opacity: 0.8; letter-spacing: 1px; }
+    h1 { font-size: 1.4rem; letter-spacing: 3px; text-transform: uppercase; color: #fff; text-shadow: 0 0 15px rgba(255,255,255,0.1); font-weight: 900; margin: 0; font-family: 'Arial Black', sans-serif; line-height: 1; }
+    .meta-info { font-family: 'Courier New', monospace; color: var(--gold); margin-top: 2px; font-size: 0.7rem; opacity: 0.8; letter-spacing: 1px; }
     .container { max-width: 1800px; margin: 0 auto; padding: 0 20px; }
     
-    /* DASHBOARD */
+    /* 🔥 DASHBOARD - MINI HUD MODE (極致緊湊) 🔥 */
     .dashboard-panel { 
         background: linear-gradient(180deg, rgba(20,20,25,0.9), rgba(5,5,5,0.95)); 
         border: 1px solid #333; 
-        border-radius: 8px; 
-        padding: 8px; 
-        margin: 5px 0 25px 0; 
+        border-radius: 10px; 
+        padding: 10px; /* 極小內距 */
+        margin: 5px 0 20px 0; 
         box-shadow: 0 0 20px rgba(0,0,0,0.5); 
         position: relative; 
         overflow: hidden; 
         backdrop-filter: blur(10px); 
     }
     .dashboard-panel::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: linear-gradient(90deg, var(--tw), var(--gold), var(--us)); box-shadow: 0 0 8px var(--gold); }
-    .dash-grid { display: grid; grid-template-columns: 1fr 1fr 1.3fr; gap: 8px; } 
+    .dash-grid { display: grid; grid-template-columns: 1fr 1fr 1.3fr; gap: 10px; } 
     
     .dash-group { 
         display: flex; flex-direction: column; 
         background: rgba(255,255,255,0.02); 
-        border-radius: 4px; 
-        padding: 6px 10px; 
+        border-radius: 6px; 
+        padding: 8px 12px; /* 緊湊內距 */
         border: 1px solid #333; 
         position: relative; 
         height: 100%; 
-        justify-content: center; 
+        justify-content: space-between; 
     }
     .dash-group.tw-style { border-color: rgba(255, 42, 42, 0.3); }
     .dash-group.us-style { border-color: rgba(0, 210, 255, 0.3); }
     .dash-group.total-style { border-color: rgba(255, 215, 0, 0.3); }
 
-    .dash-header { display: flex; align-items: center; margin-bottom: 2px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 2px; }
-    .dash-title { font-size: 0.75rem; font-weight: 900; letter-spacing: 1px; color: #fff; text-transform: uppercase; } 
-    .data-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0px; }
+    .dash-header { display: flex; align-items: center; justify-content: flex-start; margin-bottom: 5px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 3px; }
+    .dash-title { font-size: 0.85rem; font-weight: 900; letter-spacing: 1px; color: #fff; text-transform: uppercase; } 
+    .data-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2px; }
     
-    .data-label { font-size: 0.7rem; color: #777; font-weight: 700; margin-right: 5px; }
-    .data-val { font-family: 'Courier New', monospace; font-size: 1rem; font-weight: 900; color: #fff; } 
-    .data-val .unit-tag { font-size: 0.6rem; color: #555; margin-left: 2px; }
-    .data-val.asset { color: #fff; font-size: 1.1rem; }
+    .data-label { font-size: 0.75rem; color: #888; font-weight: 700; }
+    .data-val { font-family: 'Courier New', monospace; font-size: 1.1rem; font-weight: 900; color: #fff; } 
+    .data-val .unit-tag { font-size: 0.6rem; color: #666; margin-left: 2px; }
+    .data-val.asset { color: #fff; font-size: 1.2rem; }
 
-    .profit-block { margin-top: 2px; padding: 2px 5px; background: rgba(0,0,0,0.3); border-radius: 3px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
-    .profit-main { font-family: 'Courier New'; font-size: 0.9rem; font-weight: 900; }
-    .profit-sub { font-size: 0.75rem; font-weight: bold; }
+    /* 獲利區塊極簡化 */
+    .profit-block { margin-top: 5px; padding: 4px 8px; background: rgba(0,0,0,0.3); border-radius: 4px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
+    .profit-main { font-family: 'Courier New'; font-size: 1rem; font-weight: 900; }
+    .profit-sub { font-size: 0.8rem; font-weight: bold; }
 
-    .total-big-val { font-family: 'Courier New'; font-size: 1.5rem; font-weight: 900; color: #fff; text-align: right; margin: 0; text-shadow: 0 0 10px rgba(255,215,0,0.3); line-height: 1.1; }
-    .total-roi-display { font-family: 'Courier New'; font-size: 1rem; font-weight: 900; text-align: right; margin-bottom: 2px; opacity: 1; }
-    .rate-display { font-family: 'Courier New'; font-size: 0.6rem; color: var(--gold); opacity: 0.6; text-align: right; margin-top: 0; }
+    /* 總資產大字再次縮小 */
+    .total-big-val { font-family: 'Courier New'; font-size: 1.8rem; font-weight: 900; color: #fff; text-align: right; margin: 0; text-shadow: 0 0 15px rgba(255,215,0,0.3); line-height: 1.1; }
+    .total-roi-display { font-family: 'Courier New'; font-size: 1.1rem; font-weight: 900; text-align: right; margin-bottom: 5px; opacity: 1; }
+    .rate-display { font-family: 'Courier New'; font-size: 0.65rem; color: var(--gold); opacity: 0.7; text-align: right; margin-top: 2px; }
     
     .c-tw { color: var(--tw); } .c-us { color: var(--us); } .c-gold { color: var(--gold); }
     .color-profit { color: var(--green)!important; text-shadow: 0 0 5px rgba(0,255,106,0.4); }
@@ -83,7 +85,7 @@
     @media(max-width: 900px) { .dash-grid { grid-template-columns: 1fr; gap: 8px; } .total-big-val { font-size: 1.8rem; } header { flex-direction: column; gap: 5px; } .header-text { text-align: center; } .dash-header { justify-content: center; } }
 
     /* SECTIONS */
-    .section-title { font-size: 0.9rem; border-left: 3px solid var(--gold); padding-left: 10px; margin: 25px 0 10px; text-transform: uppercase; font-weight: 900; color: #fff; display: flex; align-items: center; letter-spacing: 2px; }
+    .section-title { font-size: 1rem; border-left: 3px solid var(--gold); padding-left: 10px; margin: 25px 0 10px; text-transform: uppercase; font-weight: 900; color: #fff; display: flex; align-items: center; letter-spacing: 2px; }
     .section-title::after { content: ''; flex-grow: 1; height: 1px; background: #333; margin-left: 15px; }
 
     /* DECK */
@@ -131,18 +133,20 @@
     @media(max-width: 768px) { .event-list { grid-template-columns: 1fr; } }
 
     /* ========================================= */
-    /* 🔥 COMPACT ARENA v15.5 🔥 */
+    /* 🔥 COMPACT ARENA STYLES (v15.3) 🔥 */
     /* ========================================= */
     .arena-container { width: 100%; }
 
+    /* 雙欄佈局容器 - 高度大幅降低 */
     .arena-dashboard-v15 {
         display: grid;
         grid-template-columns: 320px 1fr; 
         gap: 15px;
-        height: 320px; 
+        height: 300px; /* 🔥 高度縮減至 300px，適配 TOP 5 */
         margin-bottom: 20px;
     }
 
+    /* --- 左側：排行榜面板 --- */
     .leaderboard-panel {
         background: linear-gradient(180deg, rgba(20,20,25,0.9), rgba(5,5,5,0.95));
         border: 1px solid #333;
@@ -155,7 +159,7 @@
     }
     .lb-header {
         background: linear-gradient(90deg, #1a1a1e, #050505);
-        padding: 8px 12px;
+        padding: 10px 15px;
         border-bottom: 1px solid #444;
         font-family: 'Arial Black', sans-serif;
         color: var(--gold);
@@ -165,93 +169,166 @@
         justify-content: space-between;
         align-items: center;
         font-size: 0.9rem;
+        text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
     }
     .lb-header-sub { font-size: 0.7rem; color: #888; font-weight: normal; font-family: 'Courier New'; }
     
-    .lb-list { flex-grow: 1; overflow-y: auto; padding: 0; }
+    .lb-list {
+        flex-grow: 1;
+        overflow-y: auto; 
+        padding: 2px 0;
+    }
     .lb-list::-webkit-scrollbar { width: 4px; }
     .lb-list::-webkit-scrollbar-track { background: #0a0a0c; }
     .lb-list::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
 
-    /* 🔥 CLICKABLE ROWS */
     .lb-row {
         display: flex;
         align-items: center;
-        padding: 6px 10px;
+        padding: 8px 10px;
         border-bottom: 1px solid rgba(255,255,255,0.05);
+        transition: all 0.2s ease;
         font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        cursor: pointer;
-        transition: background 0.2s;
+        cursor: default;
+        position: relative;
     }
-    .lb-row:hover { background: rgba(255, 215, 0, 0.15); }
+    .lb-row:hover { background: rgba(255, 255, 255, 0.05); }
     
-    .lb-rank { width: 25px; font-weight: 900; color: #555; font-family: 'Courier New'; font-size: 0.85rem; text-align: center; }
-    .lb-info { flex-grow: 1; padding: 0 8px; overflow: hidden; }
-    .lb-name { color: #e0e0e0; font-weight: bold; font-size: 0.8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .lb-code { font-size: 0.7rem; color: #666; font-family: 'Courier New'; }
-    .lb-val { font-family: 'Courier New', monospace; font-weight: 900; font-size: 0.95rem; text-align: right; min-width: 60px; }
+    .lb-rank { 
+        width: 25px; 
+        font-weight: 900; 
+        color: #555; 
+        font-family: 'Courier New'; 
+        font-size: 0.9rem;
+        text-align: center;
+    }
+    .lb-info {
+        flex-grow: 1;
+        padding: 0 8px;
+        overflow: hidden;
+    }
+    .lb-name { 
+        color: #e0e0e0; 
+        font-weight: bold; 
+        font-size: 0.85rem; 
+        white-space: nowrap; 
+        overflow: hidden; 
+        text-overflow: ellipsis; 
+        margin-bottom: 1px;
+    }
+    .lb-code {
+        font-size: 0.7rem;
+        color: #888;
+        font-family: 'Courier New';
+    }
+    .lb-val { 
+        font-family: 'Courier New', monospace;
+        font-weight: 900; 
+        font-size: 1rem;
+        text-align: right; 
+        min-width: 70px;
+    }
 
-    .lb-row.rank-1 .lb-rank { color: var(--gold); }
+    .lb-row.rank-1 { background: linear-gradient(90deg, rgba(255, 215, 0, 0.1), transparent); }
+    .lb-row.rank-1 .lb-rank { color: var(--gold); text-shadow: 0 0 10px var(--gold); font-size: 1.1rem; }
     .lb-row.rank-1 .lb-name { color: var(--gold); }
-    .lb-row.rank-2 .lb-rank { color: #e0e0e0; }
-    .lb-row.rank-3 .lb-rank { color: #cd7f32; }
+    .lb-row.rank-2 .lb-rank { color: #e0e0e0; text-shadow: 0 0 8px #e0e0e0; }
+    .lb-row.rank-3 .lb-rank { color: #cd7f32; text-shadow: 0 0 8px #cd7f32; }
 
+    /* --- 右側：圖表面板 --- */
     .chart-panel {
-        background: rgba(0,0,0,0.4);
+        background: rgba(0,0,0,0.5);
         border: 1px solid #333;
         border-radius: 10px;
-        padding: 30px 10px 20px 10px; 
+        padding: 30px 15px 20px 15px; /* 上方Padding減少 */
         position: relative;
         display: flex;
         align-items: flex-end; 
         justify-content: space-evenly; 
-        gap: 5px; 
+        gap: 15px; /* 間距拉大，因為只有5根 */
         backdrop-filter: blur(5px);
         overflow: hidden;
     }
     .chart-panel::before {
-        content: 'TOP 13 PERFORMANCE (ROI %)';
+        content: 'TOP 5 PERFORMANCE (ROI %)';
         position: absolute;
-        top: 8px; left: 12px;
+        top: 10px; left: 15px;
         font-family: 'Arial Black';
-        color: rgba(255,255,255,0.1);
-        font-size: 0.85rem;
+        color: rgba(255,255,255,0.15);
+        font-size: 1rem;
         letter-spacing: 1px;
         pointer-events: none;
+        z-index: 0;
     }
     .chart-grid {
-        position: absolute; inset: 0; pointer-events: none; z-index: 0;
-        background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
-        background-size: 100% 25%;
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+        background-image: 
+            linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+        background-size: 100% 25%, 20% 100%;
+        opacity: 0.5;
     }
 
     .bar-wrapper {
-        flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; position: relative; z-index: 1;
-        max-width: 50px; min-width: 20px; 
+        flex: 1;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        align-items: center;
+        position: relative;
+        z-index: 1;
+        max-width: 60px; /* 稍微加寬，因為只有5根 */
+        min-width: 30px;
     }
     .bar-fill {
         width: 70%;
-        background: #444;
+        background: linear-gradient(0deg, rgba(255, 145, 0, 0.3) 0%, var(--gold) 100%);
         border-top: 2px solid #fff;
         border-radius: 4px 4px 0 0;
         transition: height 1s cubic-bezier(0.25, 0.8, 0.25, 1);
         min-height: 4px;
         position: relative;
+        box-shadow: 0 0 15px rgba(255, 145, 0, 0.4);
+    }
+    .bar-fill:hover {
+        filter: brightness(1.2);
+        box-shadow: 0 0 25px rgba(255, 215, 0, 0.7);
     }
     .bar-val-top {
-        position: absolute; top: -18px; left: 50%; transform: translateX(-50%);
-        font-size: 0.65rem; color: #fff; font-weight: 900; font-family: 'Courier New'; text-shadow: 0 0 5px #000;
+        position: absolute;
+        top: -20px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 0.75rem;
+        color: #fff;
+        font-weight: 900;
+        font-family: 'Courier New';
+        text-shadow: 0 0 5px #000;
         white-space: nowrap;
     }
     .bar-label-bottom {
-        margin-top: 4px; font-size: 0.6rem; color: #888; text-align: center; font-family: 'Courier New'; font-weight: bold;
-        white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%;
+        margin-top: 6px;
+        font-size: 0.7rem;
+        color: #aaa;
+        text-align: center;
+        font-family: 'Courier New';
+        font-weight: bold;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 100%;
     }
 
+    /* RWD */
     @media(max-width: 900px) {
         .arena-dashboard-v15 { grid-template-columns: 1fr; height: auto; gap: 15px; }
-        .leaderboard-panel { height: 250px; } 
-        .chart-panel { height: 200px; padding: 30px 10px 10px 10px; }
+        .leaderboard-panel { height: 280px; } 
+        .chart-panel { height: 250px; padding: 30px 10px 10px 10px; }
+        .bar-val-top { font-size: 0.65rem; top: -16px; }
     }
 
     /* FOOTER */
@@ -265,7 +342,7 @@
     /* MODAL */
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 9999; }
     .modal-active { display: flex; animation: fadeIn 0.2s; }
-    .modal-content { background: #121214; border: 2px solid #444; border-radius: 16px; padding: 30px; max-width: 500px; width: 90%; box-shadow: 0 0 80px rgba(0,0,0,1); transition: border-color 0.3s; }
+    .modal-content { background: #121214; border: 2px solid #444; border-radius: 16px; padding: 30px; max-width: 500px; width: 90%; box-shadow: 0 0 80px rgba(0,0,0,1); }
     .modal-header { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 20px; }
     .m-code { font-size: 2.2rem; font-weight: 900; color: #fff; }
     .m-skill { font-size: 1.2rem; color: #aaa; font-weight: bold; margin-left: 15px; }
@@ -278,9 +355,19 @@
 
     /* DEBUG CONSOLE */
     #debug-panel {
-        display: none; background: #000; border: 2px solid #0f0; color: #0f0; font-family: 'Courier New', monospace;
-        padding: 15px; height: 400px; overflow-y: scroll; margin: 20px 0; font-size: 0.85rem;
-        white-space: pre-wrap; box-shadow: 0 0 20px rgba(0, 255, 0, 0.2); border-radius: 8px;
+        display: none; /* 預設隱藏 */
+        background: #000;
+        border: 2px solid #0f0;
+        color: #0f0;
+        font-family: 'Courier New', monospace;
+        padding: 15px;
+        height: 400px;
+        overflow-y: scroll;
+        margin: 20px 0;
+        font-size: 0.85rem;
+        white-space: pre-wrap;
+        box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+        border-radius: 8px;
     }
     .log-line { border-bottom: 1px solid #111; padding: 2px 0; }
     .log-err { color: #ff2a2a; font-weight: bold; }
@@ -292,34 +379,36 @@
 <div id="refresh-indicator"><div class="refresh-text"><div class="spinner"></div>REFRESHING...</div></div>
 
 <header>
+  <img id="pageLogo" src="" alt="Logo">
   <div class="header-text">
       <h1 id="pageTitle">LOADING...</h1>
       <div class="meta-info" id="pageMeta">LOADING DATA...</div>
   </div>
-  <img id="pageLogo" src="" alt="Logo">
 </header>
 
 <div class="container">
   <div class="dashboard-panel">
     <div class="dash-grid">
       <div class="dash-group tw-style">
-        <div class="dash-header"><span class="dash-title c-tw">TWD</span></div>
+        <div class="dash-header"><span class="dash-title c-tw">TWD 戰情</span></div>
         <div class="data-row"><span class="data-label">COST</span><span class="data-val" id="costTW">...<span class="unit-tag">萬</span></span></div>
         <div class="data-row"><span class="data-label">ASSET</span><span class="data-val asset" id="assetTW">...<span class="unit-tag">萬</span></span></div>
         <div class="profit-block"><span class="profit-main" id="plTW_val">...</span><span class="profit-sub" id="plTW_pct">...</span></div>
       </div>
       <div class="dash-group us-style">
-        <div class="dash-header"><span class="dash-title c-us">USD</span></div>
+        <div class="dash-header"><span class="dash-title c-us">USD 戰情</span></div>
         <div class="data-row"><span class="data-label">COST</span><span class="data-val" id="costUS">...<span class="unit-tag">萬</span></span></div>
         <div class="data-row"><span class="data-label">ASSET</span><span class="data-val asset" id="assetUS">...<span class="unit-tag">萬</span></span></div>
         <div class="profit-block"><span class="profit-main" id="plUS_val">...</span><span class="profit-sub" id="plUS_pct">...</span></div>
       </div>
       <div class="dash-group total-style">
-        <div class="dash-header" style="justify-content: center;"><span class="dash-title c-gold">NET WORTH</span></div>
+        <div class="dash-header" style="justify-content: center;"><span class="dash-title c-gold">TOTAL ASSET</span></div>
         <div class="total-big-val" id="totalAsset">...</div>
         <div class="total-roi-block">
             <div class="total-roi-display" id="totalROI">...</div>
         </div>
+        <div class="data-row"><span class="data-label">總成本 (TWD)</span><span class="data-val" id="totalCostTWD">...</span></div>
+        <div class="data-row"><span class="data-label">總損益 (TWD)</span><span class="data-val" id="totalDiff">...</span></div>
         <div class="rate-display" id="rateInfo">Loading Rate...</div>
       </div>
     </div>
@@ -352,31 +441,23 @@
       <div><span class="m-code" id="mCode"></span><span class="m-skill" id="mSkill"></span></div>
       <span class="close-btn" onclick="closeModal()">&times;</span>
     </div>
-    <div class="m-row">
-        <span class="m-label" id="label1">初始資金 (CAPITAL)</span>
-        <div class="m-value highlight" id="val1"></div>
-    </div>
-    <div class="m-row">
-        <span class="m-label" id="label2">戰略定位 (STRATEGY)</span>
-        <div class="m-value" id="val2"></div>
-    </div>
-    <div class="m-row">
-        <span class="m-label" id="label3">嚴格執行 SOP</span>
-        <div class="m-value" id="val3" style="padding:15px;background:rgba(0,0,0,0.3);border-left:3px solid #555;border-radius:6px"></div>
-    </div>
+    <div class="m-row"><span class="m-label">初始資金 (CAPITAL)</span><div class="m-value highlight" id="mCost"></div></div>
+    <div class="m-row"><span class="m-label">戰略定位 (STRATEGY)</span><div class="m-value" id="mStrategy"></div></div>
+    <div class="m-row"><span class="m-label">嚴格執行 SOP</span><div class="m-value" id="mSop" style="padding:15px;background:rgba(0,0,0,0.3);border-left:3px solid #555;border-radius:6px"></div></div>
   </div>
 </div>
 
 <script>
 // =========================================================
-//  ✅ CORRECT GOOGLE SHEET URL (FIXED)
+//  ✅ CORRECT LINK RESTORED
 // =========================================================
 const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQuNQc8E7BlYLR5E6WlYHVQ3l_ki95CqcEcpS8sNQESRKcg5yECE-e2bgMvLGU-Vx5HFuWo5OS1GUIT/pub?output=tsv';
 
+// === 備份資料 (包含完整的鐵律與標題) ===
 const FALLBACK_DATA = `
 A (code)	B (type)	C (rpg)	D (target)	E (skill)	F (cost)	G (current)	H (strategy)	I (sop)	J (image)
 Title	PROJECT CAGE : RELOADED	
-Meta	v15.7 (Fixed) • 2025-2031	
+Meta	v15.3 (Restored) • 2025-2031	
 L01	🔒 資金封閉鐵律	1,000 萬只進不出。僅能在定存、活存、證券戶間流動，嚴禁消費。
 L02	⚖️ 歸一化競技鐵律	績效起點皆為 100%。不比金額大小，只比策略報酬率 (%)。
 L03	🔄 配息再投入鐵律	股息 100% 留倉再投入，視為淨值一部分，維持複利效應。
@@ -416,12 +497,14 @@ Logo	https://ubamboo-design.github.io/Mark-investment-dashboard/Mark_Investment_
 `.trim();
 
 let currentRate = 32.5;
-// 🔥 新增 strategiesData 用於存儲 P 開頭的策略詳情
-let cardsData = {}, portfolios = {}, strategiesData = {}, eventsData = [], lawsData = [];
+let cardsData = {}, portfolios = {}, eventsData = [], lawsData = [];
 let configData = { title: 'PROJECT CAGE', meta: 'LOADING...' };
 let logoUrl = ''; 
 let isFallback = false;
 
+// =========================================================
+// 🐞 DEBUGGER UTILS
+// =========================================================
 function toggleDebug() {
     const panel = document.getElementById('debug-panel');
     panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
@@ -436,10 +519,11 @@ function uiLog(msg, type = 'info') {
     else if (type === 'warn') colorClass = 'log-warn';
     
     panel.innerHTML += `<div class="log-line ${colorClass}">[${time}] ${msg}</div>`;
-    panel.scrollTop = panel.scrollHeight; 
+    panel.scrollTop = panel.scrollHeight; // Auto scroll to bottom
     console.log(`[${type.toUpperCase()}] ${msg}`);
 }
 
+// ================= PULL TO REFRESH =================
 let touchStart = 0;
 let touchEnd = 0;
 const refreshIndicator = document.getElementById('refresh-indicator');
@@ -462,6 +546,7 @@ async function triggerRefresh(keepOpen = false) {
     await init();
     setTimeout(() => { refreshIndicator.style.height = '0px'; spinner.style.display = 'none'; }, 800);
 }
+// ===================================================
 
 const defaultIcons = {
     'C01': `<svg class="mc-media" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" r="20" stroke="currentColor" stroke-width="2" fill="none"/></svg>`
@@ -469,11 +554,14 @@ const defaultIcons = {
 
 init();
 
+// =========================================================
+// 🔄 UPDATED INIT FUNCTION
+// =========================================================
 async function init() {
-    uiLog('=== SYSTEM START (v15.7) ===');
+    uiLog('=== SYSTEM START (v15.3 RESTORE) ===');
     uiLog(`Fetching Data from: ${GOOGLE_SHEET_URL.substring(0, 50)}...`);
     
-    cardsData = {}; portfolios = {}; strategiesData = {}; eventsData = []; lawsData = [];
+    cardsData = {}; portfolios = {}; eventsData = []; lawsData = [];
     isFallback = false;
     const cardCon = document.getElementById('cardContainer');
     if(cardCon) cardCon.innerHTML = '<div class="loading">CONNECTING...</div>';
@@ -481,6 +569,8 @@ async function init() {
     const arenaCon = document.getElementById('arenaContainer');
     if(arenaCon) arenaCon.innerHTML = '<div class="loading">LOADING STRATEGIES...</div>';
 
+
+    // 1. Fetch Rate
     try {
         const rateRes = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
         const rateData = await rateRes.json();
@@ -493,17 +583,27 @@ async function init() {
         uiLog('匯率 API 連線失敗，使用預設值', 'warn'); 
     }
 
+    // 2. Fetch Sheet Data
     try {
         const cacheBuster = `&t=${Date.now()}`;
+        uiLog('開始下載 Google Sheet 資料...');
+        
         const sheetRes = await fetch(GOOGLE_SHEET_URL + cacheBuster);
+        uiLog(`HTTP Status: ${sheetRes.status}`);
+
         if (!sheetRes.ok) throw new Error(`HTTP Error ${sheetRes.status}`);
+        
         const sheetText = await sheetRes.text();
+        uiLog(`資料下載完成，長度: ${sheetText.length} chars`, 'success');
+
         if(sheetText.trim().startsWith('<!DOCTYPE') || sheetText.includes('<html')) {
             throw new Error('格式錯誤 (HTML Response)');
         }
+
         parseSheetData(sheetText);
         uiLog('資料解析完成，開始渲染 UI...', 'success');
         renderAll();
+
     } catch(e) {
         uiLog(`連線失敗或解析錯誤: ${e.message}`, 'error');
         isFallback = true;
@@ -519,6 +619,9 @@ async function init() {
     }
 }
 
+// =========================================================
+// 📝 PARSER
+// =========================================================
 function parseSheetData(text){
   const rows = text.split('\n').map(r=>r.trim()); 
   let currentGroup = '未分類';
@@ -535,6 +638,7 @@ function parseSheetData(text){
     if(c[0] === '代號' && c[1] === '名稱') { mode = 'STRATEGIES'; continue; }
     if(c[0] === '事件簿') { mode = 'EVENTS'; continue; }
 
+    // 1. 卡片模式
     if(c[0].startsWith('C')) {
         if (cardsData[c[0]]) continue; 
         let skillName = c[4]; 
@@ -551,18 +655,15 @@ function parseSheetData(text){
             strategy: c[7], sop: c[8], media: displayMedia
         };
     } 
+    // 2. 策略模式
     else if(c[0].startsWith('P')){
           if(!portfolios[currentGroup]) portfolios[currentGroup] = [];
-          
-          let strategyObj = {
+          portfolios[currentGroup].push({
               code: c[0], name: c[1], 
               deck: c[2] ? c[2].split('+').map(s=>s.trim()) : [], 
               deckStr: c[2] || '',
               mindset: c[3] || '-', persona: c[4] || '-', conflict: c[5] || '-'
-          };
-          
-          portfolios[currentGroup].push(strategyObj);
-          strategiesData[c[0]] = strategyObj;
+          });
     }
     else if (mode === 'STRATEGIES' && c[0] && !c[0].startsWith('P') && c[0] !== '代號' && c.length < 5) {
         if(c[0].length > 0) currentGroup = c[0].trim();
@@ -592,7 +693,7 @@ function renderAll(){
     renderDashboard(); 
     renderCards(); 
     renderEvents(); 
-    renderArena(); 
+    renderArena(); // 🔥 呼叫新的渲染函數
     renderFooter();
 }
 
@@ -681,12 +782,13 @@ function renderEvents(){
 }
 
 // =========================================================
-// 🔥 INTERACTIVE ARENA (Scroll List + Top 13 Chart)
+// 🔥 NEW ARENA RENDER FUNCTION (v15.3 - TOP 5 + COMPACT) 🔥
 // =========================================================
 function renderArena(){
     const con = document.getElementById('arenaContainer'); 
     con.innerHTML = ''; 
     
+    // 1. 收集並扁平化所有策略數據
     let allStrategies = [];
     Object.keys(portfolios).forEach(groupName => {
         portfolios[groupName].forEach(p => {
@@ -695,37 +797,40 @@ function renderArena(){
                 const c = cardsData[code];
                 if (c) { tc += c.cost; ta += c.current; }
             });
+            // 防止除以零或無數據的狀況
             if(tc === 0) tc = 1; 
             const res = calc(tc, ta);
             allStrategies.push({
                 code: p.code, name: p.name,
-                roiNum: parseFloat(res.roi),
-                roiStr: res.roi,
+                roiNum: parseFloat(res.roi), // 數值型 ROI 用於排序和圖表高度
+                roiStr: res.roi,             // 字串型 ROI 用於顯示
                 cls: res.cls, sign: res.sign
             });
         });
     });
 
+    // 2. 排序：ROI 由高到低
     allStrategies.sort((a, b) => b.roiNum - a.roiNum);
     
-    const topStrategies = allStrategies.slice(0, 13); // Chart top 13
+    // 🔥 只取前 5 名 🔥
+    const topStrategies = allStrategies.slice(0, 5);
 
+    // 3. 準備 HTML 結構
     let html = `<div class="arena-dashboard-v15">`;
 
-    // --- 左側：列表 (顯示所有，可滾動) ---
+    // --- 左側：排行榜 (Leaderboard) ---
     html += `
     <div class="leaderboard-panel">
         <div class="lb-header">
             <span>LIVE BATTLE</span>
-            <span class="lb-header-sub">${allStrategies.length} ENTRIES</span>
+            <span class="lb-header-sub">TOP ${topStrategies.length}</span>
         </div>
         <div class="lb-list">`;
     
-    // 渲染所有策略到列表中，並加入 onclick 事件
-    allStrategies.forEach((s, index) => {
+    topStrategies.forEach((s, index) => {
         const rankClass = `rank-${index + 1}`;
         html += `
-            <div class="lb-row ${rankClass}" onclick="openStrategyModal('${s.code}')">
+            <div class="lb-row ${rankClass}">
                 <span class="lb-rank">#${index + 1}</span>
                 <div class="lb-info">
                     <div class="lb-name">${s.name}</div>
@@ -734,20 +839,23 @@ function renderArena(){
                 <span class="lb-val ${s.cls}">${s.sign}${s.roiStr}%</span>
             </div>`;
     });
-    html += `</div></div>`; 
+    html += `</div></div>`; // End leaderboard-panel
 
-    // --- 右側：圖表 (只顯示 Top 13) ---
+    // --- 右側：長條圖 (Bar Chart) ---
     html += `<div class="chart-panel"><div class="chart-grid"></div>`;
     
+    // 找出最大 ROI 用於設定圖表比例
     let maxROI = Math.max(...topStrategies.map(s => s.roiNum));
     if (maxROI < 10) maxROI = 10;
     if (maxROI <= 0) maxROI = 1; 
 
     topStrategies.forEach(s => {
+        // 計算高度百分比
         let heightPct = (s.roiNum / maxROI) * 100;
-        if (heightPct < 4 && s.roiNum > -99) heightPct = 4; 
+        if (heightPct < 4 && s.roiNum > -99) heightPct = 4; // 稍微拉高最小值，讓圖表好看
         if (s.roiNum <= -99) heightPct = 0; 
         
+        // 根據 ROI 動態改變顏色 (金/綠/紅)
         let barColorBg = 'linear-gradient(0deg, rgba(255, 145, 0, 0.3) 0%, var(--gold) 100%)';
         let shadowColor = 'rgba(255, 215, 0, 0.6)';
         if(s.cls.includes('profit')) {
@@ -767,60 +875,26 @@ function renderArena(){
             </div>`;
     });
 
-    html += `</div>`; 
-    html += `</div>`; 
+    html += `</div>`; // End chart-panel
+    html += `</div>`; // End arena-dashboard-v15
 
+    // 4. 注入 DOM
     con.innerHTML = html;
 }
 
-// 🔥 Open Modal for CARDS (C-Codes)
 function openModal(k){
   const c=cardsData[k];
   document.getElementById('mCode').textContent=c.code;
   document.getElementById('mSkill').textContent=c.skill;
-  
-  // 重置標籤
-  document.getElementById('label1').textContent = "初始資金 (CAPITAL)";
-  document.getElementById('val1').textContent = `${c.type.includes('us')?'US$':'NT$'} ${c.cost.toLocaleString()}`;
-  document.getElementById('val1').className = "m-value highlight";
-
-  document.getElementById('label2').textContent = "戰略定位 (STRATEGY)";
-  document.getElementById('val2').textContent = c.strategy;
-
-  document.getElementById('label3').textContent = "嚴格執行 SOP";
-  document.getElementById('val3').textContent = c.sop;
-
+  document.getElementById('mCost').textContent=`${c.type.includes('us')?'US$':'NT$'} ${c.cost.toLocaleString()}`;
+  document.getElementById('mStrategy').textContent=c.strategy;
+  document.getElementById('mSop').textContent=c.sop;
   const map={'type-tw':'--tw','type-us':'--us','type-yield':'--yield','type-ber':'--ber','type-trap':'--trap'};
   const color=getComputedStyle(document.documentElement).getPropertyValue(map[c.type]||'--gold').trim();
   document.querySelector('.modal-content').style.borderColor=color;
   document.getElementById('cardModal').style.display='flex';
   document.getElementById('cardModal').classList.add('modal-active');
 }
-
-// 🔥 Open Modal for STRATEGIES (P-Codes)
-function openStrategyModal(k) {
-    const s = strategiesData[k];
-    if (!s) return;
-
-    document.getElementById('mCode').textContent = s.code;
-    document.getElementById('mSkill').textContent = s.name;
-
-    // 修改標籤與內容
-    document.getElementById('label1').textContent = "競技亮點 (HIGHLIGHT)";
-    document.getElementById('val1').textContent = s.mindset;
-    document.getElementById('val1').className = "m-value highlight"; // 保持金色
-
-    document.getElementById('label2').textContent = "人格側寫 (PERSONA)";
-    document.getElementById('val2').textContent = s.persona;
-
-    document.getElementById('label3').textContent = "預期心理衝突 (CONFLICT)";
-    document.getElementById('val3').textContent = s.conflict;
-
-    document.querySelector('.modal-content').style.borderColor = 'var(--gold)'; // 策略預設金色
-    document.getElementById('cardModal').style.display = 'flex';
-    document.getElementById('cardModal').classList.add('modal-active');
-}
-
 function closeModal(){document.getElementById('cardModal').style.display='none'}
 document.addEventListener('keydown',e=>e.key==='Escape'&&closeModal());
 </script>
