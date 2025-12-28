@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PROJECT CAGE : RELOADED v15.6 (Interactive)</title>
+<title>PROJECT CAGE : RELOADED v15.7 (Link Fixed)</title>
 <style>
     :root {
         --bg: #050505; --card: #0a0a0c; --bar: #1a1a1e; --text: #e0e0e0; --mute: #888;
@@ -180,10 +180,10 @@
         padding: 6px 10px;
         border-bottom: 1px solid rgba(255,255,255,0.05);
         font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        cursor: pointer; /* Change cursor to pointer */
+        cursor: pointer;
         transition: background 0.2s;
     }
-    .lb-row:hover { background: rgba(255, 215, 0, 0.15); } /* Gold highlight on hover */
+    .lb-row:hover { background: rgba(255, 215, 0, 0.15); }
     
     .lb-rank { width: 25px; font-weight: 900; color: #555; font-family: 'Courier New'; font-size: 0.85rem; text-align: center; }
     .lb-info { flex-grow: 1; padding: 0 8px; overflow: hidden; }
@@ -368,12 +368,15 @@
 </div>
 
 <script>
+// =========================================================
+//  ✅ CORRECT GOOGLE SHEET URL (FIXED)
+// =========================================================
 const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQuNQc8E7BlYLR5E6WlYHVQ3l_ki95CqcEcpS8sNQESRKcg5yECE-e2bgMvLGU-Vx5HFuWo5OS1GUIT/pub?output=tsv';
 
 const FALLBACK_DATA = `
 A (code)	B (type)	C (rpg)	D (target)	E (skill)	F (cost)	G (current)	H (strategy)	I (sop)	J (image)
 Title	PROJECT CAGE : RELOADED	
-Meta	v15.6 (Interactive) • 2025-2031	
+Meta	v15.7 (Fixed) • 2025-2031	
 L01	🔒 資金封閉鐵律	1,000 萬只進不出。僅能在定存、活存、證券戶間流動，嚴禁消費。
 L02	⚖️ 歸一化競技鐵律	績效起點皆為 100%。不比金額大小，只比策略報酬率 (%)。
 L03	🔄 配息再投入鐵律	股息 100% 留倉再投入，視為淨值一部分，維持複利效應。
@@ -467,7 +470,7 @@ const defaultIcons = {
 init();
 
 async function init() {
-    uiLog('=== SYSTEM START (v15.6) ===');
+    uiLog('=== SYSTEM START (v15.7) ===');
     uiLog(`Fetching Data from: ${GOOGLE_SHEET_URL.substring(0, 50)}...`);
     
     cardsData = {}; portfolios = {}; strategiesData = {}; eventsData = []; lawsData = [];
@@ -559,7 +562,6 @@ function parseSheetData(text){
           };
           
           portfolios[currentGroup].push(strategyObj);
-          // 🔥 儲存到 strategiesData 以便 Modal 查詢
           strategiesData[c[0]] = strategyObj;
     }
     else if (mode === 'STRATEGIES' && c[0] && !c[0].startsWith('P') && c[0] !== '代號' && c.length < 5) {
