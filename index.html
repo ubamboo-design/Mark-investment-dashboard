@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
-<title>PROJECT CAGE : RELOADED v16.11 (Sheet ROI Sync)</title>
+<title>PROJECT CAGE : RELOADED v16.13 (Target Col M)</title>
 <style>
-    /* CSS 與前版完全相同，無更動 */
+    /* CSS 樣式完全保持不變 */
     :root {
         --bg: #050505; --card: #0a0a0c; --bar: #1a1a1e; --text: #e0e0e0; --mute: #888;
         --tw: #ff2a2a; --us: #00d2ff; --yield: #00ff6a; --ber: #ff9100; --trap: #bd00ff; 
@@ -153,6 +153,7 @@
       <div class="meta-info" id="pageMeta">LOADING DATA...</div>
   </div>
 </header>
+
 <div class="container">
   <div class="dashboard-wrapper">
       <div class="dash-grid">
@@ -213,7 +214,7 @@ const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQuNQc
 
 let currentRate = 32.5;
 let cardsData = {}, portfolios = {}, strategiesData = {}, eventsData = [], lawsData = [];
-let configData = { title: 'PROJECT CAGE', meta: 'v16.11' };
+let configData = { title: 'PROJECT CAGE', meta: 'v16.12' };
 let logoUrl = ''; 
 let isFallback = false;
 const defaultIcons = { 'C01': `<svg class="mc-media" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" r="20" stroke="currentColor" stroke-width="2" fill="none"/></svg>` };
@@ -222,7 +223,9 @@ function toggleDebug() { const panel = document.getElementById('debug-panel'); p
 function uiLog(msg, type = 'info') { const panel = document.getElementById('debug-panel'); panel.innerHTML += `<div>[${new Date().toLocaleTimeString()}] ${msg}</div>`; panel.scrollTop = panel.scrollHeight; }
 
 async function init() {
+    // 🛑 修正重複問題：每次 init 都先把資料清空
     cardsData = {}; portfolios = {}; strategiesData = {}; eventsData = []; lawsData = [];
+
     try {
         const rateRes = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
         const rateData = await rateRes.json();
@@ -263,13 +266,15 @@ function parseSheetData(text){
         };
     } else if(c[0].startsWith('P')){
         if(!portfolios[currentGroup]) portfolios[currentGroup] = [];
-        // 🛠️ 關鍵修正：直接讀取 Sheet 上的報酬率欄位 (N欄, Index 13)
-        // 注意：Excel欄位順序 A=0, ..., N=13
-        let sheetROI = c[13] ? c[13].replace('%', '').trim() : '0';
+        
+        // 🛠️ 智能抓取 ROI：直接鎖定 M 欄 (Index 12)
+        // 注意：Excel欄位 A=0 ... M=12
+        let sheetROI = c[12] ? c[12].replace('%', '').trim() : '0';
+
         let sObj = { 
             code: c[0], name: c[1], deck: c[2] ? c[2].split('+').map(s=>s.trim()) : [], 
             mindset: c[3] || '-', persona: c[4] || '-', conflict: c[5] || '-',
-            sheetROI: parseFloat(sheetROI) // 存入 Sheet 讀到的 ROI
+            sheetROI: parseFloat(sheetROI) 
         };
         portfolios[currentGroup].push(sObj); strategiesData[c[0]] = sObj;
     } else if (mode === 'STRATEGIES' && c[0] && !c[0].startsWith('P') && c.length < 5) {
@@ -283,8 +288,8 @@ function parseSheetData(text){
 
 function calc(cost, cur){
   if(!cost) return {roi:0, arrow:'-', cls:'', diff: 0, sign: ''};
-  const diff = cur - cost, roiRaw = diff/cost, roi = (roiRaw*100).toFixed(1);
-  let cls = roiRaw >= 0.5 ? 'color-gold' : roiRaw >= 0 ? 'color-profit' : roiRaw <= -0.5 ? 'color-dead' : 'color-loss';
+  const diff = cur - cost, roi = ((diff/cost)*100).toFixed(1);
+  let cls = roi >= 0.5 ? 'color-gold' : roi >= 0 ? 'color-profit' : roi <= -0.5 ? 'color-dead' : 'color-loss';
   return {roi, arrow: diff>=0 ? '▲' : '▼', sign: diff>=0 ? '+' : '', cls, diff};
 }
 
@@ -316,15 +321,12 @@ function renderArena(){
     const con = document.getElementById('arenaContainer'); con.innerHTML = ''; 
     let allS = [];
     Object.keys(portfolios).forEach(g => portfolios[g].forEach(p => {
-        // 🛠️ 修正：直接使用 Sheet 讀到的 ROI，不再重新計算
         const roiNum = p.sheetROI; 
-        // 判斷顏色邏輯
         let cls = roiNum >= 50 ? 'color-gold' : roiNum >= 0 ? 'color-profit' : roiNum <= -50 ? 'color-dead' : 'color-loss';
         let sign = roiNum >= 0 ? '+' : '';
-        
         allS.push({ code: p.code, name: p.name, roiNum: roiNum, roiStr: roiNum.toFixed(2), cls: cls, sign: sign, rawDeck: p.deck });
     }));
-    allS.sort((a, b) => b.roiNum - a.roiNum); // 依照 Excel 報酬率排序
+    allS.sort((a, b) => b.roiNum - a.roiNum); 
 
     let html = `<div class="arena-dashboard-v15"><div class="leaderboard-panel"><div class="lb-header"><span>LIVE BATTLE</span><span>${allS.length} ENTRIES</span></div><div class="lb-list">`;
     allS.forEach((s, i) => {
