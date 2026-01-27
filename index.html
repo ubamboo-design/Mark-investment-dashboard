@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
-<title>PROJECT CAGE : RELOADED v16.22 (Modal Sync)</title>
+<title>PROJECT CAGE : RELOADED v16.23 (Modal Fix)</title>
 <style>
-    /* CSS: 保持 v16.19 的完美佈局，僅優化 Modal 樣式 */
+    /* CSS 與 v16.21 保持一致，無需更動 */
     :root {
         --bg: #050505; --card: #0a0a0c; --bar: #1a1a1e; --text: #e0e0e0; --mute: #888;
         --tw: #ff2a2a; --us: #00d2ff; --yield: #00ff6a; --ber: #ff9100; --trap: #bd00ff; 
@@ -57,7 +57,6 @@
     .hud-row .val { color: #ccc; font-family: var(--font-num); font-weight: bold; letter-spacing: 1px; }
     .sub-label { font-size: 0.8rem; color: rgba(255,255,255,0.6); margin-bottom: 2px; font-family: 'Segoe UI', sans-serif; text-align: center; }
     .main-val { font-family: var(--font-num); font-size: 2.2rem; font-weight: 700; letter-spacing: 1px; line-height: 1; color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.3); text-align: center; margin-top: 5px; }
-    .cost-val { font-family: 'Segoe UI', sans-serif; font-size: 0.9rem; color: #aaa; letter-spacing: 1px; font-weight: bold; }
     .pl-block { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; margin-top: auto; width: 100%; text-align: center; position: relative; z-index: 2; }
     .pl-val { font-family: var(--font-num); font-size: 1.3rem; font-weight: bold; }
     .pl-pct { font-size: 0.9rem; margin-left: 5px; opacity: 0.8; font-family: var(--font-num); }
@@ -219,7 +218,7 @@ const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQuNQc
 
 let currentRate = 32.5;
 let cardsData = {}, portfolios = {}, strategiesData = {}, eventsData = [], lawsData = [];
-let configData = { title: 'PROJECT CAGE', meta: 'v16.22' };
+let configData = { title: 'PROJECT CAGE', meta: 'v16.23' };
 let logoUrl = ''; 
 let isFallback = false;
 const defaultIcons = { 'C01': `<svg class="mc-media" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" r="20" stroke="currentColor" stroke-width="2" fill="none"/></svg>` };
@@ -260,6 +259,7 @@ function parseSheetData(text){
         let investedRaw = c[13] || '0';
         let isUSD = budgetRaw.includes('$') && !budgetRaw.includes('NT$');
         let imgUrl = fixDriveUrl(c[9] ? c[9].trim() : '');
+        
         cardsData[c[0]] = {
             code: c[0], type: c[1], rpg: c[2], target: c[3], skill: c[4],
             isUSD: isUSD,
@@ -267,22 +267,39 @@ function parseSheetData(text){
             current: parseFloat(currentRaw.replace(/[NT$US,\s]/g, '')) || 0,
             invested: parseFloat(investedRaw.replace(/[NT$US,\s]/g, '')) || 0,
             media: imgUrl ? `<img src="${imgUrl}" class="mc-media">` : defaultIcons['C01'],
-            strategy: c[7], sop: c[8], imgUrl: imgUrl
+            strategy: c[7] || '-', sop: c[8] || '-', imgUrl: imgUrl
         };
     } else if(c[0].startsWith('P')){
         if(!portfolios[currentGroup]) portfolios[currentGroup] = [];
+        
         let rawInv = c[9] ? c[9].trim() : '0';
         let displayInv = rawInv;
-        if (rawInv.includes('NT')) { displayInv = 'NT$' + rawInv.replace(/[^0-9,.]/g, ''); } 
-        else { displayInv = 'USD$' + rawInv.replace(/[^0-9,.]/g, ''); }
+        if (rawInv.includes('NT')) {
+            displayInv = 'NT$' + rawInv.replace(/[^0-9,.]/g, '');
+        } else {
+            displayInv = 'USD$' + rawInv.replace(/[^0-9,.]/g, '');
+        }
+
         let sheetROI = '0';
-        for(let k=c.length-1; k>=0; k--) { if(c[k] && c[k].includes('%')) { sheetROI = c[k].replace('%','').trim(); break; } }
+        for(let k=c.length-1; k>=0; k--) {
+            if(c[k] && c[k].includes('%')) {
+                sheetROI = c[k].replace('%','').trim();
+                break;
+            }
+        }
+
+        // 🛠️ 讀取策略表資料，若為空則標記為 null
+        let highlight = c[3] ? c[3].trim() : null; // D欄
+        let explain = c[4] ? c[4].trim() : null;   // E欄
+        let deck = c[2] ? c[2].split('+').map(s=>s.trim()) : [];
+
         let sObj = { 
-            code: c[0], name: c[1], deck: c[2] ? c[2].split('+').map(s=>s.trim()) : [], 
-            mindset: c[3] || '-', persona: c[4] || '-', conflict: c[5] || '-',
-            sheetROI: parseFloat(sheetROI), sheetInvested: displayInv,
-            // 🛠️ 策略彈窗專用資料
-            budget: c[5] || '-', invested: c[9] || '-'
+            code: c[0], name: c[1], deck: deck, 
+            sheetROI: parseFloat(sheetROI),
+            sheetInvested: displayInv,
+            // 🛠️ 彈窗資料：保留原始值或 null
+            budget: c[5] || '-', invested: c[9] || '-',
+            highlight: highlight, explain: explain 
         };
         portfolios[currentGroup].push(sObj); strategiesData[c[0]] = sObj;
     } else if (mode === 'STRATEGIES' && c[0] && !c[0].startsWith('P') && c.length < 5) {
@@ -342,14 +359,22 @@ function renderArena(){
     allS.sort((a, b) => b.roiNum - a.roiNum); 
     let html = `<div class="arena-dashboard-v15"><div class="leaderboard-panel"><div class="lb-header"><span class="title">LIVE BATTLE</span><span class="lbl-inv">已投入金額</span><span class="lbl-roi">報酬率</span></div><div class="lb-list">`;
     allS.forEach((s, i) => {
-        const deck = s.rawDeck.map(code => { const card = cardsData[code]; return card?.imgUrl ? `<img src="${fixDriveUrl(card.imgUrl)}" class="lb-card-icon">` : `<div class="lb-card-icon" style="background:#222;font-size:8px;">${code}</div>`; }).join('');
+        const deck = s.rawDeck.map(code => {
+            const card = cardsData[code];
+            return card?.imgUrl ? `<img src="${fixDriveUrl(card.imgUrl)}" class="lb-card-icon">` : `<div class="lb-card-icon" style="background:#222;font-size:8px;">${code}</div>`;
+        }).join('');
         html += `<div class="lb-row rank-${i+1}" onclick="openStrategyModal('${s.code}')"><span class="lb-rank">#${i+1}</span><div class="lb-info"><div class="lb-name">${s.name}</div><div class="lb-code">${s.code}</div></div><div class="lb-deck">${deck}</div><div class="lb-invested">${s.invested}</div><span class="lb-val ${s.cls}">${s.sign}${s.roiStr}%</span></div>`;
     });
     let maxR = Math.max(...allS.map(x => Math.abs(x.roiNum)), 10);
     con.innerHTML = html + `</div></div><div class="chart-panel"><div class="chart-grid"></div>` + allS.slice(0, 13).map(s => { let h = (Math.abs(s.roiNum) / (maxR * 1.2)) * 100; let color = s.cls === 'color-profit' ? 'var(--red)' : (s.cls==='color-gold'?'var(--gold)':'var(--green)'); return `<div class="bar-wrapper"><div class="bar-fill" style="height:${h}%; background:${color}; box-shadow: 0 0 10px ${color}"><span class="bar-val-top">${s.roiStr}%</span></div><div class="bar-label-bottom">${s.code}</div></div>`; }).join('') + `</div></div>`;
 }
 
-function renderCards(){ const con=document.getElementById('cardContainer'); con.innerHTML=''; Object.values(cardsData).forEach(c=>{ con.innerHTML+=`<div class="micro-card ${c.type}" onclick="openModal('${c.code}')"><div class="mc-header"><span class="mc-code">${c.code}</span><span class="mc-target">${c.target}</span></div><div class="mc-image-container">${c.media}</div><div class="mc-footer"><div class="mc-chn-name">${c.rpg||''}</div><div class="mc-eng-name">${c.skill}</div><div class="mc-cost-badge">$${(c.budget/10000).toFixed(0)}萬</div></div></div>`; });}
+function renderCards(){
+    const con=document.getElementById('cardContainer'); con.innerHTML='';
+    Object.values(cardsData).forEach(c=>{
+        con.innerHTML+=`<div class="micro-card ${c.type}" onclick="openModal('${c.code}')"><div class="mc-header"><span class="mc-code">${c.code}</span><span class="mc-target">${c.target}</span></div><div class="mc-image-container">${c.media}</div><div class="mc-footer"><div class="mc-chn-name">${c.rpg||''}</div><div class="mc-eng-name">${c.skill}</div><div class="mc-cost-badge">$${(c.budget/10000).toFixed(0)}萬</div></div></div>`;
+    });
+}
 function renderEvents(){ const con = document.getElementById('eventContainer'); con.innerHTML = eventsData.slice(0, 2).map(e => `<div class="event-card${e.isUrgent?' emergency':''}"><div class="event-header"><span class="event-date">${e.date}</span><span class="event-status">${e.status}</span></div><div class="event-content">${e.content}</div></div>`).join(''); }
 function renderFooter() { const con = document.getElementById('footerContainer'); con.innerHTML = lawsData.map(law => `<div class="info-box"><span class="info-title">${law.title}</span>${law.content}</div>`).join('') + `<div class="info-box refresh-btn" onclick="init()">↻ REFRESH DATA</div>`; }
 
@@ -358,7 +383,6 @@ function openModal(k){
     const c=cardsData[k]; 
     document.getElementById('mCode').textContent=c.code; 
     document.getElementById('mSkill').textContent=c.skill; 
-    // 顯示預算與實際投入
     document.getElementById('val1').textContent = `${c.isUSD?'US$':'NT$'} ${c.budget.toLocaleString()}`; 
     document.getElementById('val_invested').textContent = `${c.isUSD?'US$':'NT$'} ${c.invested.toLocaleString()}`; 
     document.getElementById('val2').textContent = c.strategy; 
@@ -367,17 +391,33 @@ function openModal(k){
     document.getElementById('cardModal').classList.add('modal-active'); 
 }
 
-// 🛠️ 策略彈窗 (Strategies)
+// 🛠️ 策略彈窗 (Strategies) - 智能 Fallback
 function openStrategyModal(k) { 
     const s = strategiesData[k]; 
     document.getElementById('mCode').textContent = s.code; 
     document.getElementById('mSkill').textContent = s.name; 
-    // 對應到策略 Sheet 的預算與投入欄位
     document.getElementById('val1').textContent = s.budget; 
     document.getElementById('val_invested').textContent = s.invested; 
-    // 策略與SOP對應欄位 (Mindset / Persona)
-    document.getElementById('val2').textContent = s.mindset; 
-    document.getElementById('val3').textContent = s.persona; 
+    
+    // 🔍 智能判斷：如果策略表的內容是空的，就去抓核心卡牌的內容
+    let displayStrategy = s.highlight;
+    let displaySOP = s.explain;
+
+    if (!displayStrategy || displayStrategy === '-') {
+        // Fallback: 找第一張關聯卡牌
+        const coreCardCode = s.deck[0]; 
+        const coreCard = cardsData[coreCardCode];
+        if (coreCard) displayStrategy = coreCard.strategy + " (Inherited from Card)";
+    }
+
+    if (!displaySOP || displaySOP === '-') {
+        const coreCardCode = s.deck[0];
+        const coreCard = cardsData[coreCardCode];
+        if (coreCard) displaySOP = coreCard.sop + " (Inherited from Card)";
+    }
+
+    document.getElementById('val2').textContent = displayStrategy || '-'; 
+    document.getElementById('val3').textContent = displaySOP || '-'; 
     document.getElementById('cardModal').style.display = 'flex'; 
     document.getElementById('cardModal').classList.add('modal-active'); 
 }
