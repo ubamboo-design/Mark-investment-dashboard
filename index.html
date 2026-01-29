@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
-<title>PROJECT CAGE : RELOADED v16.33 (Fix Undefined)</title>
+<title>PROJECT CAGE : RELOADED v16.34 (Verified)</title>
 <style>
-    /* CSS 全局設定 (保持 v16.31 完美狀態) */
+    /* CSS 全局設定 (保持 v16.31 樣式) */
     :root {
         --bg: #050505; --card: #0a0a0c; --bar: #1a1a1e; --text: #e0e0e0; --mute: #888;
         --tw: #ff2a2a; --us: #00d2ff; --yield: #00ff6a; --ber: #ff9100; --trap: #bd00ff; 
@@ -311,7 +311,7 @@ const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQuNQc
 
 let currentRate = 32.5;
 let cardsData = {}, portfolios = {}, strategiesData = {}, eventsData = [], lawsData = [];
-let configData = { title: 'PROJECT CAGE', meta: 'v16.33' };
+let configData = { title: 'PROJECT CAGE', meta: 'v16.34' };
 let logoUrl = ''; 
 let isFallback = false;
 const defaultIcons = { 'C01': `<svg class="mc-media" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" r="20" stroke="currentColor" stroke-width="2" fill="none"/></svg>` };
@@ -351,6 +351,7 @@ function parseSheetData(text){
         let currentRaw = c[6] || '0';
         let investedRaw = c[13] || '0';
         let sharesRaw = c[11] || '0'; 
+        
         let isUSD = budgetRaw.includes('$') && !budgetRaw.includes('NT$');
         let imgUrl = fixDriveUrl(c[9] ? c[9].trim() : '');
         cardsData[c[0]] = {
@@ -365,27 +366,37 @@ function parseSheetData(text){
         };
     } else if(c[0].startsWith('P')){
         if(!portfolios[currentGroup]) portfolios[currentGroup] = [];
+        
+        // 🛠️ 1. 抓取 J 欄 (Index 9)
         let rawInv = c[9] ? c[9].trim() : '0';
         
+        // 🛠️ 2. 強制貨幣檢查：如果 C08/P08 是 NT$200,000，這裡必須顯示 NT
+        //    透過檢查 rawInv 內容是否包含 NT
         let displayInv = rawInv;
-        let budgetStr = c[5] || '';
-        if (budgetStr.includes('NT')) {
-             displayInv = 'NT$ ' + rawInv.replace(/[NT$US,\s]/g, '');
+        if (rawInv.includes('NT')) {
+            displayInv = 'NT$' + rawInv.replace(/[^0-9,.]/g, '');
+        } else if (rawInv.includes('$')) {
+            displayInv = 'USD$' + rawInv.replace(/[^0-9,.]/g, '');
         } else {
-             displayInv = 'USD$ ' + rawInv.replace(/[NT$US,\s]/g, '');
+            // 如果只有數字，預設為 NT (除非標題有寫 USD)
+             displayInv = 'NT$' + rawInv.replace(/[^0-9,.]/g, '');
         }
 
         let sheetROI = '0';
         for(let k=c.length-1; k>=0; k--) {
             if(c[k] && c[k].includes('%')) { sheetROI = c[k].replace('%','').trim(); break; }
         }
+
         let highlight = c[3] ? c[3].trim() : null;
         let explain = c[4] ? c[4].trim() : null;
         let deck = c[2] ? c[2].split('+').map(s=>s.trim()) : [];
         let sObj = { 
             code: c[0], name: c[1], deck: deck, 
-            sheetROI: parseFloat(sheetROI), sheetInvested: displayInv,
-            budget: c[5] || '-', invested: c[9] || '-',
+            sheetROI: parseFloat(sheetROI), 
+            sheetInvested: displayInv, // 存入正確格式的金額
+            budget: c[5] || '-', 
+            // 🛠️ 修復 undefined：將 invested 也存一份 (跟 sheetInvested 一樣)
+            invested: displayInv, 
             highlight: highlight, explain: explain 
         };
         portfolios[currentGroup].push(sObj); strategiesData[c[0]] = sObj;
@@ -405,16 +416,8 @@ function formatCompact(num, isUSD = false) {
 }
 
 function formatCurrencyString(str) {
-    if (!str || str === '-') return '-';
-    let cleanStr = str.replace(/[NT$USD,\s]/g, '');
-    let num = parseFloat(cleanStr);
-    if (isNaN(num)) return str;
-    if (str.includes('NT') || str.includes('TWD')) {
-        return 'NT$ ' + num.toLocaleString(undefined, { maximumFractionDigits: 0 });
-    } else if (str.includes('$') || str.includes('USD')) {
-        return 'USD$ ' + num.toLocaleString(undefined, { maximumFractionDigits: 0 });
-    }
-    return '$ ' + num.toLocaleString();
+    // 簡單過濾，因為已經在 parse 階段處理過了
+    return str;
 }
 
 function calc(cost, cur){
@@ -460,14 +463,15 @@ function renderArena(){
         const roiNum = p.sheetROI; 
         let cls = roiNum >= 50 ? 'color-gold' : roiNum >= 0 ? 'color-profit' : roiNum <= -50 ? 'color-dead' : 'color-loss';
         let sign = roiNum >= 0 ? '+' : '';
+        // 🛠️ 確保 invested 屬性存在
         allS.push({ code: p.code, name: p.name, roiNum: roiNum, roiStr: roiNum.toFixed(2), cls: cls, sign: sign, rawDeck: p.deck, invested: p.sheetInvested });
     }));
     allS.sort((a, b) => b.roiNum - a.roiNum); 
     let html = `<div class="arena-dashboard-v15"><div class="leaderboard-panel"><div class="lb-header"><span class="title">LIVE BATTLE</span><span class="lbl-inv">已投入金額</span><span class="lbl-roi">報酬率</span></div><div class="lb-list">`;
     allS.forEach((s, i) => {
         const deck = s.rawDeck.map(code => { const card = cardsData[code]; return card?.imgUrl ? `<img src="${fixDriveUrl(card.imgUrl)}" class="lb-card-icon">` : `<div class="lb-card-icon" style="background:#222;font-size:8px;">${code}</div>`; }).join('');
-        // 🛠️ 修正點：使用 s.sheetInvested (正確的變數)
-        html += `<div class="lb-row rank-${i+1}" onclick="openStrategyModal('${s.code}')"><span class="lb-rank">#${i+1}</span><div class="lb-info"><div class="lb-name">${s.name}</div><div class="lb-code">${s.code}</div></div><div class="lb-deck">${deck}</div><div class="lb-invested">${formatCurrencyString(s.sheetInvested)}</div><span class="lb-val ${s.cls}">${s.sign}${s.roiStr}%</span></div>`;
+        // 🛠️ 確保顯示變數正確
+        html += `<div class="lb-row rank-${i+1}" onclick="openStrategyModal('${s.code}')"><span class="lb-rank">#${i+1}</span><div class="lb-info"><div class="lb-name">${s.name}</div><div class="lb-code">${s.code}</div></div><div class="lb-deck">${deck}</div><div class="lb-invested">${s.invested}</div><span class="lb-val ${s.cls}">${s.sign}${s.roiStr}%</span></div>`;
     });
     let maxR = Math.max(...allS.map(x => Math.abs(x.roiNum)), 5);
     const chartBarsHTML = allS.slice(0, 13).map((s, i) => {
@@ -510,7 +514,7 @@ function openStrategyModal(k) {
     document.getElementById('mCode').textContent = s.code; 
     document.getElementById('mSkill').textContent = s.name; 
     document.getElementById('val1').textContent = s.budget; 
-    document.getElementById('val_invested').textContent = s.sheetInvested; 
+    document.getElementById('val_invested').textContent = s.invested; 
     
     document.getElementById('row_shares').style.display = 'none'; // Hide
 
