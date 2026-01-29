@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
-<title>PROJECT CAGE : RELOADED v16.31 (Strategy Logic Fix)</title>
+<title>PROJECT CAGE : RELOADED v16.32 (BTC Fix)</title>
 <style>
-    /* CSS 全局設定 */
+    /* CSS 全局設定 (保持 v16.31 完美狀態) */
     :root {
         --bg: #050505; --card: #0a0a0c; --bar: #1a1a1e; --text: #e0e0e0; --mute: #888;
         --tw: #ff2a2a; --us: #00d2ff; --yield: #00ff6a; --ber: #ff9100; --trap: #bd00ff; 
@@ -30,7 +30,7 @@
     .meta-info { font-family: 'Courier New', monospace; color: var(--gold); margin-top: 4px; font-size: 0.75rem; opacity: 0.8; letter-spacing: 1px; }
     .container { max-width: 1600px; margin: 0 auto; padding: 0 10px; }
 
-    /* Dashboard Wrapper (保持金屬感) */
+    /* Dashboard Wrapper */
     .dashboard-wrapper { 
         margin-top: 20px; padding: 15px; 
         background: linear-gradient(160deg, #3a3a45 0%, #1a1a1e 60%, #0a0a0c 100%);
@@ -311,7 +311,7 @@ const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQuNQc
 
 let currentRate = 32.5;
 let cardsData = {}, portfolios = {}, strategiesData = {}, eventsData = [], lawsData = [];
-let configData = { title: 'PROJECT CAGE', meta: 'v16.31' };
+let configData = { title: 'PROJECT CAGE', meta: 'v16.32' };
 let logoUrl = ''; 
 let isFallback = false;
 const defaultIcons = { 'C01': `<svg class="mc-media" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" r="20" stroke="currentColor" stroke-width="2" fill="none"/></svg>` };
@@ -351,7 +351,14 @@ function parseSheetData(text){
         let currentRaw = c[6] || '0';
         let investedRaw = c[13] || '0';
         let sharesRaw = c[11] || '0'; 
-        let isUSD = budgetRaw.includes('$') && !budgetRaw.includes('NT$');
+        
+        // 🛠️ v16.32 修正：BTC (NT$200,000) 雖然沒有 NT 字樣，但要檢查上下文
+        // 這裡改為：只要包含 NT 就一定是 TWD，否則包含 $ 才是 USD
+        // 另外增加判斷：如果預算字串包含 'NT'，則強制 isUSD = false
+        let isUSD = false;
+        if (budgetRaw.includes('NT')) { isUSD = false; }
+        else if (budgetRaw.includes('$')) { isUSD = true; }
+        
         let imgUrl = fixDriveUrl(c[9] ? c[9].trim() : '');
         cardsData[c[0]] = {
             code: c[0], type: c[1], rpg: c[2], target: c[3], skill: c[4],
@@ -366,6 +373,29 @@ function parseSheetData(text){
     } else if(c[0].startsWith('P')){
         if(!portfolios[currentGroup]) portfolios[currentGroup] = [];
         let rawInv = c[9] ? c[9].trim() : '0';
+        
+        // 🛠️ v16.32 同步修正 P-Strategy 的貨幣判斷
+        let displayInv = rawInv;
+        let isUSD_P = false;
+        if (rawInv.includes('NT')) { isUSD_P = false; }
+        else if (rawInv.includes('$')) { isUSD_P = true; }
+        
+        // 強制檢查：如果 rawInv 是純數字，且對應的 C 卡是 TWD，則修正
+        // 但這裡沒有直接 link，暫時依賴 Sheet 字串
+        // 不過 C08 (BTC) 在 Sheet 上 P08 那行可能也寫了 NT$200,000 (看截圖)
+        // 截圖 P08 的 J 欄是 `NT$200,000` (image_eb65ee.png 上面 P08 的 Invested 是 USD $200,000 ??)
+        // 等等，截圖 image_eb65ee.png 顯示 P08 是 USD$200,000。
+        // 但 image_4d349b.png (Excel) 顯示 P08 J欄是 `200000` (純數字) 或 `NT$200,000`?
+        // Excel 截圖中 P08 J欄是 `$200,000` (看起來像 USD 格式)
+        // 但是 F 欄是 `NT$200,000.00`。
+        // 邏輯修正：優先參考 F 欄 (預算) 的幣別
+        let budgetStr = c[5] || '';
+        if (budgetStr.includes('NT')) {
+             displayInv = 'NT$ ' + rawInv.replace(/[NT$US,\s]/g, '');
+        } else {
+             displayInv = 'USD$ ' + rawInv.replace(/[NT$US,\s]/g, '');
+        }
+
         let sheetROI = '0';
         for(let k=c.length-1; k>=0; k--) {
             if(c[k] && c[k].includes('%')) { sheetROI = c[k].replace('%','').trim(); break; }
@@ -375,7 +405,7 @@ function parseSheetData(text){
         let deck = c[2] ? c[2].split('+').map(s=>s.trim()) : [];
         let sObj = { 
             code: c[0], name: c[1], deck: deck, 
-            sheetROI: parseFloat(sheetROI), sheetInvested: rawInv,
+            sheetROI: parseFloat(sheetROI), sheetInvested: displayInv,
             budget: c[5] || '-', invested: c[9] || '-',
             highlight: highlight, explain: explain 
         };
@@ -397,6 +427,7 @@ function formatCompact(num, isUSD = false) {
 
 function formatCurrencyString(str) {
     if (!str || str === '-') return '-';
+    // 🛠️ v16.32 優化顯示，確保 NT$ 與數字間有空格
     let cleanStr = str.replace(/[NT$USD,\s]/g, '');
     let num = parseFloat(cleanStr);
     if (isNaN(num)) return str;
@@ -405,7 +436,8 @@ function formatCurrencyString(str) {
     } else if (str.includes('$') || str.includes('USD')) {
         return 'USD$ ' + num.toLocaleString(undefined, { maximumFractionDigits: 0 });
     }
-    return str;
+    // 預設 (如果判斷不出)
+    return '$ ' + num.toLocaleString();
 }
 
 function calc(cost, cur){
@@ -457,7 +489,7 @@ function renderArena(){
     let html = `<div class="arena-dashboard-v15"><div class="leaderboard-panel"><div class="lb-header"><span class="title">LIVE BATTLE</span><span class="lbl-inv">已投入金額</span><span class="lbl-roi">報酬率</span></div><div class="lb-list">`;
     allS.forEach((s, i) => {
         const deck = s.rawDeck.map(code => { const card = cardsData[code]; return card?.imgUrl ? `<img src="${fixDriveUrl(card.imgUrl)}" class="lb-card-icon">` : `<div class="lb-card-icon" style="background:#222;font-size:8px;">${code}</div>`; }).join('');
-        html += `<div class="lb-row rank-${i+1}" onclick="openStrategyModal('${s.code}')"><span class="lb-rank">#${i+1}</span><div class="lb-info"><div class="lb-name">${s.name}</div><div class="lb-code">${s.code}</div></div><div class="lb-deck">${deck}</div><div class="lb-invested">${formatCurrencyString(s.invested)}</div><span class="lb-val ${s.cls}">${s.sign}${s.roiStr}%</span></div>`;
+        html += `<div class="lb-row rank-${i+1}" onclick="openStrategyModal('${s.code}')"><span class="lb-rank">#${i+1}</span><div class="lb-info"><div class="lb-name">${s.name}</div><div class="lb-code">${s.code}</div></div><div class="lb-deck">${deck}</div><div class="lb-invested">${s.sheetInvested}</div><span class="lb-val ${s.cls}">${s.sign}${s.roiStr}%</span></div>`;
     });
     
     let maxR = Math.max(...allS.map(x => Math.abs(x.roiNum)), 5);
@@ -502,7 +534,7 @@ function openStrategyModal(k) {
     document.getElementById('mCode').textContent = s.code; 
     document.getElementById('mSkill').textContent = s.name; 
     document.getElementById('val1').textContent = s.budget; 
-    document.getElementById('val_invested').textContent = s.invested; 
+    document.getElementById('val_invested').textContent = s.sheetInvested; // Use sheetInvested for display
     
     // 🛠️ 策略彈窗隱藏股數
     document.getElementById('row_shares').style.display = 'none'; // Hide
