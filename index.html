@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
-<title>PROJECT Colosseum</title>
+<title>PROJECT CAGE : RELOADED v16.50 (Ratio Added)</title>
 <style>
-    /* CSS 全局設定 (保持穩定) */
+    /* CSS 全局設定 (保持 v16.47 樣式) */
     :root {
         --bg: #050505; --card: #0a0a0c; --bar: #1a1a1e; --text: #e0e0e0; --mute: #888;
         --tw: #ff2a2a; --us: #00d2ff; --yield: #00ff6a; --ber: #ff9100; --trap: #bd00ff; 
@@ -128,17 +128,14 @@
 
     /* Arena */
     .arena-container { width: 100%; }
-    
-    /* 🛠️ v16.49 Grid Layout: List Fixed | Chart FLEX (Max) | Video Fixed (Right) */
     .arena-dashboard-v15 { 
         display: grid; 
-        grid-template-columns: 420px 1fr 340px; /* List 420 | Chart Max | Video 340 */
+        grid-template-columns: 420px 0.6fr 460px; /* List 420px | Chart 0.6fr | Video 460px */
         gap: 15px; 
         margin-bottom: 20px; 
         height: auto; 
         align-items: stretch; 
     }
-    
     .leaderboard-panel { 
         background: linear-gradient(160deg, #2d2d35 0%, #141417 100%);
         border-top: 1px solid rgba(255,255,255,0.2);
@@ -380,7 +377,7 @@
               <div style="color:var(--tw); font-weight:900; margin-bottom:5px;">4. 無腦平衡 (MINDLESS)</div>
               <div style="font-size:0.8rem; color:#666; margin-bottom:10px;">強制回歸設定比例</div>
               <table class="calc-table">
-                  <thead><tr><th>ASSET</th><th>CURRENT</th><th style="text-align:center">ACTION</th><th style="text-align:right">TARGET</th></tr></thead>
+                  <thead><tr><th>ASSET</th><th>CURRENT (%)</th><th style="text-align:center">ACTION</th><th style="text-align:right">TARGET (%)</th></tr></thead>
                   <tbody id="calc_mindlessBody"></tbody>
               </table>
               <div style="margin-top:10px; text-align:center; font-size:0.8rem; color:#888;">現金消耗: <span id="calc_mindlessTotal" style="color:var(--tw); font-weight:bold;">--</span></div>
@@ -389,7 +386,7 @@
               <div style="color:var(--yield); font-weight:900; margin-bottom:5px;">5. 聰明平衡 (SMART)</div>
               <div style="font-size:0.8rem; color:#666; margin-bottom:10px;">狙擊跌最深標的 (Sniper Mode)</div>
               <table class="calc-table">
-                  <thead><tr><th>ASSET</th><th>CURRENT</th><th style="text-align:center">ACTION</th><th style="text-align:right">FINAL</th></tr></thead>
+                   <thead><tr><th>ASSET</th><th>CURRENT (%)</th><th style="text-align:center">ACTION</th><th style="text-align:right">FINAL (%)</th></tr></thead>
                   <tbody id="calc_smartBody"></tbody>
               </table>
               <div style="margin-top:10px; text-align:center; font-size:0.8rem; color:#888;">現金消耗: <span id="calc_smartTotal" style="color:var(--yield); font-weight:bold;">--</span></div>
@@ -442,7 +439,7 @@ const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQuNQc
 
 let currentRate = 32.5;
 let cardsData = {}, portfolios = {}, strategiesData = {}, eventsData = [], lawsData = [];
-let configData = { title: 'PROJECT CAGE', meta: 'v16.48', ytUrl: '' }; 
+let configData = { title: 'PROJECT CAGE', meta: 'v16.50', ytUrl: '' }; 
 let logoUrl = ''; 
 let isFallback = false;
 const defaultIcons = { 'C01': `<svg class="mc-media" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" r="20" stroke="currentColor" stroke-width="2" fill="none"/></svg>` };
@@ -778,6 +775,8 @@ function initCalculator() {
         const currentTotal = currentQQQ + currentQLD + currentCash;
 
         const currentCashRatioVal = currentTotal > 0 ? currentCash / currentTotal : 0;
+        const currentQQQRatioVal = currentTotal > 0 ? currentQQQ / currentTotal : 0;
+        const currentQLDRatioVal = currentTotal > 0 ? currentQLD / currentTotal : 0;
         const targetCashRatioVal = allocCash / 100;
         const excessRatioVal = Math.max(0, currentCashRatioVal - targetCashRatioVal);
 
@@ -800,12 +799,33 @@ function initCalculator() {
         
         const smartFinalQQQ = currentQQQ + smartActionQQQ;
         const smartFinalQLD = currentQLD + smartActionQLD;
+        const smartFinalTotal = smartFinalCash + smartFinalQQQ + smartFinalQLD;
+        
+        // Final Ratios
+        const smartFinalQQQRatio = smartFinalTotal > 0 ? smartFinalQQQ / smartFinalTotal : 0;
+        const smartFinalQLDRatio = smartFinalTotal > 0 ? smartFinalQLD / smartFinalTotal : 0;
+        const smartFinalCashRatio = smartFinalTotal > 0 ? smartFinalCash / smartFinalTotal : 0;
 
-        // Render Mindless
+        // 🛠️ v16.50: Render with Ratios
         outputs.mindlessBody.innerHTML = `
-            <tr><td>QQQ</td><td>${fmtMoney(currentQQQ)}</td><td style="text-align:center;"><span class="calc-badge badge-buy">+${fmtMoney(actionQQQ)}</span></td><td style="text-align:right;">${fmtMoney(mindlessTargetQQQ)}</td></tr>
-            <tr><td>QLD</td><td>${fmtMoney(currentQLD)}</td><td style="text-align:center;"><span class="calc-badge badge-buy">+${fmtMoney(actionQLD)}</span></td><td style="text-align:right;">${fmtMoney(mindlessTargetQLD)}</td></tr>
-            <tr><td>CASH</td><td>${fmtMoney(currentCash)}</td><td style="text-align:center;"><span class="calc-badge badge-sell">-${fmtMoney(mindlessInjection)}</span></td><td style="text-align:right;">${fmtMoney(mindlessTargetCash)}</td></tr>
+            <tr>
+                <td>QQQ</td>
+                <td>${fmtMoney(currentQQQ)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(currentQQQRatioVal)})</span></td>
+                <td style="text-align:center;"><span class="calc-badge badge-buy">+${fmtMoney(actionQQQ)}</span></td>
+                <td style="text-align:right;">${fmtMoney(mindlessTargetQQQ)} <span style="font-size:0.75rem; color:#888;">(${allocQQQ}%)</span></td>
+            </tr>
+            <tr>
+                <td>QLD</td>
+                <td>${fmtMoney(currentQLD)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(currentQLDRatioVal)})</span></td>
+                <td style="text-align:center;"><span class="calc-badge badge-buy">+${fmtMoney(actionQLD)}</span></td>
+                <td style="text-align:right;">${fmtMoney(mindlessTargetQLD)} <span style="font-size:0.75rem; color:#888;">(${allocQLD}%)</span></td>
+            </tr>
+            <tr>
+                <td>CASH</td>
+                <td>${fmtMoney(currentCash)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(currentCashRatioVal)})</span></td>
+                <td style="text-align:center;"><span class="calc-badge badge-sell">-${fmtMoney(mindlessInjection)}</span></td>
+                <td style="text-align:right;">${fmtMoney(mindlessTargetCash)} <span style="font-size:0.75rem; color:#888;">(${allocCash}%)</span></td>
+            </tr>
         `;
         outputs.mindlessTotal.innerText = fmtMoney(mindlessInjection);
 
@@ -814,9 +834,24 @@ function initCalculator() {
         const qldBadge = smartActionQLD > 0 ? `<span class="calc-badge badge-buy">🔥 +${fmtMoney(smartActionQLD)}</span>` : '-';
 
         outputs.smartBody.innerHTML = `
-            <tr><td>QQQ</td><td>${fmtMoney(currentQQQ)}</td><td style="text-align:center;">${qqqBadge}</td><td style="text-align:right;">${fmtMoney(smartFinalQQQ)}</td></tr>
-            <tr><td>QLD</td><td>${fmtMoney(currentQLD)}</td><td style="text-align:center;">${qldBadge}</td><td style="text-align:right;">${fmtMoney(smartFinalQLD)}</td></tr>
-            <tr><td>CASH</td><td>${fmtMoney(currentCash)}</td><td style="text-align:center;"><span class="calc-badge badge-sell">-${fmtMoney(smartInjection)}</span></td><td style="text-align:right;">${fmtMoney(smartFinalCash)}</td></tr>
+            <tr>
+                <td>QQQ</td>
+                <td>${fmtMoney(currentQQQ)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(currentQQQRatioVal)})</span></td>
+                <td style="text-align:center;">${qqqBadge}</td>
+                <td style="text-align:right;">${fmtMoney(smartFinalQQQ)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(smartFinalQQQRatio)})</span></td>
+            </tr>
+            <tr>
+                <td>QLD</td>
+                <td>${fmtMoney(currentQLD)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(currentQLDRatioVal)})</span></td>
+                <td style="text-align:center;">${qldBadge}</td>
+                <td style="text-align:right;">${fmtMoney(smartFinalQLD)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(smartFinalQLDRatio)})</span></td>
+            </tr>
+            <tr>
+                <td>CASH</td>
+                <td>${fmtMoney(currentCash)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(currentCashRatioVal)})</span></td>
+                <td style="text-align:center;"><span class="calc-badge badge-sell">-${fmtMoney(smartInjection)}</span></td>
+                <td style="text-align:right;">${fmtMoney(smartFinalCash)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(smartFinalCashRatio)})</span></td>
+            </tr>
         `;
         outputs.smartTotal.innerText = fmtMoney(smartInjection);
     }
