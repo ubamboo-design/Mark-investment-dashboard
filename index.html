@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
-<title>PROJECT CAGE : RELOADED v16.48 (Calc Center)</title>
+<title>PROJECT Colosseum</title>
 <style>
-    /* CSS 全局設定 (保持 v16.47 樣式) */
+    /* CSS 全局設定 (保持穩定) */
     :root {
         --bg: #050505; --card: #0a0a0c; --bar: #1a1a1e; --text: #e0e0e0; --mute: #888;
         --tw: #ff2a2a; --us: #00d2ff; --yield: #00ff6a; --ber: #ff9100; --trap: #bd00ff; 
@@ -128,14 +128,17 @@
 
     /* Arena */
     .arena-container { width: 100%; }
+    
+    /* 🛠️ v16.49 Grid Layout: List Fixed | Chart FLEX (Max) | Video Fixed (Right) */
     .arena-dashboard-v15 { 
         display: grid; 
-        grid-template-columns: 420px 0.6fr 460px; /* List | Chart | Video */
+        grid-template-columns: 420px 1fr 340px; /* List 420 | Chart Max | Video 340 */
         gap: 15px; 
         margin-bottom: 20px; 
         height: auto; 
         align-items: stretch; 
     }
+    
     .leaderboard-panel { 
         background: linear-gradient(160deg, #2d2d35 0%, #141417 100%);
         border-top: 1px solid rgba(255,255,255,0.2);
