@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
-<title>PROJECT CAGE : RELOADED v16.42 (Layout Tuned)</title>
+<title>PROJECT CAGE : RELOADED v16.44 (Calc Added)</title>
 <style>
-    /* CSS 全局設定 (保持 v16.41 穩定版樣式) */
+    /* CSS 全局設定 (保持穩定版樣式) */
     :root {
         --bg: #050505; --card: #0a0a0c; --bar: #1a1a1e; --text: #e0e0e0; --mute: #888;
         --tw: #ff2a2a; --us: #00d2ff; --yield: #00ff6a; --ber: #ff9100; --trap: #bd00ff; 
@@ -83,7 +83,7 @@
     .deck-wrapper { overflow-x: auto; padding-bottom: 25px; padding-top: 5px; }
     .deck-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 12px; min-width: 0; } 
     
-    /* Card (Neon Glow Restored) */
+    /* Card */
     .micro-card { 
         background: linear-gradient(145deg, #25252a, #121214);
         border: 2px solid #333; 
@@ -99,7 +99,6 @@
         box-shadow: 0 5px 15px rgba(0,0,0,0.5); 
     }
     .micro-card:hover { transform: translateY(-6px); z-index: 10; }
-    
     .mc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; padding: 0 4px; z-index: 2; }
     .mc-code { font-size: 0.9rem; font-weight: 900; color: #fff; opacity: 0.9; font-family: 'Arial Black'; } 
     .mc-target { font-size: 0.65rem; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); padding: 1px 4px; border-radius: 4px; color: #aaa; font-family: 'Courier New'; }
@@ -129,17 +128,14 @@
 
     /* Arena */
     .arena-container { width: 100%; }
-    
-    /* 🛠️ v16.42 Updated Grid Ratios: Shrink Chart (Middle), Widen Video (Right) */
     .arena-dashboard-v15 { 
         display: grid; 
-        grid-template-columns: 420px 0.9fr 360px; /* Adjusted: 420 | 0.9fr | 360 */
+        grid-template-columns: 420px 0.6fr 460px; /* List | Chart | Video */
         gap: 15px; 
         margin-bottom: 20px; 
         height: auto; 
         align-items: stretch; 
     }
-    
     .leaderboard-panel { 
         background: linear-gradient(160deg, #2d2d35 0%, #141417 100%);
         border-top: 1px solid rgba(255,255,255,0.2);
@@ -216,14 +212,7 @@
     }
     .yt-panel:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.9), 0 0 20px rgba(255, 0, 0, 0.2); }
     .yt-header { font-family: 'Arial Black'; color: #fff; margin-bottom: 10px; font-size: 0.9rem; letter-spacing: 1px; width: 100%; text-align: left; opacity: 0.8; }
-    .yt-thumb-wrapper {
-        width: 100%;
-        aspect-ratio: 16 / 9;
-        position: relative;
-        border-radius: 8px;
-        overflow: hidden;
-        border: 2px solid #333;
-    }
+    .yt-thumb-wrapper { width: 100%; aspect-ratio: 16 / 9; position: relative; border-radius: 8px; overflow: hidden; border: 2px solid #333; }
     .yt-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
     .yt-panel:hover .yt-img { transform: scale(1.1); }
     .play-icon {
@@ -233,10 +222,7 @@
         color: #fff; font-size: 24px; border: 2px solid #fff;
         box-shadow: 0 0 20px rgba(0,0,0,0.5);
     }
-    .yt-footer {
-        margin-top: 10px; font-size: 0.8rem; color: #888; width: 100%; text-align: center;
-        font-family: 'Courier New'; font-weight: bold;
-    }
+    .yt-footer { margin-top: 10px; font-size: 0.8rem; color: #888; width: 100%; text-align: center; font-family: 'Courier New'; font-weight: bold; }
     .yt-no-signal {
         width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center;
         background: repeating-linear-gradient(0deg, #111 0px, #111 2px, #222 3px);
@@ -256,7 +242,6 @@
         .pl-val { font-size: 0.85rem; }
         .pl-pct { font-size: 0.6rem; display: block; margin-left: 0; margin-top: -2px; }
         .sub-label { font-size: 0.6rem; opacity: 0.7; }
-        /* 🛠️ Mobile: Stack columns vertically */
         .arena-dashboard-v15 { grid-template-columns: 1fr; height: auto; gap: 15px; } 
         .leaderboard-panel { height: auto; } 
         .chart-panel { height: 350px; }
@@ -288,12 +273,32 @@
     .color-gold { color: var(--gold)!important; text-shadow: 0 0 10px rgba(255,215,0,0.6); } 
     .color-dead { color: var(--dark-purple)!important; text-shadow: 0 0 10px rgba(148,0,211,0.6); }
     
-    .yt-btn {
-        display: inline-block; margin-top: 15px; padding: 10px 20px; background: linear-gradient(90deg, #ff0000, #cc0000); color: #fff; text-decoration: none; font-family: 'Orbitron', sans-serif; font-weight: bold; border-radius: 4px; border: 1px solid #ff4d4d; box-shadow: 0 0 10px rgba(255,0,0,0.5); transition: all 0.3s; text-align: center; width: 100%; cursor: pointer;
-    }
+    .yt-btn { display: inline-block; margin-top: 15px; padding: 10px 20px; background: linear-gradient(90deg, #ff0000, #cc0000); color: #fff; text-decoration: none; font-family: 'Orbitron', sans-serif; font-weight: bold; border-radius: 4px; border: 1px solid #ff4d4d; box-shadow: 0 0 10px rgba(255,0,0,0.5); transition: all 0.3s; text-align: center; width: 100%; cursor: pointer; }
     .yt-btn:hover { background: linear-gradient(90deg, #ff3333, #e60000); box-shadow: 0 0 20px rgba(255,0,0,0.8); transform: translateY(-2px); }
 
     #debug-panel { display: none; background: #000; border: 2px solid #0f0; color: #0f0; font-family: 'Courier New'; padding: 15px; height: 400px; overflow-y: scroll; margin: 20px 0; font-size: 0.85rem; }
+
+    /* 🛠️ Calculator Styles (Reskinned) */
+    .calc-container { margin-top: 20px; padding: 20px; background: linear-gradient(160deg, #1a1a1e 0%, #0a0a0c 100%); border: 1px solid #333; border-radius: 10px; }
+    .calc-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
+    .calc-card { background: #050505; border: 1px solid #333; padding: 15px; border-radius: 8px; position: relative; }
+    .calc-card.blue { border-left: 4px solid var(--us); }
+    .calc-card.indigo { border-left: 4px solid #6366f1; }
+    .calc-card.red { border-left: 4px solid var(--tw); }
+    .calc-card.green { border-left: 4px solid var(--yield); }
+    .calc-label { font-size: 0.7rem; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; display: block; font-weight: bold; }
+    .calc-input { width: 100%; background: #111; border: 1px solid #444; color: #fff; padding: 8px; border-radius: 4px; font-family: 'Rajdhani', sans-serif; font-size: 1.1rem; font-weight: bold; text-align: center; transition: all .3s; }
+    .calc-input:focus { border-color: var(--cyan); outline: none; box-shadow: 0 0 10px rgba(0,247,255,0.2); }
+    .calc-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .calc-table th { color: #666; text-align: left; padding: 5px; border-bottom: 1px solid #333; font-size: 0.7rem; }
+    .calc-table td { color: #ccc; padding: 8px 5px; border-bottom: 1px solid #222; }
+    .calc-badge { padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
+    .badge-buy { background: rgba(0, 255, 106, 0.1); color: var(--yield); border: 1px solid var(--yield); }
+    .badge-sell { background: rgba(255, 42, 42, 0.1); color: var(--tw); border: 1px solid var(--tw); }
+    
+    @media(max-width: 800px) {
+        .calc-grid { grid-template-columns: 1fr; }
+    }
 </style>
 </head>
 <body>
@@ -336,6 +341,7 @@
           </div>
       </div>
   </div>
+
   <div class="section-title">I. LIVE BATTLE (投資競技場)</div>
   <div class="arena-container" id="arenaContainer"></div>
   <div class="section-title">II. SKILL CARDS (七大技能卡牌)</div>
@@ -344,8 +350,54 @@
   <div class="event-list" id="eventContainer"></div>
   <div class="section-title">IV. IRON LAWS (核心鐵律)</div>
   <div class="footer-grid" id="footerContainer"></div>
+
+  <div class="section-title">V. TACTICAL CALCULATOR (戰術計算機)</div>
+  <div class="calc-container">
+      <div class="calc-grid">
+          <div class="calc-card blue">
+              <div style="color:var(--us); font-weight:bold; margin-bottom:10px;">1. 初始總資產</div>
+              <input type="number" id="calc_initialWealth" value="10000000" class="calc-input">
+          </div>
+          <div class="calc-card indigo">
+              <div style="color:#6366f1; font-weight:bold; margin-bottom:10px;">2. 期望比例 (%)</div>
+              <div style="display:flex; gap:5px;">
+                  <div><span class="calc-label">QQQ</span><input type="number" id="calc_allocQQQ" value="50" class="calc-input"></div>
+                  <div><span class="calc-label">QLD</span><input type="number" id="calc_allocQLD" value="20" class="calc-input"></div>
+                  <div><span class="calc-label" style="color:var(--yield)">CASH</span><input type="number" id="calc_allocCash" value="30" class="calc-input" style="color:var(--yield); border-color:var(--yield);"></div>
+              </div>
+          </div>
+          <div class="calc-card red">
+              <div style="color:var(--tw); font-weight:bold; margin-bottom:10px;">3. 市場跌幅 (%)</div>
+              <div style="display:flex; gap:5px;">
+                  <div><span class="calc-label">QQQ Drop</span><input type="number" id="calc_perfQQQ" value="-30" class="calc-input" style="color:var(--tw);"></div>
+                  <div><span class="calc-label">QLD Drop</span><input type="number" id="calc_perfQLD" value="-60" class="calc-input" style="color:var(--tw);"></div>
+              </div>
+          </div>
+      </div>
+
+      <div class="calc-grid" style="grid-template-columns: 1fr 1fr;">
+          <div class="calc-card" style="border-top: 3px solid var(--tw);">
+              <div style="color:var(--tw); font-weight:900; margin-bottom:5px;">4. 無腦平衡 (MINDLESS)</div>
+              <div style="font-size:0.8rem; color:#666; margin-bottom:10px;">強制回歸設定比例</div>
+              <table class="calc-table">
+                  <thead><tr><th>ASSET</th><th>CURRENT</th><th style="text-align:center">ACTION</th><th style="text-align:right">TARGET</th></tr></thead>
+                  <tbody id="calc_mindlessBody"></tbody>
+              </table>
+              <div style="margin-top:10px; text-align:center; font-size:0.8rem; color:#888;">現金消耗: <span id="calc_mindlessTotal" style="color:var(--tw); font-weight:bold;">--</span></div>
+          </div>
+          <div class="calc-card" style="border-top: 3px solid var(--yield);">
+              <div style="color:var(--yield); font-weight:900; margin-bottom:5px;">5. 聰明平衡 (SMART)</div>
+              <div style="font-size:0.8rem; color:#666; margin-bottom:10px;">狙擊跌最深標的 (Sniper Mode)</div>
+              <table class="calc-table">
+                  <thead><tr><th>ASSET</th><th>CURRENT</th><th style="text-align:center">ACTION</th><th style="text-align:right">FINAL</th></tr></thead>
+                  <tbody id="calc_smartBody"></tbody>
+              </table>
+              <div style="margin-top:10px; text-align:center; font-size:0.8rem; color:#888;">現金消耗: <span id="calc_smartTotal" style="color:var(--yield); font-weight:bold;">--</span></div>
+          </div>
+      </div>
+  </div>
 </div>
-<div class="container"><div id="debug-panel">Waiting for logs...</div></div>
+
 <div id="cardModal" class="modal-overlay" onclick="closeModal()">
   <div class="modal-content" onclick="event.stopPropagation()">
     <div class="modal-header"><div><span class="m-code" id="mCode"></span><span class="m-skill" id="mSkill"></span></div><span class="close-btn" onclick="closeModal()">&times;</span></div>
@@ -361,7 +413,7 @@
 </div>
 
 <script>
-// 🛠️ v16.42: Hardcoded fallback video (Source from user screenshot)
+// Default Video
 const DEFAULT_YT = 'https://www.youtube.com/watch?v=7rY3QaVQrzo';
 
 function fixDriveUrl(url) {
@@ -383,7 +435,7 @@ const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQuNQc
 
 let currentRate = 32.5;
 let cardsData = {}, portfolios = {}, strategiesData = {}, eventsData = [], lawsData = [];
-let configData = { title: 'PROJECT CAGE', meta: 'v16.42', ytUrl: '' }; 
+let configData = { title: 'PROJECT CAGE', meta: 'v16.44', ytUrl: '' }; 
 let logoUrl = ''; 
 let isFallback = false;
 const defaultIcons = { 'C01': `<svg class="mc-media" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" r="20" stroke="currentColor" stroke-width="2" fill="none"/></svg>` };
@@ -404,12 +456,14 @@ async function init() {
         parseSheetData(sheetText);
         renderAll();
     } catch(e) { console.error('Sheet Loading Failed'); }
+    
+    // Initialize Calculator Logic
+    initCalculator();
 }
 
 function parseSheetData(text){
   const rows = text.split('\n').map(r=>r.trim()); 
   
-  // 🛠️ v16.42 God-Mode Scan: 全表無死角搜尋 YouTube 連結
   for(let r of rows) {
       if(!r) continue;
       const cells = r.split('\t');
@@ -422,7 +476,6 @@ function parseSheetData(text){
       if(configData.ytUrl) break;
   }
   
-  // 🛠️ v16.42: Fallback (如果 Sheet 讀不到，就用預設值)
   if (!configData.ytUrl) {
       configData.ytUrl = DEFAULT_YT;
   }
@@ -563,7 +616,6 @@ function renderArena(){
     }));
     allS.sort((a, b) => b.roiNum - a.roiNum); 
     
-    // 🛠️ v16.42: Generate YT HTML (Smart Scan Result)
     let ytHTML = '';
     const ytId = getYoutubeId(configData.ytUrl);
     
@@ -577,7 +629,6 @@ function renderArena(){
             <div class="yt-footer">點擊觀看解盤影片</div>
         </div>`;
     } else {
-        // Fallback (Should be rare with hardcoded default)
         ytHTML = `<div class="yt-panel">
             <div class="yt-no-signal">
                 <div style="font-size:30px; margin-bottom:10px;">⚡</div>
@@ -608,8 +659,6 @@ function renderArena(){
              </div>
          </div>`;
      }).join('');
-     
-     // 🛠️ v16.42: Inject YT HTML into 3rd column
      con.innerHTML = html + `</div></div><div class="chart-panel"><div class="chart-grid"></div>${chartBarsHTML}</div>${ytHTML}</div>`;
 }
 
@@ -628,7 +677,6 @@ function openModal(k){
     document.getElementById('val2').textContent = c.strategy; 
     document.getElementById('val3').textContent = c.sop; 
     
-    // 🛠️ v16.42 Global YT Button Logic
     const ytBtn = document.getElementById('yt_container');
     const ytLink = document.getElementById('btn_yt');
     if (configData.ytUrl && configData.ytUrl.length > 5) {
@@ -681,6 +729,96 @@ function openStrategyModal(k) {
 function closeModal(){document.getElementById('cardModal').style.display='none'}
 function renderHeader() { const img = document.getElementById('pageLogo'); if (logoUrl) { img.src = logoUrl; img.style.display = 'block'; } document.getElementById('pageTitle').textContent = configData.title; document.getElementById('pageMeta').textContent = configData.meta; }
 function renderAll(){ renderHeader(); renderDashboard(); renderCards(); renderEvents(); renderArena(); renderFooter(); }
+
+// 🛠️ Calculator Logic (Encapsulated)
+function initCalculator() {
+    const inputs = {
+        initialWealth: document.getElementById('calc_initialWealth'),
+        allocQQQ: document.getElementById('calc_allocQQQ'),
+        allocQLD: document.getElementById('calc_allocQLD'),
+        allocCash: document.getElementById('calc_allocCash'),
+        perfQQQ: document.getElementById('calc_perfQQQ'),
+        perfQLD: document.getElementById('calc_perfQLD'),
+    };
+
+    const outputs = {
+        mindlessBody: document.getElementById('calc_mindlessBody'),
+        mindlessTotal: document.getElementById('calc_mindlessTotal'),
+        smartBody: document.getElementById('calc_smartBody'),
+        smartTotal: document.getElementById('calc_smartTotal')
+    };
+
+    const fmtMoney = (val) => new Intl.NumberFormat('zh-TW', { maximumFractionDigits: 0 }).format(Math.round(val));
+    const fmtPct = (val) => (val * 100).toFixed(1) + '%';
+
+    function calculate() {
+        const initialWealth = parseFloat(inputs.initialWealth.value) || 0;
+        const allocQQQ = parseFloat(inputs.allocQQQ.value) || 0;
+        const allocQLD = parseFloat(inputs.allocQLD.value) || 0;
+        const allocCash = parseFloat(inputs.allocCash.value) || 0;
+        const perfQQQ = parseFloat(inputs.perfQQQ.value) || 0;
+        const perfQLD = parseFloat(inputs.perfQLD.value) || 0;
+
+        // Init
+        const startQQQ = initialWealth * (allocQQQ / 100);
+        const startQLD = initialWealth * (allocQLD / 100);
+        const startCash = initialWealth * (allocCash / 100);
+
+        // After Drop
+        const currentQQQ = startQQQ * (1 + perfQQQ / 100);
+        const currentQLD = startQLD * (1 + perfQLD / 100);
+        const currentCash = startCash;
+        const currentTotal = currentQQQ + currentQLD + currentCash;
+
+        const currentCashRatioVal = currentTotal > 0 ? currentCash / currentTotal : 0;
+        const targetCashRatioVal = allocCash / 100;
+        const excessRatioVal = Math.max(0, currentCashRatioVal - targetCashRatioVal);
+
+        // Mindless
+        const mindlessTargetCash = currentTotal * targetCashRatioVal;
+        const mindlessTargetQQQ = currentTotal * (allocQQQ / 100);
+        const mindlessTargetQLD = currentTotal * (allocQLD / 100);
+        const actionCash = mindlessTargetCash - currentCash; // Negative means spending
+        const actionQQQ = mindlessTargetQQQ - currentQQQ;
+        const actionQLD = mindlessTargetQLD - currentQLD;
+        const mindlessInjection = Math.abs(actionCash); // Spending amount
+
+        // Smart
+        const smartInjection = currentCash * excessRatioVal;
+        const smartFinalCash = currentCash - smartInjection;
+        let smartActionQQQ = 0;
+        let smartActionQLD = 0;
+        // Sniper Logic
+        if (perfQLD < perfQQQ) { smartActionQLD = smartInjection; } else { smartActionQQQ = smartInjection; }
+        
+        const smartFinalQQQ = currentQQQ + smartActionQQQ;
+        const smartFinalQLD = currentQLD + smartActionQLD;
+
+        // Render Mindless
+        outputs.mindlessBody.innerHTML = `
+            <tr><td>QQQ</td><td>${fmtMoney(currentQQQ)}</td><td style="text-align:center;"><span class="calc-badge badge-buy">+${fmtMoney(actionQQQ)}</span></td><td style="text-align:right;">${fmtMoney(mindlessTargetQQQ)}</td></tr>
+            <tr><td>QLD</td><td>${fmtMoney(currentQLD)}</td><td style="text-align:center;"><span class="calc-badge badge-buy">+${fmtMoney(actionQLD)}</span></td><td style="text-align:right;">${fmtMoney(mindlessTargetQLD)}</td></tr>
+            <tr><td>CASH</td><td>${fmtMoney(currentCash)}</td><td style="text-align:center;"><span class="calc-badge badge-sell">-${fmtMoney(mindlessInjection)}</span></td><td style="text-align:right;">${fmtMoney(mindlessTargetCash)}</td></tr>
+        `;
+        outputs.mindlessTotal.innerText = fmtMoney(mindlessInjection);
+
+        // Render Smart
+        const qqqBadge = smartActionQQQ > 0 ? `<span class="calc-badge badge-buy">🔥 +${fmtMoney(smartActionQQQ)}</span>` : '-';
+        const qldBadge = smartActionQLD > 0 ? `<span class="calc-badge badge-buy">🔥 +${fmtMoney(smartActionQLD)}</span>` : '-';
+
+        outputs.smartBody.innerHTML = `
+            <tr><td>QQQ</td><td>${fmtMoney(currentQQQ)}</td><td style="text-align:center;">${qqqBadge}</td><td style="text-align:right;">${fmtMoney(smartFinalQQQ)}</td></tr>
+            <tr><td>QLD</td><td>${fmtMoney(currentQLD)}</td><td style="text-align:center;">${qldBadge}</td><td style="text-align:right;">${fmtMoney(smartFinalQLD)}</td></tr>
+            <tr><td>CASH</td><td>${fmtMoney(currentCash)}</td><td style="text-align:center;"><span class="calc-badge badge-sell">-${fmtMoney(smartInjection)}</span></td><td style="text-align:right;">${fmtMoney(smartFinalCash)}</td></tr>
+        `;
+        outputs.smartTotal.innerText = fmtMoney(smartInjection);
+    }
+
+    Object.values(inputs).forEach(input => {
+        input.addEventListener('input', calculate);
+    });
+    calculate();
+}
 
 init();
 </script>
