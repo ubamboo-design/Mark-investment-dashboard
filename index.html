@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
-<title>PROJECT CAGE : RELOADED v16.34 (Verified)</title>
+<title>PROJECT CAGE : RELOADED v16.35 (Stable + YT)</title>
 <style>
-    /* CSS 全局設定 (保持 v16.31 樣式) */
+    /* CSS 全局設定 (保持 v16.34 穩定版樣式) */
     :root {
         --bg: #050505; --card: #0a0a0c; --bar: #1a1a1e; --text: #e0e0e0; --mute: #888;
         --tw: #ff2a2a; --us: #00d2ff; --yield: #00ff6a; --ber: #ff9100; --trap: #bd00ff; 
@@ -111,23 +111,18 @@
     .mc-eng-name { font-size: 0.65rem; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
     .mc-cost-badge { display: inline-block; margin-top: 1px; padding: 1px 8px; border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; font-size: 0.75rem; color: #aaa; background: rgba(0,0,0,0.8); }
     
-    /* Glow Restoration */
     .type-tw { border-color: var(--tw) !important; box-shadow: 0 0 15px rgba(255, 42, 42, 0.2); } 
     .type-tw:hover { box-shadow: 0 0 25px rgba(255, 42, 42, 0.5); }
     .type-tw img.mc-media { filter: drop-shadow(0 0 8px var(--tw)); }
-
     .type-us { border-color: var(--us) !important; box-shadow: 0 0 15px rgba(0, 210, 255, 0.2); } 
     .type-us:hover { box-shadow: 0 0 25px rgba(0, 210, 255, 0.5); }
     .type-us img.mc-media { filter: drop-shadow(0 0 8px var(--us)); }
-
     .type-yield { border-color: var(--yield) !important; box-shadow: 0 0 15px rgba(0, 255, 106, 0.2); } 
     .type-yield:hover { box-shadow: 0 0 25px rgba(0, 255, 106, 0.5); }
     .type-yield img.mc-media { filter: drop-shadow(0 0 8px var(--yield)); }
-
     .type-ber { border-color: var(--ber) !important; box-shadow: 0 0 15px rgba(255, 145, 0, 0.2); } 
     .type-ber:hover { box-shadow: 0 0 25px rgba(255, 145, 0, 0.5); }
     .type-ber img.mc-media { filter: drop-shadow(0 0 8px var(--ber)); }
-
     .type-trap { border-color: var(--trap) !important; box-shadow: 0 0 15px rgba(189, 0, 255, 0.2); } 
     .type-trap:hover { box-shadow: 0 0 25px rgba(189, 0, 255, 0.5); }
     .type-trap img.mc-media { filter: drop-shadow(0 0 8px var(--trap)); }
@@ -219,6 +214,7 @@
     .info-title { color: #fff; font-weight: bold; margin-bottom: 8px; display: block; font-size: 1rem; letter-spacing: 1px; }
     .refresh-btn { grid-column: span 2; background: rgba(0, 247, 255, 0.1); color: var(--cyan); text-align: center; cursor: pointer; border-color: var(--cyan); font-family: 'Courier New'; font-weight: 900; letter-spacing: 2px; }
     
+    /* 🛠️ Modal Styles */
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 9999; }
     .modal-active { display: flex; animation: fadeIn 0.2s; }
     .modal-content { background: linear-gradient(145deg, #25252a, #121214); border-top: 1px solid rgba(255,255,255,0.25); border-left: 1px solid rgba(255,255,255,0.1); border-bottom: 2px solid rgba(0,0,0,0.8); border-right: 1px solid rgba(0,0,0,0.5); border-radius: 16px; padding: 30px; max-width: 500px; width: 90%; box-shadow: 0 20px 50px rgba(0,0,0,1); }
@@ -233,6 +229,31 @@
     .color-loss { color: var(--green)!important; text-shadow: 0 0 5px rgba(0,255,106,0.4); }
     .color-gold { color: var(--gold)!important; text-shadow: 0 0 10px rgba(255,215,0,0.6); } 
     .color-dead { color: var(--dark-purple)!important; text-shadow: 0 0 10px rgba(148,0,211,0.6); }
+    
+    /* 🛠️ YouTube Button Style */
+    .yt-btn {
+        display: inline-block;
+        margin-top: 15px;
+        padding: 10px 20px;
+        background: linear-gradient(90deg, #ff0000, #cc0000);
+        color: #fff;
+        text-decoration: none;
+        font-family: 'Orbitron', sans-serif;
+        font-weight: bold;
+        border-radius: 4px;
+        border: 1px solid #ff4d4d;
+        box-shadow: 0 0 10px rgba(255,0,0,0.5);
+        transition: all 0.3s;
+        text-align: center;
+        width: 100%;
+        cursor: pointer;
+    }
+    .yt-btn:hover {
+        background: linear-gradient(90deg, #ff3333, #e60000);
+        box-shadow: 0 0 20px rgba(255,0,0,0.8);
+        transform: translateY(-2px);
+    }
+
     #debug-panel { display: none; background: #000; border: 2px solid #0f0; color: #0f0; font-family: 'Courier New'; padding: 15px; height: 400px; overflow-y: scroll; margin: 20px 0; font-size: 0.85rem; }
 </style>
 </head>
@@ -294,6 +315,9 @@
     <div class="m-row" id="row_shares"><span class="m-label">持有股數 (SHARES)</span><div class="m-value" id="val_shares"></div></div>
     <div class="m-row"><span class="m-label">戰略定位 (STRATEGY)</span><div class="m-value" id="val2"></div></div>
     <div class="m-row"><span class="m-label">嚴格執行 SOP</span><div class="m-value" id="val3" style="padding:15px;background:rgba(0,0,0,0.3);border-left:3px solid #555;border-radius:6px"></div></div>
+    <div id="yt_container" style="display:none; width:100%; text-align:center;">
+        <a id="btn_yt" href="#" target="_blank" class="yt-btn">▶ WATCH & COMMENT (前往留言)</a>
+    </div>
   </div>
 </div>
 
@@ -311,7 +335,7 @@ const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQuNQc
 
 let currentRate = 32.5;
 let cardsData = {}, portfolios = {}, strategiesData = {}, eventsData = [], lawsData = [];
-let configData = { title: 'PROJECT CAGE', meta: 'v16.34' };
+let configData = { title: 'PROJECT CAGE', meta: 'v16.35' };
 let logoUrl = ''; 
 let isFallback = false;
 const defaultIcons = { 'C01': `<svg class="mc-media" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" r="20" stroke="currentColor" stroke-width="2" fill="none"/></svg>` };
@@ -351,8 +375,12 @@ function parseSheetData(text){
         let currentRaw = c[6] || '0';
         let investedRaw = c[13] || '0';
         let sharesRaw = c[11] || '0'; 
+        let ytUrl = c[14] ? c[14].trim() : ''; 
         
-        let isUSD = budgetRaw.includes('$') && !budgetRaw.includes('NT$');
+        let isUSD = false;
+        if (budgetRaw.includes('NT')) { isUSD = false; }
+        else if (budgetRaw.includes('$')) { isUSD = true; }
+        
         let imgUrl = fixDriveUrl(c[9] ? c[9].trim() : '');
         cardsData[c[0]] = {
             code: c[0], type: c[1], rpg: c[2], target: c[3], skill: c[4],
@@ -361,42 +389,37 @@ function parseSheetData(text){
             current: parseFloat(currentRaw.replace(/[NT$US,\s]/g, '')) || 0,
             invested: parseFloat(investedRaw.replace(/[NT$US,\s]/g, '')) || 0,
             shares: sharesRaw,
+            ytUrl: ytUrl,
             media: imgUrl ? `<img src="${imgUrl}" class="mc-media">` : defaultIcons['C01'],
             strategy: c[7] || '-', sop: c[8] || '-', imgUrl: imgUrl
         };
     } else if(c[0].startsWith('P')){
         if(!portfolios[currentGroup]) portfolios[currentGroup] = [];
-        
-        // 🛠️ 1. 抓取 J 欄 (Index 9)
         let rawInv = c[9] ? c[9].trim() : '0';
         
-        // 🛠️ 2. 強制貨幣檢查：如果 C08/P08 是 NT$200,000，這裡必須顯示 NT
-        //    透過檢查 rawInv 內容是否包含 NT
         let displayInv = rawInv;
-        if (rawInv.includes('NT')) {
-            displayInv = 'NT$' + rawInv.replace(/[^0-9,.]/g, '');
-        } else if (rawInv.includes('$')) {
-            displayInv = 'USD$' + rawInv.replace(/[^0-9,.]/g, '');
+        let isUSD_P = false;
+        if (rawInv.includes('NT')) { isUSD_P = false; }
+        else if (rawInv.includes('$')) { isUSD_P = true; }
+        
+        let budgetStr = c[5] || '';
+        if (budgetStr.includes('NT')) {
+             displayInv = 'NT$ ' + rawInv.replace(/[NT$US,\s]/g, '');
         } else {
-            // 如果只有數字，預設為 NT (除非標題有寫 USD)
-             displayInv = 'NT$' + rawInv.replace(/[^0-9,.]/g, '');
+             displayInv = 'USD$ ' + rawInv.replace(/[NT$US,\s]/g, '');
         }
 
         let sheetROI = '0';
         for(let k=c.length-1; k>=0; k--) {
             if(c[k] && c[k].includes('%')) { sheetROI = c[k].replace('%','').trim(); break; }
         }
-
         let highlight = c[3] ? c[3].trim() : null;
         let explain = c[4] ? c[4].trim() : null;
         let deck = c[2] ? c[2].split('+').map(s=>s.trim()) : [];
         let sObj = { 
             code: c[0], name: c[1], deck: deck, 
-            sheetROI: parseFloat(sheetROI), 
-            sheetInvested: displayInv, // 存入正確格式的金額
-            budget: c[5] || '-', 
-            // 🛠️ 修復 undefined：將 invested 也存一份 (跟 sheetInvested 一樣)
-            invested: displayInv, 
+            sheetROI: parseFloat(sheetROI), sheetInvested: displayInv,
+            budget: c[5] || '-', invested: displayInv, 
             highlight: highlight, explain: explain 
         };
         portfolios[currentGroup].push(sObj); strategiesData[c[0]] = sObj;
@@ -416,8 +439,16 @@ function formatCompact(num, isUSD = false) {
 }
 
 function formatCurrencyString(str) {
-    // 簡單過濾，因為已經在 parse 階段處理過了
-    return str;
+    if (!str || str === '-') return '-';
+    let cleanStr = str.replace(/[NT$USD,\s]/g, '');
+    let num = parseFloat(cleanStr);
+    if (isNaN(num)) return str;
+    if (str.includes('NT') || str.includes('TWD')) {
+        return 'NT$ ' + num.toLocaleString(undefined, { maximumFractionDigits: 0 });
+    } else if (str.includes('$') || str.includes('USD')) {
+        return 'USD$ ' + num.toLocaleString(undefined, { maximumFractionDigits: 0 });
+    }
+    return '$ ' + num.toLocaleString();
 }
 
 function calc(cost, cur){
@@ -463,16 +494,15 @@ function renderArena(){
         const roiNum = p.sheetROI; 
         let cls = roiNum >= 50 ? 'color-gold' : roiNum >= 0 ? 'color-profit' : roiNum <= -50 ? 'color-dead' : 'color-loss';
         let sign = roiNum >= 0 ? '+' : '';
-        // 🛠️ 確保 invested 屬性存在
-        allS.push({ code: p.code, name: p.name, roiNum: roiNum, roiStr: roiNum.toFixed(2), cls: cls, sign: sign, rawDeck: p.deck, invested: p.sheetInvested });
+        allS.push({ code: p.code, name: p.name, roiNum: roiNum, roiStr: roiNum.toFixed(2), cls: cls, sign: sign, rawDeck: p.deck, invested: p.invested });
     }));
     allS.sort((a, b) => b.roiNum - a.roiNum); 
     let html = `<div class="arena-dashboard-v15"><div class="leaderboard-panel"><div class="lb-header"><span class="title">LIVE BATTLE</span><span class="lbl-inv">已投入金額</span><span class="lbl-roi">報酬率</span></div><div class="lb-list">`;
     allS.forEach((s, i) => {
         const deck = s.rawDeck.map(code => { const card = cardsData[code]; return card?.imgUrl ? `<img src="${fixDriveUrl(card.imgUrl)}" class="lb-card-icon">` : `<div class="lb-card-icon" style="background:#222;font-size:8px;">${code}</div>`; }).join('');
-        // 🛠️ 確保顯示變數正確
-        html += `<div class="lb-row rank-${i+1}" onclick="openStrategyModal('${s.code}')"><span class="lb-rank">#${i+1}</span><div class="lb-info"><div class="lb-name">${s.name}</div><div class="lb-code">${s.code}</div></div><div class="lb-deck">${deck}</div><div class="lb-invested">${s.invested}</div><span class="lb-val ${s.cls}">${s.sign}${s.roiStr}%</span></div>`;
+        html += `<div class="lb-row rank-${i+1}" onclick="openStrategyModal('${s.code}')"><span class="lb-rank">#${i+1}</span><div class="lb-info"><div class="lb-name">${s.name}</div><div class="lb-code">${s.code}</div></div><div class="lb-deck">${deck}</div><div class="lb-invested">${formatCurrencyString(s.invested)}</div><span class="lb-val ${s.cls}">${s.sign}${s.roiStr}%</span></div>`;
     });
+    
     let maxR = Math.max(...allS.map(x => Math.abs(x.roiNum)), 5);
     const chartBarsHTML = allS.slice(0, 13).map((s, i) => {
          let isPos = s.roiNum >= 0;
@@ -505,6 +535,16 @@ function openModal(k){
     document.getElementById('row_shares').style.display = 'flex'; 
     document.getElementById('val2').textContent = c.strategy; 
     document.getElementById('val3').textContent = c.sop; 
+    
+    const ytBtn = document.getElementById('yt_container');
+    const ytLink = document.getElementById('btn_yt');
+    if (c.ytUrl && c.ytUrl.length > 5) {
+        ytLink.href = c.ytUrl;
+        ytBtn.style.display = 'block';
+    } else {
+        ytBtn.style.display = 'none';
+    }
+
     document.getElementById('cardModal').style.display='flex'; 
     document.getElementById('cardModal').classList.add('modal-active'); 
 }
@@ -514,9 +554,10 @@ function openStrategyModal(k) {
     document.getElementById('mCode').textContent = s.code; 
     document.getElementById('mSkill').textContent = s.name; 
     document.getElementById('val1').textContent = s.budget; 
-    document.getElementById('val_invested').textContent = s.invested; 
+    document.getElementById('val_invested').textContent = s.invested; // Corrected variable
     
     document.getElementById('row_shares').style.display = 'none'; // Hide
+    document.getElementById('yt_container').style.display = 'none'; 
 
     let displayStrategy = s.highlight;
     let displaySOP = s.explain;
