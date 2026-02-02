@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
-<title>PROJECT CAGE : RELOADED v16.36 (B31 YT Link)</title>
+<title>PROJECT CAGE : RELOADED v16.37 (Currency Fixed)</title>
 <style>
     /* CSS 全局設定 (保持 v16.35 穩定版樣式) */
     :root {
@@ -83,7 +83,7 @@
     .deck-wrapper { overflow-x: auto; padding-bottom: 25px; padding-top: 5px; }
     .deck-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 12px; min-width: 0; } 
     
-    /* Card */
+    /* Card (Neon Glow Restored) */
     .micro-card { 
         background: linear-gradient(145deg, #25252a, #121214);
         border: 2px solid #333; 
@@ -99,6 +99,7 @@
         box-shadow: 0 5px 15px rgba(0,0,0,0.5); 
     }
     .micro-card:hover { transform: translateY(-6px); z-index: 10; }
+    
     .mc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; padding: 0 4px; z-index: 2; }
     .mc-code { font-size: 0.9rem; font-weight: 900; color: #fff; opacity: 0.9; font-family: 'Arial Black'; } 
     .mc-target { font-size: 0.65rem; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); padding: 1px 4px; border-radius: 4px; color: #aaa; font-family: 'Courier New'; }
@@ -110,18 +111,23 @@
     .mc-eng-name { font-size: 0.65rem; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
     .mc-cost-badge { display: inline-block; margin-top: 1px; padding: 1px 8px; border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; font-size: 0.75rem; color: #aaa; background: rgba(0,0,0,0.8); }
     
+    /* Glow Restoration */
     .type-tw { border-color: var(--tw) !important; box-shadow: 0 0 15px rgba(255, 42, 42, 0.2); } 
     .type-tw:hover { box-shadow: 0 0 25px rgba(255, 42, 42, 0.5); }
     .type-tw img.mc-media { filter: drop-shadow(0 0 8px var(--tw)); }
+
     .type-us { border-color: var(--us) !important; box-shadow: 0 0 15px rgba(0, 210, 255, 0.2); } 
     .type-us:hover { box-shadow: 0 0 25px rgba(0, 210, 255, 0.5); }
     .type-us img.mc-media { filter: drop-shadow(0 0 8px var(--us)); }
+
     .type-yield { border-color: var(--yield) !important; box-shadow: 0 0 15px rgba(0, 255, 106, 0.2); } 
     .type-yield:hover { box-shadow: 0 0 25px rgba(0, 255, 106, 0.5); }
     .type-yield img.mc-media { filter: drop-shadow(0 0 8px var(--yield)); }
+
     .type-ber { border-color: var(--ber) !important; box-shadow: 0 0 15px rgba(255, 145, 0, 0.2); } 
     .type-ber:hover { box-shadow: 0 0 25px rgba(255, 145, 0, 0.5); }
     .type-ber img.mc-media { filter: drop-shadow(0 0 8px var(--ber)); }
+
     .type-trap { border-color: var(--trap) !important; box-shadow: 0 0 15px rgba(189, 0, 255, 0.2); } 
     .type-trap:hover { box-shadow: 0 0 25px rgba(189, 0, 255, 0.5); }
     .type-trap img.mc-media { filter: drop-shadow(0 0 8px var(--trap)); }
@@ -334,7 +340,7 @@ const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQuNQc
 
 let currentRate = 32.5;
 let cardsData = {}, portfolios = {}, strategiesData = {}, eventsData = [], lawsData = [];
-let configData = { title: 'PROJECT CAGE', meta: 'v16.36', ytUrl: '' }; // Added global ytUrl
+let configData = { title: 'PROJECT CAGE', meta: 'v16.37', ytUrl: '' }; 
 let logoUrl = ''; 
 let isFallback = false;
 const defaultIcons = { 'C01': `<svg class="mc-media" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" r="20" stroke="currentColor" stroke-width="2" fill="none"/></svg>` };
@@ -360,7 +366,6 @@ async function init() {
 function parseSheetData(text){
   const rows = text.split('\n').map(r=>r.trim()); 
   
-  // 🛠️ v16.36 New Feature: Read Global YT Link from Row 31 (Index 30), Column B (Index 1)
   if (rows[30]) {
       const cols = rows[30].split('\t');
       if (cols[1] && cols[1].includes('http')) {
@@ -383,10 +388,33 @@ function parseSheetData(text){
         let currentRaw = c[6] || '0';
         let investedRaw = c[13] || '0';
         let sharesRaw = c[11] || '0'; 
+        let ytUrl = c[30] ? c[30].trim() : ''; 
         
+        // 🛠️ v16.37 核心修復：強制貨幣判定邏輯
         let isUSD = false;
-        if (budgetRaw.includes('NT')) { isUSD = false; }
-        else if (budgetRaw.includes('$')) { isUSD = true; }
+        let type = c[1] ? c[1].toLowerCase() : '';
+        let code = c[0] || '';
+
+        // 規則 1：如果預算包含 NT，就是台幣
+        if (budgetRaw.includes('NT')) { 
+            isUSD = false; 
+        }
+        // 規則 2：如果代號是 00 開頭 (如 0050, 00878)，強制台幣
+        else if (code.startsWith('00')) {
+            isUSD = false;
+        }
+        // 規則 3：如果 Type 是 tw/yield/ber，強制台幣
+        else if (type.includes('tw') || type.includes('yield') || type.includes('ber')) {
+            isUSD = false;
+        }
+        // 規則 4：如果包含 $ 且前面規則都沒中，才是美金
+        else if (budgetRaw.includes('$')) {
+            isUSD = true;
+        }
+        // 規則 5：預設美金 (針對 QLD, Gold 等)
+        else {
+            isUSD = true; 
+        }
         
         let imgUrl = fixDriveUrl(c[9] ? c[9].trim() : '');
         cardsData[c[0]] = {
@@ -396,22 +424,31 @@ function parseSheetData(text){
             current: parseFloat(currentRaw.replace(/[NT$US,\s]/g, '')) || 0,
             invested: parseFloat(investedRaw.replace(/[NT$US,\s]/g, '')) || 0,
             shares: sharesRaw,
+            ytUrl: ytUrl,
             media: imgUrl ? `<img src="${imgUrl}" class="mc-media">` : defaultIcons['C01'],
             strategy: c[7] || '-', sop: c[8] || '-', imgUrl: imgUrl
         };
     } else if(c[0].startsWith('P')){
         if(!portfolios[currentGroup]) portfolios[currentGroup] = [];
         let rawInv = c[9] ? c[9].trim() : '0';
-        let displayInv = rawInv;
-        let isUSD_P = false;
-        if (rawInv.includes('NT')) { isUSD_P = false; }
-        else if (rawInv.includes('$')) { isUSD_P = true; }
         
-        let budgetStr = c[5] || '';
-        if (budgetStr.includes('NT')) {
-             displayInv = 'NT$ ' + rawInv.replace(/[NT$US,\s]/g, '');
+        // 🛠️ v16.37 核心修復：策略表強制繼承卡牌貨幣
+        let displayInv = rawInv;
+        let deck = c[2] ? c[2].split('+').map(s=>s.trim()) : [];
+        let mainCardCode = deck[0]; // 抓第一張卡牌
+        let isStrategyUSD = false; // 預設台幣
+
+        // 從卡牌繼承幣別
+        if (mainCardCode && cardsData[mainCardCode]) {
+            isStrategyUSD = cardsData[mainCardCode].isUSD;
+        }
+
+        // 格式化顯示
+        let cleanVal = rawInv.replace(/[NT$US,\s]/g, ''); // 清除所有符號，只留數字
+        if (isStrategyUSD) {
+             displayInv = 'USD$ ' + cleanVal;
         } else {
-             displayInv = 'USD$ ' + rawInv.replace(/[NT$US,\s]/g, '');
+             displayInv = 'NT$ ' + cleanVal;
         }
 
         let sheetROI = '0';
@@ -420,7 +457,7 @@ function parseSheetData(text){
         }
         let highlight = c[3] ? c[3].trim() : null;
         let explain = c[4] ? c[4].trim() : null;
-        let deck = c[2] ? c[2].split('+').map(s=>s.trim()) : [];
+        
         let sObj = { 
             code: c[0], name: c[1], deck: deck, 
             sheetROI: parseFloat(sheetROI), sheetInvested: displayInv,
@@ -444,16 +481,8 @@ function formatCompact(num, isUSD = false) {
 }
 
 function formatCurrencyString(str) {
-    if (!str || str === '-') return '-';
-    let cleanStr = str.replace(/[NT$USD,\s]/g, '');
-    let num = parseFloat(cleanStr);
-    if (isNaN(num)) return str;
-    if (str.includes('NT') || str.includes('TWD')) {
-        return 'NT$ ' + num.toLocaleString(undefined, { maximumFractionDigits: 0 });
-    } else if (str.includes('$') || str.includes('USD')) {
-        return 'USD$ ' + num.toLocaleString(undefined, { maximumFractionDigits: 0 });
-    }
-    return '$ ' + num.toLocaleString();
+    // 因為在 parseSheetData 已經強制格式化過了，這裡直接回傳即可
+    return str;
 }
 
 function calc(cost, cur){
@@ -505,7 +534,7 @@ function renderArena(){
     let html = `<div class="arena-dashboard-v15"><div class="leaderboard-panel"><div class="lb-header"><span class="title">LIVE BATTLE</span><span class="lbl-inv">已投入金額</span><span class="lbl-roi">報酬率</span></div><div class="lb-list">`;
     allS.forEach((s, i) => {
         const deck = s.rawDeck.map(code => { const card = cardsData[code]; return card?.imgUrl ? `<img src="${fixDriveUrl(card.imgUrl)}" class="lb-card-icon">` : `<div class="lb-card-icon" style="background:#222;font-size:8px;">${code}</div>`; }).join('');
-        html += `<div class="lb-row rank-${i+1}" onclick="openStrategyModal('${s.code}')"><span class="lb-rank">#${i+1}</span><div class="lb-info"><div class="lb-name">${s.name}</div><div class="lb-code">${s.code}</div></div><div class="lb-deck">${deck}</div><div class="lb-invested">${formatCurrencyString(s.invested)}</div><span class="lb-val ${s.cls}">${s.sign}${s.roiStr}%</span></div>`;
+        html += `<div class="lb-row rank-${i+1}" onclick="openStrategyModal('${s.code}')"><span class="lb-rank">#${i+1}</span><div class="lb-info"><div class="lb-name">${s.name}</div><div class="lb-code">${s.code}</div></div><div class="lb-deck">${deck}</div><div class="lb-invested">${s.invested}</div><span class="lb-val ${s.cls}">${s.sign}${s.roiStr}%</span></div>`;
     });
     
     let maxR = Math.max(...allS.map(x => Math.abs(x.roiNum)), 5);
@@ -564,7 +593,6 @@ function openStrategyModal(k) {
     
     document.getElementById('row_shares').style.display = 'none'; 
     
-    // 🛠️ v16.36 Global YT Button for Strategies too
     const ytBtn = document.getElementById('yt_container');
     const ytLink = document.getElementById('btn_yt');
     if (configData.ytUrl && configData.ytUrl.length > 5) {
