@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
-<title>PROJECT CAGE : RELOADED v16.52 (Reality Check)</title>
+<title>PROJECT CAGE : RELOADED v16.53 (Beta Tactician)</title>
 <style>
     /* CSS 全局設定 (保持 v16.47 樣式) */
     :root {
@@ -356,11 +356,14 @@
               <input type="number" id="calc_initialWealth" value="10000000" class="calc-input">
           </div>
           <div class="calc-card indigo">
-              <div style="color:#6366f1; font-weight:bold; margin-bottom:10px;">2. 期望比例 (%)</div>
+              <div style="color:#6366f1; font-weight:bold; margin-bottom:10px;">
+                  2. 期望比例 (RATIO)
+                  <div id="calc_betaDisplay" style="float:right; background:#000; color:#0ff; padding:2px 6px; border-radius:4px; border:1px solid #0ff; font-size:0.7rem;">β: 0.9</div>
+              </div>
               <div style="display:flex; gap:5px;">
-                  <div><span class="calc-label">QQQ</span><input type="number" id="calc_allocQQQ" value="50" class="calc-input"></div>
-                  <div><span class="calc-label">QLD</span><input type="number" id="calc_allocQLD" value="20" class="calc-input"></div>
-                  <div><span class="calc-label" style="color:var(--yield)">CASH</span><input type="number" id="calc_allocCash" value="30" class="calc-input" style="color:var(--yield); border-color:var(--yield);"></div>
+                  <div><span class="calc-label">QQQ</span><input type="number" id="calc_allocQQQ" value="5" class="calc-input"></div>
+                  <div><span class="calc-label">QLD</span><input type="number" id="calc_allocQLD" value="2" class="calc-input"></div>
+                  <div><span class="calc-label" style="color:var(--yield)">CASH</span><input type="number" id="calc_allocCash" value="3" class="calc-input" style="color:var(--yield); border-color:var(--yield);"></div>
               </div>
           </div>
           <div class="calc-card red">
@@ -380,7 +383,8 @@
                   <thead><tr><th>ASSET</th><th>CURRENT (%)</th><th style="text-align:center">ACTION</th><th style="text-align:right">TARGET (%)</th></tr></thead>
                   <tbody id="calc_mindlessBody"></tbody>
               </table>
-              <div id="calc_mindlessAssets"></div> <div style="margin-top:10px; text-align:center; font-size:0.8rem; color:#888;">
+              <div id="calc_mindlessAssets"></div>
+              <div style="margin-top:10px; text-align:center; font-size:0.8rem; color:#888;">
                   <span id="calc_mindlessLabel">現金消耗 (CONSUMPTION)</span>: 
                   <span id="calc_mindlessTotal" style="color:var(--tw); font-weight:bold;">--</span>
               </div>
@@ -392,7 +396,8 @@
                   <thead><tr><th>ASSET</th><th>CURRENT (%)</th><th style="text-align:center">ACTION</th><th style="text-align:right">FINAL (%)</th></tr></thead>
                   <tbody id="calc_smartBody"></tbody>
               </table>
-              <div id="calc_smartAssets"></div> <div style="margin-top:10px; text-align:center; font-size:0.8rem; color:#888;">現金消耗: <span id="calc_smartTotal" style="color:var(--yield); font-weight:bold;">--</span></div>
+              <div id="calc_smartAssets"></div>
+              <div style="margin-top:10px; text-align:center; font-size:0.8rem; color:#888;">現金消耗: <span id="calc_smartTotal" style="color:var(--yield); font-weight:bold;">--</span></div>
           </div>
       </div>
   </div>
@@ -627,7 +632,7 @@ function renderArena(){
     const ytId = getYoutubeId(configData.ytUrl);
     
     if(ytId) {
-        // 🛠️ v16.52: Updated Video Title
+        // 🛠️ v16.52: New Video Title
         ytHTML = `<div class="yt-panel" onclick="window.open('${configData.ytUrl}', '_blank')">
             <div class="yt-header">馬克投資。玩的就是真實</div>
             <div class="yt-thumb-wrapper">
@@ -758,7 +763,8 @@ function initCalculator() {
         smartTotal: document.getElementById('calc_smartTotal'),
         smartCard: document.getElementById('calc_smartCard'),
         smartAssets: document.getElementById('calc_smartAssets'), // New
-        mindlessCard: document.getElementById('calc_mindlessCard')
+        mindlessCard: document.getElementById('calc_mindlessCard'),
+        betaDisplay: document.getElementById('calc_betaDisplay')
     };
 
     const fmtMoney = (val) => new Intl.NumberFormat('zh-TW', { maximumFractionDigits: 0 }).format(Math.round(val));
@@ -766,11 +772,22 @@ function initCalculator() {
 
     function calculate() {
         const initialWealth = parseFloat(inputs.initialWealth.value) || 0;
-        const allocQQQ = parseFloat(inputs.allocQQQ.value) || 0;
-        const allocQLD = parseFloat(inputs.allocQLD.value) || 0;
-        const allocCash = parseFloat(inputs.allocCash.value) || 0;
+        const rawQQQ = parseFloat(inputs.allocQQQ.value) || 0;
+        const rawQLD = parseFloat(inputs.allocQLD.value) || 0;
+        const rawCash = parseFloat(inputs.allocCash.value) || 0;
         const perfQQQ = parseFloat(inputs.perfQQQ.value) || 0;
         const perfQLD = parseFloat(inputs.perfQLD.value) || 0;
+
+        // Ratio Calculation
+        let totalParts = rawQQQ + rawQLD + rawCash;
+        if (totalParts === 0) totalParts = 1;
+        const allocQQQ = (rawQQQ / totalParts) * 100;
+        const allocQLD = (rawQLD / totalParts) * 100;
+        const allocCash = (rawCash / totalParts) * 100;
+
+        // Beta Calculation
+        const betaVal = ((rawQQQ * 1) + (rawQLD * 2)) / totalParts;
+        outputs.betaDisplay.innerHTML = `β: ${betaVal.toFixed(2)}`;
 
         // Init
         const startQQQ = initialWealth * (allocQQQ / 100);
@@ -789,7 +806,7 @@ function initCalculator() {
         const targetCashRatioVal = allocCash / 100;
         const excessRatioVal = Math.max(0, currentCashRatioVal - targetCashRatioVal);
 
-        // Mindless
+        // Mindless (RATIO)
         const mindlessTargetCash = currentTotal * targetCashRatioVal;
         const mindlessTargetQQQ = currentTotal * (allocQQQ / 100);
         const mindlessTargetQLD = currentTotal * (allocQLD / 100);
@@ -798,7 +815,7 @@ function initCalculator() {
         const actionQLD = mindlessTargetQLD - currentQLD;
         const mindlessInjection = Math.abs(actionCash); 
         
-        // 🛠️ v16.52: Calculate Total Assets After Rebalancing
+        // 🛠️ v16.52: Calculate Total Assets After Rebalancing (Reality Check)
         const mindlessFinalTotal = mindlessTargetQQQ + mindlessTargetQLD + mindlessTargetCash;
 
         // Auto-Hide Logic
@@ -833,25 +850,25 @@ function initCalculator() {
         const smartFinalQLDRatio = smartFinalTotal > 0 ? smartFinalQLD / smartFinalTotal : 0;
         const smartFinalCashRatio = smartFinalTotal > 0 ? smartFinalCash / smartFinalTotal : 0;
 
-        // Render Mindless
+        // Render Mindless (RATIO)
         outputs.mindlessBody.innerHTML = `
             <tr>
                 <td>QQQ</td>
                 <td>${fmtMoney(currentQQQ)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(currentQQQRatioVal)})</span></td>
                 <td style="text-align:center;"><span class="calc-badge ${actionQQQ>=0?'badge-buy':'badge-sell'}">${actionQQQ>=0?'+':''}${fmtMoney(actionQQQ)}</span></td>
-                <td style="text-align:right;">${fmtMoney(mindlessTargetQQQ)} <span style="font-size:0.75rem; color:#888;">(${allocQQQ}%)</span></td>
+                <td style="text-align:right;">${fmtMoney(mindlessTargetQQQ)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(allocQQQ/100)})</span></td>
             </tr>
             <tr>
                 <td>QLD</td>
                 <td>${fmtMoney(currentQLD)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(currentQLDRatioVal)})</span></td>
                 <td style="text-align:center;"><span class="calc-badge ${actionQLD>=0?'badge-buy':'badge-sell'}">${actionQLD>=0?'+':''}${fmtMoney(actionQLD)}</span></td>
-                <td style="text-align:right;">${fmtMoney(mindlessTargetQLD)} <span style="font-size:0.75rem; color:#888;">(${allocQLD}%)</span></td>
+                <td style="text-align:right;">${fmtMoney(mindlessTargetQLD)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(allocQLD/100)})</span></td>
             </tr>
             <tr>
                 <td>CASH</td>
                 <td>${fmtMoney(currentCash)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(currentCashRatioVal)})</span></td>
                 <td style="text-align:center;"><span class="calc-badge ${actionCash>=0?'badge-buy':'badge-sell'}">${actionCash>=0?'+':''}${fmtMoney(actionCash)}</span></td>
-                <td style="text-align:right;">${fmtMoney(mindlessTargetCash)} <span style="font-size:0.75rem; color:#888;">(${allocCash}%)</span></td>
+                <td style="text-align:right;">${fmtMoney(mindlessTargetCash)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(allocCash/100)})</span></td>
             </tr>
         `;
         // 🛠️ v16.52: Inject Assets Check
