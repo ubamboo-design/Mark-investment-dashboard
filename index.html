@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
-<title>PROJECT CAGE : RELOADED v16.50 (Ratio Added)</title>
+<title>PROJECT CAGE : RELOADED v16.51 (Smart Auto-Hide)</title>
 <style>
     /* CSS 全局設定 (保持 v16.47 樣式) */
     :root {
@@ -372,17 +372,20 @@
           </div>
       </div>
 
-      <div class="calc-grid" style="grid-template-columns: 1fr 1fr;">
-          <div class="calc-card" style="border-top: 3px solid var(--tw);">
+      <div class="calc-grid" id="calc_resultsGrid" style="grid-template-columns: 1fr 1fr;">
+          <div class="calc-card" id="calc_mindlessCard" style="border-top: 3px solid var(--tw);">
               <div style="color:var(--tw); font-weight:900; margin-bottom:5px;">4. 無腦平衡 (MINDLESS)</div>
               <div style="font-size:0.8rem; color:#666; margin-bottom:10px;">強制回歸設定比例</div>
               <table class="calc-table">
                   <thead><tr><th>ASSET</th><th>CURRENT (%)</th><th style="text-align:center">ACTION</th><th style="text-align:right">TARGET (%)</th></tr></thead>
                   <tbody id="calc_mindlessBody"></tbody>
               </table>
-              <div style="margin-top:10px; text-align:center; font-size:0.8rem; color:#888;">現金消耗: <span id="calc_mindlessTotal" style="color:var(--tw); font-weight:bold;">--</span></div>
+              <div style="margin-top:10px; text-align:center; font-size:0.8rem; color:#888;">
+                  <span id="calc_mindlessLabel">現金消耗 (CONSUMPTION)</span>: 
+                  <span id="calc_mindlessTotal" style="color:var(--tw); font-weight:bold;">--</span>
+              </div>
           </div>
-          <div class="calc-card" style="border-top: 3px solid var(--yield);">
+          <div class="calc-card" id="calc_smartCard" style="border-top: 3px solid var(--yield);">
               <div style="color:var(--yield); font-weight:900; margin-bottom:5px;">5. 聰明平衡 (SMART)</div>
               <div style="font-size:0.8rem; color:#666; margin-bottom:10px;">狙擊跌最深標的 (Sniper Mode)</div>
               <table class="calc-table">
@@ -439,7 +442,7 @@ const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQuNQc
 
 let currentRate = 32.5;
 let cardsData = {}, portfolios = {}, strategiesData = {}, eventsData = [], lawsData = [];
-let configData = { title: 'PROJECT CAGE', meta: 'v16.50', ytUrl: '' }; 
+let configData = { title: 'PROJECT CAGE', meta: 'v16.51', ytUrl: '' }; 
 let logoUrl = ''; 
 let isFallback = false;
 const defaultIcons = { 'C01': `<svg class="mc-media" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" r="20" stroke="currentColor" stroke-width="2" fill="none"/></svg>` };
@@ -748,8 +751,11 @@ function initCalculator() {
     const outputs = {
         mindlessBody: document.getElementById('calc_mindlessBody'),
         mindlessTotal: document.getElementById('calc_mindlessTotal'),
+        mindlessLabel: document.getElementById('calc_mindlessLabel'),
         smartBody: document.getElementById('calc_smartBody'),
-        smartTotal: document.getElementById('calc_smartTotal')
+        smartTotal: document.getElementById('calc_smartTotal'),
+        smartCard: document.getElementById('calc_smartCard'),
+        mindlessCard: document.getElementById('calc_mindlessCard')
     };
 
     const fmtMoney = (val) => new Intl.NumberFormat('zh-TW', { maximumFractionDigits: 0 }).format(Math.round(val));
@@ -789,6 +795,23 @@ function initCalculator() {
         const actionQLD = mindlessTargetQLD - currentQLD;
         const mindlessInjection = Math.abs(actionCash); 
 
+        // 🛠️ v16.51 Auto-Hide Logic
+        // actionCash > 0 implies selling stocks to buy cash (Reserve/Profit Taking)
+        // actionCash < 0 implies using cash to buy stocks (Consumption/Dip Buying)
+        const isReserve = actionCash > 0;
+        
+        if(isReserve) {
+            outputs.smartCard.style.display = 'none';
+            outputs.mindlessCard.style.gridColumn = 'span 2';
+            outputs.mindlessLabel.innerText = "現金儲備 (RESERVE)";
+            outputs.mindlessTotal.style.color = "var(--yield)"; // Green
+        } else {
+            outputs.smartCard.style.display = 'block';
+            outputs.mindlessCard.style.gridColumn = 'auto';
+            outputs.mindlessLabel.innerText = "現金消耗 (CONSUMPTION)";
+            outputs.mindlessTotal.style.color = "var(--tw)"; // Red
+        }
+
         // Smart
         const smartInjection = currentCash * excessRatioVal;
         const smartFinalCash = currentCash - smartInjection;
@@ -806,24 +829,24 @@ function initCalculator() {
         const smartFinalQLDRatio = smartFinalTotal > 0 ? smartFinalQLD / smartFinalTotal : 0;
         const smartFinalCashRatio = smartFinalTotal > 0 ? smartFinalCash / smartFinalTotal : 0;
 
-        // 🛠️ v16.50: Render with Ratios
+        // Render Mindless
         outputs.mindlessBody.innerHTML = `
             <tr>
                 <td>QQQ</td>
                 <td>${fmtMoney(currentQQQ)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(currentQQQRatioVal)})</span></td>
-                <td style="text-align:center;"><span class="calc-badge badge-buy">+${fmtMoney(actionQQQ)}</span></td>
+                <td style="text-align:center;"><span class="calc-badge ${actionQQQ>=0?'badge-buy':'badge-sell'}">${actionQQQ>=0?'+':''}${fmtMoney(actionQQQ)}</span></td>
                 <td style="text-align:right;">${fmtMoney(mindlessTargetQQQ)} <span style="font-size:0.75rem; color:#888;">(${allocQQQ}%)</span></td>
             </tr>
             <tr>
                 <td>QLD</td>
                 <td>${fmtMoney(currentQLD)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(currentQLDRatioVal)})</span></td>
-                <td style="text-align:center;"><span class="calc-badge badge-buy">+${fmtMoney(actionQLD)}</span></td>
+                <td style="text-align:center;"><span class="calc-badge ${actionQLD>=0?'badge-buy':'badge-sell'}">${actionQLD>=0?'+':''}${fmtMoney(actionQLD)}</span></td>
                 <td style="text-align:right;">${fmtMoney(mindlessTargetQLD)} <span style="font-size:0.75rem; color:#888;">(${allocQLD}%)</span></td>
             </tr>
             <tr>
                 <td>CASH</td>
                 <td>${fmtMoney(currentCash)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(currentCashRatioVal)})</span></td>
-                <td style="text-align:center;"><span class="calc-badge badge-sell">-${fmtMoney(mindlessInjection)}</span></td>
+                <td style="text-align:center;"><span class="calc-badge ${actionCash>=0?'badge-buy':'badge-sell'}">${actionCash>=0?'+':''}${fmtMoney(actionCash)}</span></td>
                 <td style="text-align:right;">${fmtMoney(mindlessTargetCash)} <span style="font-size:0.75rem; color:#888;">(${allocCash}%)</span></td>
             </tr>
         `;
