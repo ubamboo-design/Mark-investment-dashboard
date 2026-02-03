@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
-<title>PROJECT CAGE : RELOADED v16.55 (Mobile Grid Fix)</title>
+<title>PROJECT CAGE : RELOADED v16.56 (Mobile Calc Fix)</title>
 <style>
-    /* CSS 全局設定 */
+    /* CSS 全局設定 (保持 v16.47 樣式) */
     :root {
         --bg: #050505; --card: #0a0a0c; --bar: #1a1a1e; --text: #e0e0e0; --mute: #888;
         --tw: #ff2a2a; --us: #00d2ff; --yield: #00ff6a; --ber: #ff9100; --trap: #bd00ff; 
@@ -128,8 +128,6 @@
 
     /* Arena */
     .arena-container { width: 100%; }
-    
-    /* 🛠️ v16.54 Fix: 420px | 1fr (Wide) | 340px (Fixed) */
     .arena-dashboard-v15 { 
         display: grid; 
         grid-template-columns: 420px 1fr 340px; 
@@ -138,7 +136,6 @@
         height: auto; 
         align-items: stretch; 
     }
-    
     .leaderboard-panel { 
         background: linear-gradient(160deg, #2d2d35 0%, #141417 100%);
         border-top: 1px solid rgba(255,255,255,0.2);
@@ -292,9 +289,13 @@
 
     #debug-panel { display: none; background: #000; border: 2px solid #0f0; color: #0f0; font-family: 'Courier New'; padding: 15px; height: 400px; overflow-y: scroll; margin: 20px 0; font-size: 0.85rem; }
 
-    /* 🛠️ Calculator Styles (Reskinned) */
+    /* 🛠️ Calculator Styles (v16.56 Mobile Fix) */
     .calc-container { margin-top: 20px; padding: 20px; background: linear-gradient(160deg, #1a1a1e 0%, #0a0a0c 100%); border: 1px solid #333; border-radius: 10px; }
-    .calc-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
+    
+    /* 🛠️ Use dedicated classes to avoid override issues */
+    .calc-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
+    .calc-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+    
     .calc-card { background: #050505; border: 1px solid #333; padding: 15px; border-radius: 8px; position: relative; }
     .calc-card.blue { border-left: 4px solid var(--us); }
     .calc-card.indigo { border-left: 4px solid #6366f1; }
@@ -310,8 +311,9 @@
     .badge-buy { background: rgba(0, 255, 106, 0.1); color: var(--yield); border: 1px solid var(--yield); }
     .badge-sell { background: rgba(255, 42, 42, 0.1); color: var(--tw); border: 1px solid var(--tw); }
     
-    @media(max-width: 800px) {
-        .calc-grid { grid-template-columns: 1fr; }
+    @media(max-width: 900px) {
+        /* 🛠️ Force 1 column on mobile for calculator */
+        .calc-grid-3, .calc-grid-2 { grid-template-columns: 1fr !important; }
     }
 </style>
 </head>
@@ -363,7 +365,7 @@
   
   <div class="section-title">III. TACTICAL CALCULATOR (戰術計算機)</div>
   <div class="calc-container">
-      <div class="calc-grid">
+      <div class="calc-grid-3">
           <div class="calc-card blue">
               <div style="color:var(--us); font-weight:bold; margin-bottom:10px;">1. 初始總資產</div>
               <input type="number" id="calc_initialWealth" value="10000000" class="calc-input">
@@ -388,7 +390,7 @@
           </div>
       </div>
 
-      <div class="calc-grid" id="calc_resultsGrid" style="grid-template-columns: 1fr 1fr;">
+      <div class="calc-grid-2" id="calc_resultsGrid">
           <div class="calc-card" id="calc_mindlessCard" style="border-top: 3px solid var(--tw);">
               <div style="color:var(--tw); font-weight:900; margin-bottom:5px;">4. 比例平衡 (RATIO)</div>
               <div style="font-size:0.8rem; color:#666; margin-bottom:10px;">強制回歸設定比例</div>
@@ -460,7 +462,7 @@ const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQuNQc
 
 let currentRate = 32.5;
 let cardsData = {}, portfolios = {}, strategiesData = {}, eventsData = [], lawsData = [];
-let configData = { title: 'PROJECT CAGE', meta: 'v16.55', ytUrl: '' }; 
+let configData = { title: 'PROJECT CAGE', meta: 'v16.56', ytUrl: '' }; 
 let logoUrl = ''; 
 let isFallback = false;
 const defaultIcons = { 'C01': `<svg class="mc-media" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" r="20" stroke="currentColor" stroke-width="2" fill="none"/></svg>` };
@@ -645,7 +647,6 @@ function renderArena(){
     const ytId = getYoutubeId(configData.ytUrl);
     
     if(ytId) {
-        // 🛠️ v16.52: New Video Title
         ytHTML = `<div class="yt-panel" onclick="window.open('${configData.ytUrl}', '_blank')">
             <div class="yt-header">馬克投資。玩的就是真實</div>
             <div class="yt-thumb-wrapper">
@@ -836,7 +837,10 @@ function initCalculator() {
         
         if(isReserve) {
             outputs.smartCard.style.display = 'none';
-            outputs.mindlessCard.style.gridColumn = 'span 2';
+            // 🛠️ v16.56 Mobile Fix: Use CSS class, not direct grid-column manipulation if possible, 
+            // but here we simply reset column span. 
+            // On mobile, grid is 1 column, so span 2 just fills it. On desktop, it spans full width.
+            outputs.mindlessCard.style.gridColumn = '1 / -1'; 
             outputs.mindlessLabel.innerText = "現金儲備 (RESERVE)";
             outputs.mindlessTotal.style.color = "var(--yield)"; 
         } else {
