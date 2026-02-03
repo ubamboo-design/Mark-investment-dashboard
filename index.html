@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
-<title>PROJECT CAGE : RELOADED v16.65 (True Injection)</title>
+<title>PROJECT CAGE : RELOADED v16.62 (Counter Fixed)</title>
 <style>
     /* CSS 全局設定 (保持 v16.56 樣式) */
     :root {
@@ -376,18 +376,8 @@
   <div class="calc-container">
       <div class="calc-grid-3">
           <div class="calc-card blue">
-              <div style="color:var(--us); font-weight:bold; margin-bottom:10px;">1. 資產設定 (ASSETS)</div>
-              <div style="margin-bottom:8px;">
-                  <span class="calc-label">初始總資產 (Initial)</span>
-                  <input type="number" id="calc_initialWealth" value="10000000" class="calc-input">
-              </div>
-              <div>
-                  <span class="calc-label" style="color:var(--yield);">🔥 動態加碼 (Injection)</span>
-                  <div style="display:flex; align-items:center; gap:5px;">
-                      <input type="number" id="calc_injection" value="0" class="calc-input" style="border-color:var(--yield); color:var(--yield); opacity:0.5; pointer-events:none;">
-                      <input type="checkbox" id="calc_useInjection" style="width:20px; height:20px; accent-color:var(--yield); cursor:pointer;">
-                  </div>
-              </div>
+              <div style="color:var(--us); font-weight:bold; margin-bottom:10px;">1. 初始總資產</div>
+              <input type="number" id="calc_initialWealth" value="10000000" class="calc-input">
           </div>
           <div class="calc-card indigo">
               <div style="color:#6366f1; font-weight:bold; margin-bottom:10px;">
@@ -488,7 +478,7 @@ const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQuNQc
 
 let currentRate = 32.5;
 let cardsData = {}, portfolios = {}, strategiesData = {}, eventsData = [], lawsData = [];
-let configData = { title: 'PROJECT CAGE', meta: 'v16.65', ytUrl: '' }; 
+let configData = { title: 'PROJECT CAGE', meta: 'v16.62', ytUrl: '' }; 
 let logoUrl = ''; 
 let isFallback = false;
 const defaultIcons = { 'C01': `<svg class="mc-media" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" r="20" stroke="currentColor" stroke-width="2" fill="none"/></svg>` };
@@ -522,28 +512,32 @@ function updateVisitorCount() {
     const el = document.getElementById('visitorCount');
     if(!el) return;
 
+    // Timeout Promise
     const timeout = new Promise((_, reject) => 
         setTimeout(() => reject(new Error('Timeout')), 3000)
     );
 
+    // Fetch Promise
     const fetchData = fetch('https://api.counterapi.dev/v1/mark_investment_dashboard/visits/up')
         .then(res => {
             if (!res.ok) throw new Error('Network response was not ok');
             return res.json();
         });
 
+    // Race
     Promise.race([fetchData, timeout])
         .then(data => {
             el.innerText = `[ ${data.count.toLocaleString()} ]`;
             el.classList.remove('connecting');
-            el.style.color = 'var(--yield)'; 
+            el.style.color = 'var(--yield)'; // Green
         })
         .catch(err => {
             console.warn('Counter Failed:', err);
+            // Fallback: Fake number based on current time (just to show something)
             const fakeNum = Math.floor(Date.now() / 10000000); 
             el.innerText = `[ ${fakeNum.toLocaleString()}* ]`;
             el.classList.remove('connecting');
-            el.style.color = 'var(--tw)'; 
+            el.style.color = 'var(--tw)'; // Red (indicates simulated)
         });
 }
 
@@ -862,46 +856,27 @@ function initCalculator() {
         allocCash: document.getElementById('calc_allocCash'),
         perfQQQ: document.getElementById('calc_perfQQQ'),
         perfQLD: document.getElementById('calc_perfQLD'),
-        injection: document.getElementById('calc_injection'), // 🛠️ v16.63 New Input
-        useInjection: document.getElementById('calc_useInjection') // 🛠️ v16.64 Checkbox Logic
     };
 
     const outputs = {
         mindlessBody: document.getElementById('calc_mindlessBody'),
         mindlessTotal: document.getElementById('calc_mindlessTotal'),
         mindlessLabel: document.getElementById('calc_mindlessLabel'),
-        mindlessAssets: document.getElementById('calc_mindlessAssets'),
+        mindlessAssets: document.getElementById('calc_mindlessAssets'), // New
         smartBody: document.getElementById('calc_smartBody'),
         smartTotal: document.getElementById('calc_smartTotal'),
         smartCard: document.getElementById('calc_smartCard'),
-        smartAssets: document.getElementById('calc_smartAssets'),
+        smartAssets: document.getElementById('calc_smartAssets'), // New
         mindlessCard: document.getElementById('calc_mindlessCard'),
         betaDisplay: document.getElementById('calc_betaDisplay')
     };
 
+    // 🛠️ v16.58: Floor Logic for Calculator
     const fmtMoney = (val) => new Intl.NumberFormat('zh-TW', { maximumFractionDigits: 0 }).format(Math.floor(val));
     const fmtPct = (val) => floorDec(val * 100, 1).toFixed(1) + '%';
-    
-    // 🛠️ v16.64: Toggle Input State
-    inputs.useInjection.addEventListener('change', (e) => {
-        if(e.target.checked) {
-            inputs.injection.style.opacity = '1';
-            inputs.injection.style.pointerEvents = 'auto';
-        } else {
-            inputs.injection.style.opacity = '0.5';
-            inputs.injection.style.pointerEvents = 'none';
-        }
-        calculate();
-    });
 
     function calculate() {
         const initialWealth = parseFloat(inputs.initialWealth.value) || 0;
-        
-        // 🛠️ v16.65: Dynamic Logic
-        const injectionInputVal = parseFloat(inputs.injection.value) || 0;
-        const isInjectionMode = inputs.useInjection.checked;
-        const injectionVal = isInjectionMode ? injectionInputVal : 0;
-        
         const rawQQQ = parseFloat(inputs.allocQQQ.value) || 0;
         const rawQLD = parseFloat(inputs.allocQLD.value) || 0;
         const rawCash = parseFloat(inputs.allocCash.value) || 0;
@@ -928,182 +903,123 @@ function initCalculator() {
         const currentQQQ = startQQQ * (1 + perfQQQ / 100);
         const currentQLD = startQLD * (1 + perfQLD / 100);
         const currentCash = startCash;
-        
-        // 🛠️ v16.65: Determine "Available Wealth" based on mode
-        // Mode OFF: Total Wealth = Current Assets (Cash + Stocks)
-        // Mode ON: Total Wealth = Current Assets + Injection
-        const totalWealth = currentQQQ + currentQLD + currentCash + injectionVal;
+        const currentTotal = currentQQQ + currentQLD + currentCash;
 
-        // Ratios for Display
-        const currentTotalForRatio = currentQQQ + currentQLD + currentCash;
-        const currentQQQRatioVal = currentTotalForRatio > 0 ? currentQQQ / currentTotalForRatio : 0;
-        const currentQLDRatioVal = currentTotalForRatio > 0 ? currentQLD / currentTotalForRatio : 0;
-        const currentCashRatioVal = currentTotalForRatio > 0 ? currentCash / currentTotalForRatio : 0;
+        const currentCashRatioVal = currentTotal > 0 ? currentCash / currentTotal : 0;
+        const currentQQQRatioVal = currentTotal > 0 ? currentQQQ / currentTotal : 0;
+        const currentQLDRatioVal = currentTotal > 0 ? currentQLD / currentTotal : 0;
+        const targetCashRatioVal = allocCash / 100;
+        const excessRatioVal = Math.max(0, currentCashRatioVal - targetCashRatioVal);
+
+        // Mindless (RATIO)
+        const mindlessTargetCash = currentTotal * targetCashRatioVal;
+        const mindlessTargetQQQ = currentTotal * (allocQQQ / 100);
+        const mindlessTargetQLD = currentTotal * (allocQLD / 100);
+        const actionCash = mindlessTargetCash - currentCash; 
+        const actionQQQ = mindlessTargetQQQ - currentQQQ;
+        const actionQLD = mindlessTargetQLD - currentQLD;
+        const mindlessInjection = Math.abs(actionCash); 
         
-        // Target Amounts (Based on Total Wealth including any injection)
-        const targetQQQ = totalWealth * (allocQQQ / 100);
-        const targetQLD = totalWealth * (allocQLD / 100);
-        const targetCash = totalWealth * (allocCash / 100);
+        // 🛠️ v16.52: Calculate Total Assets After Rebalancing (Reality Check)
+        const mindlessFinalTotal = mindlessTargetQQQ + mindlessTargetQLD + mindlessTargetCash;
+
+        // Auto-Hide Logic
+        const isReserve = actionCash > 0;
         
-        // --- Calculate Actions ---
-        let actionQQQ, actionQLD, actionCash, totalInjectionUsed;
-        let finalQQQ, finalQLD, finalCash, finalTotal;
-        
-        if (!isInjectionMode) {
-             // 🛠️ Scenario A: Standard Rebalancing (Consume Reserve)
-             actionQQQ = targetQQQ - currentQQQ;
-             actionQLD = targetQLD - currentQLD;
-             actionCash = targetCash - currentCash; // Can be negative (consume reserve)
-             totalInjectionUsed = Math.abs(actionCash); // Just for display label if needed
-             
-             finalQQQ = targetQQQ;
-             finalQLD = targetQLD;
-             finalCash = targetCash;
-             finalTotal = totalWealth;
-             
-             // Smart Logic (Standard)
-             // Simple logic: If QQQ dropped more, buy QQQ with available excess cash
-             // Here we use simplified sniper logic for demo consistency
-             // Buy asset that is furthest from target %? 
-             // Or simplified: Buy worst performer
+        if(isReserve) {
+            outputs.smartCard.style.display = 'none';
+            // 🛠️ v16.56 Mobile Fix: Use CSS class, not direct grid-column manipulation if possible, 
+            // but here we simply reset column span. 
+            // On mobile, grid is 1 column, so span 2 just fills it. On desktop, it spans full width.
+            outputs.mindlessCard.style.gridColumn = '1 / -1'; 
+            outputs.mindlessLabel.innerText = "現金儲備 (RESERVE)";
+            outputs.mindlessTotal.style.color = "var(--yield)"; 
         } else {
-             // 🛠️ Scenario B: Dynamic Injection (Protect Reserve)
-             // Gap Analysis
-             const gapQQQ = Math.max(0, targetQQQ - currentQQQ);
-             const gapQLD = Math.max(0, targetQLD - currentQLD);
-             const totalGap = gapQQQ + gapQLD;
-             
-             // We only have `injectionVal` to spend. We DO NOT touch `currentCash`.
-             // Mindless: Proportional to Gap
-             if (totalGap > 0) {
-                 // Allocate injection proportionally to gaps
-                 // But wait, we can't exceed injectionVal
-                 // And we can't exceed gap (technically we can, but let's stick to filling gaps)
-                 // In this "Injection Mode", we treat Injection as the ONLY source of buying power.
-                 
-                 // However, "Ratio" logic implies we try to hit targets. 
-                 // If Injection < TotalGap, we fill partially.
-                 // If Injection > TotalGap, we fill gaps and rest goes to cash? 
-                 // Let's assume Injection is fully deployed into stocks if needed.
-                 
-                 actionQQQ = injectionVal * (gapQQQ / totalGap);
-                 actionQLD = injectionVal * (gapQLD / totalGap);
-             } else {
-                 // No gaps? (Stocks went up?) Put injection into cash?
-                 // Or distribute by ratio? Let's distribute by ratio
-                 actionQQQ = injectionVal * (allocQQQ / 100);
-                 actionQLD = injectionVal * (allocQLD / 100);
-             }
-             actionCash = 0; // Reserve Protected!
-             totalInjectionUsed = injectionVal;
-             
-             finalQQQ = currentQQQ + actionQQQ;
-             finalQLD = currentQLD + actionQLD;
-             finalCash = currentCash; // Reserve Unchanged
-             finalTotal = finalQQQ + finalQLD + finalCash;
+            outputs.smartCard.style.display = 'block';
+            outputs.mindlessCard.style.gridColumn = 'auto';
+            outputs.mindlessLabel.innerText = "現金消耗 (CONSUMPTION)";
+            outputs.mindlessTotal.style.color = "var(--tw)"; 
         }
 
-        // Smart Logic (Sniper) - Re-calculated based on mode
-        let smartActionQQQ, smartActionQLD, smartActionCash, smartFinalTotal;
+        // Smart
+        const smartInjection = currentCash * excessRatioVal;
+        const smartFinalCash = currentCash - smartInjection;
+        let smartActionQQQ = 0;
+        let smartActionQLD = 0;
         
-        if (!isInjectionMode) {
-             // Smart Standard: Buy dip with excess cash
-             const excessCash = Math.max(0, currentCash - targetCash);
-             if (perfQLD < perfQQQ) { smartActionQLD = excessCash; smartActionQQQ = 0; }
-             else { smartActionQQQ = excessCash; smartActionQLD = 0; }
-             smartActionCash = -excessCash;
-        } else {
-             // Smart Injection: Sniper with Injection
-             if (perfQLD < perfQQQ) { smartActionQLD = injectionVal; smartActionQQQ = 0; }
-             else { smartActionQQQ = injectionVal; smartActionQLD = 0; }
-             smartActionCash = 0; // Reserve Protected
-        }
+        if (perfQLD < perfQQQ) { smartActionQLD = smartInjection; } else { smartActionQQQ = smartInjection; }
         
         const smartFinalQQQ = currentQQQ + smartActionQQQ;
         const smartFinalQLD = currentQLD + smartActionQLD;
-        const smartFinalCash = currentCash + smartActionCash + (isInjectionMode ? 0 : 0); // Logic handled in action
-        smartFinalTotal = smartFinalQQQ + smartFinalQLD + smartFinalCash;
-
-        // UI Updates for Injection Mode
-        if(isInjectionMode) {
-             outputs.mindlessLabel.innerText = "外部注資 (INJECTION USED)";
-             outputs.mindlessTotal.style.color = "var(--yield)"; 
-        } else {
-             // Auto-Hide Logic for Standard Mode (Reserve vs Consumption)
-             const isReserve = actionCash > 0; // Buying Cash = Reserve
-             if(isReserve) {
-                 outputs.smartCard.style.display = 'none';
-                 outputs.mindlessCard.style.gridColumn = '1 / -1'; 
-                 outputs.mindlessLabel.innerText = "現金儲備 (RESERVE)";
-                 outputs.mindlessTotal.style.color = "var(--yield)"; 
-             } else {
-                 outputs.smartCard.style.display = 'block';
-                 outputs.mindlessCard.style.gridColumn = 'auto';
-                 outputs.mindlessLabel.innerText = "現金消耗 (CONSUMPTION)";
-                 outputs.mindlessTotal.style.color = "var(--tw)"; 
-             }
-        }
+        const smartFinalTotal = smartFinalCash + smartFinalQQQ + smartFinalQLD;
         
-        // 🛠️ Render Mindless
+        // Final Ratios
+        const smartFinalQQQRatio = smartFinalTotal > 0 ? smartFinalQQQ / smartFinalTotal : 0;
+        const smartFinalQLDRatio = smartFinalTotal > 0 ? smartFinalQLD / smartFinalTotal : 0;
+        const smartFinalCashRatio = smartFinalTotal > 0 ? smartFinalCash / smartFinalTotal : 0;
+
+        // Render Mindless (RATIO)
         outputs.mindlessBody.innerHTML = `
             <tr>
                 <td>QQQ</td>
                 <td>${fmtMoney(currentQQQ)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(currentQQQRatioVal)})</span></td>
                 <td style="text-align:center;"><span class="calc-badge ${actionQQQ>=0?'badge-buy':'badge-sell'}">${actionQQQ>=0?'+':''}${fmtMoney(actionQQQ)}</span></td>
-                <td style="text-align:right;">${fmtMoney(finalQQQ)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(finalQQQ/finalTotal)})</span></td>
+                <td style="text-align:right;">${fmtMoney(mindlessTargetQQQ)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(allocQQQ/100)})</span></td>
             </tr>
             <tr>
                 <td>QLD</td>
                 <td>${fmtMoney(currentQLD)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(currentQLDRatioVal)})</span></td>
                 <td style="text-align:center;"><span class="calc-badge ${actionQLD>=0?'badge-buy':'badge-sell'}">${actionQLD>=0?'+':''}${fmtMoney(actionQLD)}</span></td>
-                <td style="text-align:right;">${fmtMoney(finalQLD)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(finalQLD/finalTotal)})</span></td>
+                <td style="text-align:right;">${fmtMoney(mindlessTargetQLD)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(allocQLD/100)})</span></td>
             </tr>
             <tr>
                 <td>CASH</td>
                 <td>${fmtMoney(currentCash)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(currentCashRatioVal)})</span></td>
-                <td style="text-align:center;"><span class="calc-badge ${actionCash>=0?'badge-buy':'badge-sell'}" style="${isInjectionMode?'opacity:0.3':''}">${actionCash==0?'-':(actionCash>0?'+':'')+fmtMoney(actionCash)}</span></td>
-                <td style="text-align:right;">${fmtMoney(finalCash)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(finalCash/finalTotal)})</span></td>
+                <td style="text-align:center;"><span class="calc-badge ${actionCash>=0?'badge-buy':'badge-sell'}">${actionCash>=0?'+':''}${fmtMoney(actionCash)}</span></td>
+                <td style="text-align:right;">${fmtMoney(mindlessTargetCash)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(allocCash/100)})</span></td>
             </tr>
         `;
+        // 🛠️ v16.52: Inject Assets Check
         outputs.mindlessAssets.innerHTML = `
             <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#888; margin-top:5px; border-top:1px dashed #333; padding-top:5px;">
-                <span>Current: ${fmtMoney(currentTotal)}</span>
-                <span>Final: ${fmtMoney(finalTotal)}</span>
+                <span>Before: ${fmtMoney(currentTotal)}</span>
+                <span>After: ${fmtMoney(mindlessFinalTotal)}</span>
             </div>
         `;
-        outputs.mindlessTotal.innerText = isInjectionMode ? fmtMoney(injectionVal) : fmtMoney(Math.abs(actionCash));
+        outputs.mindlessTotal.innerText = fmtMoney(mindlessInjection);
 
-        // 🛠️ Render Smart
+        // Render Smart
         const qqqBadge = smartActionQQQ > 0 ? `<span class="calc-badge badge-buy">🔥 +${fmtMoney(smartActionQQQ)}</span>` : '-';
         const qldBadge = smartActionQLD > 0 ? `<span class="calc-badge badge-buy">🔥 +${fmtMoney(smartActionQLD)}</span>` : '-';
-        
+
         outputs.smartBody.innerHTML = `
             <tr>
                 <td>QQQ</td>
                 <td>${fmtMoney(currentQQQ)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(currentQQQRatioVal)})</span></td>
                 <td style="text-align:center;">${qqqBadge}</td>
-                <td style="text-align:right;">${fmtMoney(smartFinalQQQ)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(smartFinalQQQ/smartFinalTotal)})</span></td>
+                <td style="text-align:right;">${fmtMoney(smartFinalQQQ)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(smartFinalQQQRatio)})</span></td>
             </tr>
             <tr>
                 <td>QLD</td>
                 <td>${fmtMoney(currentQLD)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(currentQLDRatioVal)})</span></td>
                 <td style="text-align:center;">${qldBadge}</td>
-                <td style="text-align:right;">${fmtMoney(smartFinalQLD)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(smartFinalQLD/smartFinalTotal)})</span></td>
+                <td style="text-align:right;">${fmtMoney(smartFinalQLD)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(smartFinalQLDRatio)})</span></td>
             </tr>
             <tr>
                 <td>CASH</td>
                 <td>${fmtMoney(currentCash)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(currentCashRatioVal)})</span></td>
-                <td style="text-align:center;"><span class="calc-badge badge-sell" style="${isInjectionMode?'opacity:0.3':''}">${smartActionCash==0?'-':fmtMoney(smartActionCash)}</span></td>
-                <td style="text-align:right;">${fmtMoney(smartFinalCash)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(smartFinalCash/smartFinalTotal)})</span></td>
+                <td style="text-align:center;"><span class="calc-badge badge-sell">-${fmtMoney(smartInjection)}</span></td>
+                <td style="text-align:right;">${fmtMoney(smartFinalCash)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(smartFinalCashRatio)})</span></td>
             </tr>
         `;
+        // 🛠️ v16.52: Inject Assets Check
         outputs.smartAssets.innerHTML = `
             <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#888; margin-top:5px; border-top:1px dashed #333; padding-top:5px;">
-                <span>Current: ${fmtMoney(currentTotal)}</span>
-                <span>Final: ${fmtMoney(smartFinalTotal)}</span>
+                <span>Before: ${fmtMoney(currentTotal)}</span>
+                <span>After: ${fmtMoney(smartFinalTotal)}</span>
             </div>
         `;
-        outputs.smartTotal.innerText = isInjectionMode ? fmtMoney(injectionVal) : fmtMoney(Math.abs(smartActionCash));
+        outputs.smartTotal.innerText = fmtMoney(smartInjection);
     }
 
     Object.values(inputs).forEach(input => {
