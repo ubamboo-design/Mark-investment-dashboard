@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
-<title>PROJECT CAGE : RELOADED v16.63 (Dynamic Injection)</title>
+<title>PROJECT CAGE : RELOADED v16.64 (Injection Switch)</title>
 <style>
     /* CSS 全局設定 (保持 v16.56 樣式) */
     :root {
@@ -383,7 +383,10 @@
               </div>
               <div>
                   <span class="calc-label" style="color:var(--yield);">🔥 動態加碼 (Injection)</span>
-                  <input type="number" id="calc_injection" value="0" class="calc-input" style="border-color:var(--yield); color:var(--yield);">
+                  <div style="display:flex; align-items:center; gap:5px;">
+                      <input type="number" id="calc_injection" value="0" class="calc-input" style="border-color:var(--yield); color:var(--yield); opacity:0.5; pointer-events:none;">
+                      <input type="checkbox" id="calc_useInjection" style="width:20px; height:20px; accent-color:var(--yield); cursor:pointer;">
+                  </div>
               </div>
           </div>
           <div class="calc-card indigo">
@@ -485,7 +488,7 @@ const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQuNQc
 
 let currentRate = 32.5;
 let cardsData = {}, portfolios = {}, strategiesData = {}, eventsData = [], lawsData = [];
-let configData = { title: 'PROJECT CAGE', meta: 'v16.63', ytUrl: '' }; 
+let configData = { title: 'PROJECT CAGE', meta: 'v16.64', ytUrl: '' }; 
 let logoUrl = ''; 
 let isFallback = false;
 const defaultIcons = { 'C01': `<svg class="mc-media" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" r="20" stroke="currentColor" stroke-width="2" fill="none"/></svg>` };
@@ -633,6 +636,7 @@ function parseSheetData(text){
             sheetROI: parseFloat(sheetROI), sheetInvested: displayInv,
             budget: c[5] || '-', invested: displayInv, 
             highlight: highlight, explain: explain,
+            // 🛠️ v16.58: Store raw invested number
             investedVal: parseFloat(cleanVal) || 0,
             isUSD: isStrategyUSD
         };
@@ -646,21 +650,26 @@ function parseSheetData(text){
   });
 }
 
+// 🛠️ v16.58: Floor Logic for HUD (Big Numbers)
 function formatCompact(num, isUSD = false) {
     if (Math.abs(num) >= 100000000) { 
         return floorDec(num / 100000000, 2) + '億'; 
     } else if (Math.abs(num) >= 10000) { 
-        return Math.floor(num / 10000) + '萬'; 
+        return Math.floor(num / 10000) + '萬'; // Floor to integer for cleanliness
     }
     return Math.floor(num).toLocaleString(undefined, {maximumFractionDigits: 0});
 }
 
+// 🛠️ v16.60: Unified Wan Unit Logic (USD & TWD)
 function formatBattleAmount(num, isUSD) {
     const prefix = isUSD ? 'USD$ ' : 'NT$ ';
+    
     if (num >= 10000) {
+        // Floor to 1 decimal place
         let val = floorDec(num / 10000, 1);
         return prefix + val + '萬';
     } else {
+        // Integer floor for small numbers
         return prefix + Math.floor(num).toLocaleString();
     }
 }
@@ -835,7 +844,8 @@ function renderAll(){ renderHeader(); renderDashboard(); renderCards(); renderEv
 function initCalculator() {
     const inputs = {
         initialWealth: document.getElementById('calc_initialWealth'),
-        injection: document.getElementById('calc_injection'), // 🛠️ v16.63 New Input
+        injection: document.getElementById('calc_injection'), 
+        useInjection: document.getElementById('calc_useInjection'), // 🛠️ v16.64 Checkbox Logic
         allocQQQ: document.getElementById('calc_allocQQQ'),
         allocQLD: document.getElementById('calc_allocQLD'),
         allocCash: document.getElementById('calc_allocCash'),
@@ -859,9 +869,25 @@ function initCalculator() {
     const fmtMoney = (val) => new Intl.NumberFormat('zh-TW', { maximumFractionDigits: 0 }).format(Math.floor(val));
     const fmtPct = (val) => floorDec(val * 100, 1).toFixed(1) + '%';
 
+    // 🛠️ v16.64: Toggle Input State
+    inputs.useInjection.addEventListener('change', (e) => {
+        if(e.target.checked) {
+            inputs.injection.style.opacity = '1';
+            inputs.injection.style.pointerEvents = 'auto';
+        } else {
+            inputs.injection.style.opacity = '0.5';
+            inputs.injection.style.pointerEvents = 'none';
+        }
+        calculate();
+    });
+
     function calculate() {
         const initialWealth = parseFloat(inputs.initialWealth.value) || 0;
-        const injectionVal = parseFloat(inputs.injection.value) || 0; // 🛠️ v16.63 Logic
+        
+        // 🛠️ v16.64: Checkbox Logic
+        const injectionInputVal = parseFloat(inputs.injection.value) || 0;
+        const injectionVal = inputs.useInjection.checked ? injectionInputVal : 0;
+        
         const rawQQQ = parseFloat(inputs.allocQQQ.value) || 0;
         const rawQLD = parseFloat(inputs.allocQLD.value) || 0;
         const rawCash = parseFloat(inputs.allocCash.value) || 0;
@@ -890,7 +916,7 @@ function initCalculator() {
         const currentCash = startCash;
         const totalAfterDrop = currentQQQ + currentQLD + currentCash;
         
-        // 🛠️ v16.63: Total Wealth including Injection
+        // 🛠️ v16.64: Total Wealth = Post-Drop + Injection
         const totalWealthDynamic = totalAfterDrop + injectionVal;
 
         // Current Ratios (based on total after drop, without injection yet for display)
@@ -906,9 +932,9 @@ function initCalculator() {
         const mindlessTargetQQQ = totalWealthDynamic * (allocQQQ / 100);
         const mindlessTargetQLD = totalWealthDynamic * (allocQLD / 100);
         
-        // Action = Target - Current (Injection is treated as external source, so we compare Target vs Current Holding)
-        // But wait, if I have injection, my available cash is CurrentCash + Injection.
-        // So Action Cash = TargetCash - (CurrentCash + Injection).
+        // 🛠️ v16.64 Action Logic:
+        // We have `currentCash` + `injectionVal`. We need `mindlessTargetCash`.
+        // Action = Target - (Current + Injection)
         const actionCash = mindlessTargetCash - (currentCash + injectionVal); 
         const actionQQQ = mindlessTargetQQQ - currentQQQ;
         const actionQLD = mindlessTargetQLD - currentQLD;
@@ -916,7 +942,7 @@ function initCalculator() {
         
         const mindlessFinalTotal = mindlessTargetQQQ + mindlessTargetQLD + mindlessTargetCash;
 
-        // Auto-Hide Logic (If we are buying cash/reserve, hide smart)
+        // Auto-Hide Logic
         const isReserve = actionCash > 0;
         
         if(isReserve) {
@@ -976,7 +1002,7 @@ function initCalculator() {
                 <td style="text-align:right;">${fmtMoney(mindlessTargetCash)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(allocCash/100)})</span></td>
             </tr>
         `;
-        // 🛠️ v16.63: Reality Check updated to show Injection impact
+        // 🛠️ v16.64: Reality Check updated to show Injection impact
         outputs.mindlessAssets.innerHTML = `
             <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#888; margin-top:5px; border-top:1px dashed #333; padding-top:5px;">
                 <span>Total (Pre-Inj): ${fmtMoney(totalAfterDrop)}</span>
