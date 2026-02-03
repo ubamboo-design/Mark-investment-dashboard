@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
-<title>PROJECT CAGE : RELOADED v16.62 (Counter Fixed)</title>
+<title>PROJECT CAGE : RELOADED v16.63 (Dynamic Injection)</title>
 <style>
     /* CSS 全局設定 (保持 v16.56 樣式) */
     :root {
@@ -376,8 +376,15 @@
   <div class="calc-container">
       <div class="calc-grid-3">
           <div class="calc-card blue">
-              <div style="color:var(--us); font-weight:bold; margin-bottom:10px;">1. 初始總資產</div>
-              <input type="number" id="calc_initialWealth" value="10000000" class="calc-input">
+              <div style="color:var(--us); font-weight:bold; margin-bottom:10px;">1. 資產設定 (ASSETS)</div>
+              <div style="margin-bottom:8px;">
+                  <span class="calc-label">初始總資產 (Initial)</span>
+                  <input type="number" id="calc_initialWealth" value="10000000" class="calc-input">
+              </div>
+              <div>
+                  <span class="calc-label" style="color:var(--yield);">🔥 動態加碼 (Injection)</span>
+                  <input type="number" id="calc_injection" value="0" class="calc-input" style="border-color:var(--yield); color:var(--yield);">
+              </div>
           </div>
           <div class="calc-card indigo">
               <div style="color:#6366f1; font-weight:bold; margin-bottom:10px;">
@@ -478,7 +485,7 @@ const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQuNQc
 
 let currentRate = 32.5;
 let cardsData = {}, portfolios = {}, strategiesData = {}, eventsData = [], lawsData = [];
-let configData = { title: 'PROJECT CAGE', meta: 'v16.62', ytUrl: '' }; 
+let configData = { title: 'PROJECT CAGE', meta: 'v16.63', ytUrl: '' }; 
 let logoUrl = ''; 
 let isFallback = false;
 const defaultIcons = { 'C01': `<svg class="mc-media" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" r="20" stroke="currentColor" stroke-width="2" fill="none"/></svg>` };
@@ -512,32 +519,28 @@ function updateVisitorCount() {
     const el = document.getElementById('visitorCount');
     if(!el) return;
 
-    // Timeout Promise
     const timeout = new Promise((_, reject) => 
         setTimeout(() => reject(new Error('Timeout')), 3000)
     );
 
-    // Fetch Promise
     const fetchData = fetch('https://api.counterapi.dev/v1/mark_investment_dashboard/visits/up')
         .then(res => {
             if (!res.ok) throw new Error('Network response was not ok');
             return res.json();
         });
 
-    // Race
     Promise.race([fetchData, timeout])
         .then(data => {
             el.innerText = `[ ${data.count.toLocaleString()} ]`;
             el.classList.remove('connecting');
-            el.style.color = 'var(--yield)'; // Green
+            el.style.color = 'var(--yield)'; 
         })
         .catch(err => {
             console.warn('Counter Failed:', err);
-            // Fallback: Fake number based on current time (just to show something)
             const fakeNum = Math.floor(Date.now() / 10000000); 
             el.innerText = `[ ${fakeNum.toLocaleString()}* ]`;
             el.classList.remove('connecting');
-            el.style.color = 'var(--tw)'; // Red (indicates simulated)
+            el.style.color = 'var(--tw)'; 
         });
 }
 
@@ -630,7 +633,6 @@ function parseSheetData(text){
             sheetROI: parseFloat(sheetROI), sheetInvested: displayInv,
             budget: c[5] || '-', invested: displayInv, 
             highlight: highlight, explain: explain,
-            // 🛠️ v16.58: Store raw invested number
             investedVal: parseFloat(cleanVal) || 0,
             isUSD: isStrategyUSD
         };
@@ -644,26 +646,21 @@ function parseSheetData(text){
   });
 }
 
-// 🛠️ v16.58: Floor Logic for HUD (Big Numbers)
 function formatCompact(num, isUSD = false) {
     if (Math.abs(num) >= 100000000) { 
         return floorDec(num / 100000000, 2) + '億'; 
     } else if (Math.abs(num) >= 10000) { 
-        return Math.floor(num / 10000) + '萬'; // Floor to integer for cleanliness
+        return Math.floor(num / 10000) + '萬'; 
     }
     return Math.floor(num).toLocaleString(undefined, {maximumFractionDigits: 0});
 }
 
-// 🛠️ v16.60: Unified Wan Unit Logic (USD & TWD)
 function formatBattleAmount(num, isUSD) {
     const prefix = isUSD ? 'USD$ ' : 'NT$ ';
-    
     if (num >= 10000) {
-        // Floor to 1 decimal place
         let val = floorDec(num / 10000, 1);
         return prefix + val + '萬';
     } else {
-        // Integer floor for small numbers
         return prefix + Math.floor(num).toLocaleString();
     }
 }
@@ -710,8 +707,6 @@ function renderArena(){
     const con = document.getElementById('arenaContainer'); con.innerHTML = ''; 
     let allS = [];
     Object.keys(portfolios).forEach(g => portfolios[g].forEach(p => {
-        // 🛠️ v16.58: Use Floor Logic for Sheet ROI too? No, usually calc() handles it dynamically.
-        // But for sorting, keep precision. For display, use floor.
         allS.push(p);
     }));
     allS.sort((a, b) => b.sheetROI - a.sheetROI); 
@@ -741,13 +736,9 @@ function renderArena(){
     let html = `<div class="arena-dashboard-v15"><div class="leaderboard-panel"><div class="lb-header"><span class="title">LIVE BATTLE</span><span class="lbl-inv">已投入金額</span><span class="lbl-roi">報酬率</span></div><div class="lb-list">`;
     allS.forEach((s, i) => {
         const deck = s.deck.map(code => { const card = cardsData[code]; return card?.imgUrl ? `<img src="${fixDriveUrl(card.imgUrl)}" class="lb-card-icon">` : `<div class="lb-card-icon" style="background:#222;font-size:8px;">${code}</div>`; }).join('');
-        // 🛠️ v16.58: Use formatBattleAmount
         let investedDisplay = formatBattleAmount(s.investedVal, s.isUSD);
-        
         let cls = s.sheetROI >= 50 ? 'color-gold' : s.sheetROI >= 0 ? 'color-profit' : s.sheetROI <= -50 ? 'color-dead' : 'color-loss';
         let sign = s.sheetROI >= 0 ? '+' : '';
-        
-        // 🛠️ v16.58: ROI Floor to 1 decimal
         let roiDisplay = floorDec(s.sheetROI, 1).toFixed(1);
         
         html += `<div class="lb-row rank-${i+1}" onclick="openStrategyModal('${s.code}')"><span class="lb-rank">#${i+1}</span><div class="lb-info"><div class="lb-name">${s.name}</div><div class="lb-code">${s.code}</div></div><div class="lb-deck">${deck}</div><div class="lb-invested">${investedDisplay}</div><span class="lb-val ${cls}">${sign}${roiDisplay}%</span></div>`;
@@ -762,7 +753,6 @@ function renderArena(){
          let valClass = isPos ? 'val-pos' : 'val-neg';
          let delay = i * 0.05;
          let sign = s.sheetROI >= 0 ? '+' : '';
-         // 🛠️ v16.58: ROI Floor to 1 decimal
          let roiDisplay = floorDec(s.sheetROI, 1).toFixed(1);
          return `<div class="bar-wrapper">
              <div class="bar-label-tech">${s.code}</div>
@@ -776,12 +766,6 @@ function renderArena(){
 
 function renderCards(){ const con=document.getElementById('cardContainer'); con.innerHTML=''; Object.values(cardsData).forEach(c=>{ con.innerHTML+=`<div class="micro-card ${c.type}" onclick="openModal('${c.code}')"><div class="mc-header"><span class="mc-code">${c.code}</span><span class="mc-target">${c.target}</span></div><div class="mc-image-container">${c.media}</div><div class="mc-footer"><div class="mc-chn-name">${c.rpg||''}</div><div class="mc-eng-name">${c.skill}</div><div class="mc-cost-badge">$${(c.budget/10000).toFixed(0)}萬</div></div></div>`; });}
 function renderEvents(){ const con = document.getElementById('eventContainer'); con.innerHTML = eventsData.slice(0, 2).map(e => `<div class="event-card${e.isUrgent?' emergency':''}"><div class="event-header"><span class="event-date">${e.date}</span><span class="event-status">${e.status}</span></div><div class="event-content">${e.content}</div></div>`).join(''); }
-
-// 🛠️ v16.61: renderFooter NO LONGER overwrites HTML, it only handles functionality
-// We remove the innerHTML setting from here to protect the counter
-function renderFooter() { 
-    // Logic moved to static HTML or specific update functions
-}
 
 function openModal(k){ 
     const c=cardsData[k]; 
@@ -851,6 +835,7 @@ function renderAll(){ renderHeader(); renderDashboard(); renderCards(); renderEv
 function initCalculator() {
     const inputs = {
         initialWealth: document.getElementById('calc_initialWealth'),
+        injection: document.getElementById('calc_injection'), // 🛠️ v16.63 New Input
         allocQQQ: document.getElementById('calc_allocQQQ'),
         allocQLD: document.getElementById('calc_allocQLD'),
         allocCash: document.getElementById('calc_allocCash'),
@@ -862,21 +847,21 @@ function initCalculator() {
         mindlessBody: document.getElementById('calc_mindlessBody'),
         mindlessTotal: document.getElementById('calc_mindlessTotal'),
         mindlessLabel: document.getElementById('calc_mindlessLabel'),
-        mindlessAssets: document.getElementById('calc_mindlessAssets'), // New
+        mindlessAssets: document.getElementById('calc_mindlessAssets'),
         smartBody: document.getElementById('calc_smartBody'),
         smartTotal: document.getElementById('calc_smartTotal'),
         smartCard: document.getElementById('calc_smartCard'),
-        smartAssets: document.getElementById('calc_smartAssets'), // New
+        smartAssets: document.getElementById('calc_smartAssets'),
         mindlessCard: document.getElementById('calc_mindlessCard'),
         betaDisplay: document.getElementById('calc_betaDisplay')
     };
 
-    // 🛠️ v16.58: Floor Logic for Calculator
     const fmtMoney = (val) => new Intl.NumberFormat('zh-TW', { maximumFractionDigits: 0 }).format(Math.floor(val));
     const fmtPct = (val) => floorDec(val * 100, 1).toFixed(1) + '%';
 
     function calculate() {
         const initialWealth = parseFloat(inputs.initialWealth.value) || 0;
+        const injectionVal = parseFloat(inputs.injection.value) || 0; // 🛠️ v16.63 Logic
         const rawQQQ = parseFloat(inputs.allocQQQ.value) || 0;
         const rawQLD = parseFloat(inputs.allocQLD.value) || 0;
         const rawCash = parseFloat(inputs.allocCash.value) || 0;
@@ -903,34 +888,39 @@ function initCalculator() {
         const currentQQQ = startQQQ * (1 + perfQQQ / 100);
         const currentQLD = startQLD * (1 + perfQLD / 100);
         const currentCash = startCash;
-        const currentTotal = currentQQQ + currentQLD + currentCash;
+        const totalAfterDrop = currentQQQ + currentQLD + currentCash;
+        
+        // 🛠️ v16.63: Total Wealth including Injection
+        const totalWealthDynamic = totalAfterDrop + injectionVal;
 
-        const currentCashRatioVal = currentTotal > 0 ? currentCash / currentTotal : 0;
-        const currentQQQRatioVal = currentTotal > 0 ? currentQQQ / currentTotal : 0;
-        const currentQLDRatioVal = currentTotal > 0 ? currentQLD / currentTotal : 0;
+        // Current Ratios (based on total after drop, without injection yet for display)
+        const currentQQQRatioVal = totalAfterDrop > 0 ? currentQQQ / totalAfterDrop : 0;
+        const currentQLDRatioVal = totalAfterDrop > 0 ? currentQLD / totalAfterDrop : 0;
+        const currentCashRatioVal = totalAfterDrop > 0 ? currentCash / totalAfterDrop : 0;
+        
+        // Target Ratio (Target Cash %)
         const targetCashRatioVal = allocCash / 100;
-        const excessRatioVal = Math.max(0, currentCashRatioVal - targetCashRatioVal);
 
-        // Mindless (RATIO)
-        const mindlessTargetCash = currentTotal * targetCashRatioVal;
-        const mindlessTargetQQQ = currentTotal * (allocQQQ / 100);
-        const mindlessTargetQLD = currentTotal * (allocQLD / 100);
-        const actionCash = mindlessTargetCash - currentCash; 
+        // Mindless (RATIO) - Rebalance to targets using NEW Total Wealth
+        const mindlessTargetCash = totalWealthDynamic * targetCashRatioVal;
+        const mindlessTargetQQQ = totalWealthDynamic * (allocQQQ / 100);
+        const mindlessTargetQLD = totalWealthDynamic * (allocQLD / 100);
+        
+        // Action = Target - Current (Injection is treated as external source, so we compare Target vs Current Holding)
+        // But wait, if I have injection, my available cash is CurrentCash + Injection.
+        // So Action Cash = TargetCash - (CurrentCash + Injection).
+        const actionCash = mindlessTargetCash - (currentCash + injectionVal); 
         const actionQQQ = mindlessTargetQQQ - currentQQQ;
         const actionQLD = mindlessTargetQLD - currentQLD;
         const mindlessInjection = Math.abs(actionCash); 
         
-        // 🛠️ v16.52: Calculate Total Assets After Rebalancing (Reality Check)
         const mindlessFinalTotal = mindlessTargetQQQ + mindlessTargetQLD + mindlessTargetCash;
 
-        // Auto-Hide Logic
+        // Auto-Hide Logic (If we are buying cash/reserve, hide smart)
         const isReserve = actionCash > 0;
         
         if(isReserve) {
             outputs.smartCard.style.display = 'none';
-            // 🛠️ v16.56 Mobile Fix: Use CSS class, not direct grid-column manipulation if possible, 
-            // but here we simply reset column span. 
-            // On mobile, grid is 1 column, so span 2 just fills it. On desktop, it spans full width.
             outputs.mindlessCard.style.gridColumn = '1 / -1'; 
             outputs.mindlessLabel.innerText = "現金儲備 (RESERVE)";
             outputs.mindlessTotal.style.color = "var(--yield)"; 
@@ -941,9 +931,16 @@ function initCalculator() {
             outputs.mindlessTotal.style.color = "var(--tw)"; 
         }
 
-        // Smart
-        const smartInjection = currentCash * excessRatioVal;
-        const smartFinalCash = currentCash - smartInjection;
+        // Smart Logic with Injection
+        // We have (CurrentCash + Injection). We need to keep (TotalWealth * TargetCashRatio).
+        // Excess = (CurrentCash + Injection) - (TotalWealthDynamic * TargetCashRatio)
+        const availableCash = currentCash + injectionVal;
+        const requiredCash = totalWealthDynamic * targetCashRatioVal;
+        const excessCash = Math.max(0, availableCash - requiredCash);
+        
+        const smartInjection = excessCash; // This is the amount we can fire
+        const smartFinalCash = availableCash - smartInjection; // Should be roughly requiredCash
+        
         let smartActionQQQ = 0;
         let smartActionQLD = 0;
         
@@ -979,11 +976,11 @@ function initCalculator() {
                 <td style="text-align:right;">${fmtMoney(mindlessTargetCash)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(allocCash/100)})</span></td>
             </tr>
         `;
-        // 🛠️ v16.52: Inject Assets Check
+        // 🛠️ v16.63: Reality Check updated to show Injection impact
         outputs.mindlessAssets.innerHTML = `
             <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#888; margin-top:5px; border-top:1px dashed #333; padding-top:5px;">
-                <span>Before: ${fmtMoney(currentTotal)}</span>
-                <span>After: ${fmtMoney(mindlessFinalTotal)}</span>
+                <span>Total (Pre-Inj): ${fmtMoney(totalAfterDrop)}</span>
+                <span>Final: ${fmtMoney(mindlessFinalTotal)}</span>
             </div>
         `;
         outputs.mindlessTotal.innerText = fmtMoney(mindlessInjection);
@@ -1012,11 +1009,11 @@ function initCalculator() {
                 <td style="text-align:right;">${fmtMoney(smartFinalCash)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(smartFinalCashRatio)})</span></td>
             </tr>
         `;
-        // 🛠️ v16.52: Inject Assets Check
+        
         outputs.smartAssets.innerHTML = `
             <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#888; margin-top:5px; border-top:1px dashed #333; padding-top:5px;">
-                <span>Before: ${fmtMoney(currentTotal)}</span>
-                <span>After: ${fmtMoney(smartFinalTotal)}</span>
+                <span>Total (Pre-Inj): ${fmtMoney(totalAfterDrop)}</span>
+                <span>Final: ${fmtMoney(smartFinalTotal)}</span>
             </div>
         `;
         outputs.smartTotal.innerText = fmtMoney(smartInjection);
