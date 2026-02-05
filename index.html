@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
-<title>PROJECT CAGE : RELOADED v16.73 (Bull Ratio Fix)</title>
+<title>PROJECT COLOSSEUM v16.80</title>
 <style>
-    /* CSS 全局設定 (保持 v16.56 樣式) */
+    /* CSS 全局設定 */
     :root {
         --bg: #050505; --card: #0a0a0c; --bar: #1a1a1e; --text: #e0e0e0; --mute: #888;
         --tw: #ff2a2a; --us: #00d2ff; --yield: #00ff6a; --ber: #ff9100; --trap: #bd00ff; 
@@ -30,20 +30,19 @@
     .meta-info { font-family: 'Courier New', monospace; color: var(--gold); margin-top: 4px; font-size: 0.75rem; opacity: 0.8; letter-spacing: 1px; }
     .container { max-width: 1600px; margin: 0 auto; padding: 0 10px; }
 
-    /* Dashboard Wrapper */
-    .dashboard-wrapper { 
-        margin-top: 20px; padding: 15px; 
-        background: linear-gradient(160deg, #3a3a45 0%, #1a1a1e 60%, #0a0a0c 100%);
-        border-top: 1px solid rgba(255, 255, 255, 0.25);
-        border-left: 1px solid rgba(255, 255, 255, 0.1);
-        border-bottom: 2px solid rgba(0, 0, 0, 0.8);
-        border-right: 1px solid rgba(0, 0, 0, 0.5);
-        border-radius: 8px; 
-        box-shadow: 0 15px 35px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.1);
-        position: relative; 
-    }
-    .dashboard-wrapper::before, .dashboard-wrapper::after { display: none; }
+    /* HUD Status Badge */
+    .hud-status-badge { position: absolute; top: 20px; right: 20px; display: flex; align-items: center; gap: 15px; background: rgba(0, 10, 5, 0.85); border: 1px solid var(--yield); border-radius: 4px; padding: 6px 12px; font-family: var(--font-num); font-weight: bold; color: var(--yield); font-size: 0.9rem; box-shadow: 0 0 15px rgba(0, 255, 106, 0.15), inset 0 0 5px rgba(0, 255, 106, 0.1); z-index: 100; backdrop-filter: blur(4px); letter-spacing: 1px; }
+    .hud-divider { width: 1px; height: 14px; background: rgba(0, 255, 106, 0.4); }
+    .status-group { display: flex; align-items: center; gap: 8px; }
+    .status-dot { width: 8px; height: 8px; background-color: var(--yield); border-radius: 50%; box-shadow: 0 0 8px var(--yield); animation: blink 2s infinite ease-in-out; }
+    .live-val { color: #fff; text-shadow: 0 0 5px var(--yield); }
+    .access-val { color: #aaa; }
+    @keyframes blink { 0% { opacity: 0.4; transform: scale(0.9); } 50% { opacity: 1; transform: scale(1.2); } 100% { opacity: 0.4; transform: scale(0.9); } }
+    @media(max-width: 900px) { .hud-status-badge { top: 10px; right: 10px; padding: 4px 8px; font-size: 0.75rem; gap: 10px; } .header-text { margin-top: 25px; } }
 
+    /* Dashboard Wrapper */
+    .dashboard-wrapper { margin-top: 20px; padding: 15px; background: linear-gradient(160deg, #3a3a45 0%, #1a1a1e 60%, #0a0a0c 100%); border-top: 1px solid rgba(255, 255, 255, 0.25); border-left: 1px solid rgba(255, 255, 255, 0.1); border-bottom: 2px solid rgba(0, 0, 0, 0.8); border-right: 1px solid rgba(0, 0, 0, 0.5); border-radius: 8px; box-shadow: 0 15px 35px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.1); position: relative; }
+    .dashboard-wrapper::before, .dashboard-wrapper::after { display: none; }
     .dash-grid { display: grid; grid-template-columns: 1fr 1fr 1.4fr; gap: 8px; background: #000; padding: 5px; border-radius: 4px; box-shadow: inset 0 0 10px #000; } 
 
     /* HUD Screen */
@@ -272,12 +271,6 @@
     .refresh-btn { width: 300px; background: rgba(0, 247, 255, 0.1); color: var(--cyan); text-align: center; cursor: pointer; border: 1px solid var(--cyan); font-family: 'Courier New'; font-weight: 900; letter-spacing: 2px; padding: 15px; border-radius: 8px; transition: 0.3s; }
     .refresh-btn:hover { background: rgba(0, 247, 255, 0.3); box-shadow: 0 0 15px var(--cyan); }
     
-    /* 🛠️ v16.57: System Status (Visitor Counter) */
-    .system-status { font-family: 'Orbitron'; font-size: 0.9rem; color: #555; text-align: center; letter-spacing: 2px; margin-top: 10px; }
-    .sys-count { color: var(--gold); font-weight: bold; text-shadow: 0 0 10px rgba(255, 215, 0, 0.6); margin-left: 5px; }
-    .sys-count.connecting { color: #ffcc00; animation: blink 1s infinite; }
-    @keyframes blink { 50% { opacity: 0.5; } }
-
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 9999; }
     .modal-active { display: flex; animation: fadeIn 0.2s; }
     .modal-content { background: linear-gradient(145deg, #25252a, #121214); border-top: 1px solid rgba(255,255,255,0.25); border-left: 1px solid rgba(255,255,255,0.1); border-bottom: 2px solid rgba(0,0,0,0.8); border-right: 1px solid rgba(0,0,0,0.5); border-radius: 16px; padding: 30px; max-width: 500px; width: 90%; box-shadow: 0 20px 50px rgba(0,0,0,1); }
@@ -329,10 +322,23 @@
 <body>
 <div id="refresh-indicator"><div class="refresh-text"><div class="spinner"></div>REFRESHING...</div></div>
 <header>
+  <div class="hud-status-badge">
+      <div class="status-group">
+          <div class="status-dot"></div>
+          <span style="color:#aaa; font-size:0.75rem;">ACTIVITY:</span>
+          <span id="liveUsers" class="live-val">1</span>
+      </div>
+      <div class="hud-divider"></div>
+      <div class="status-group">
+          <span style="font-size:0.75rem; color:#888;">VISITS:</span>
+          <span id="visitorCount" class="access-val">...</span>
+      </div>
+  </div>
+
   <img id="pageLogo" src="" alt="Logo">
   <div class="header-text">
-      <h1 id="pageTitle">LOADING...</h1>
-      <div class="meta-info" id="pageMeta">LOADING DATA...</div>
+      <h1 id="pageTitle">PROJECT COLOSSEUM</h1>
+      <div class="meta-info" id="pageMeta">v16.80 (Dual Strategy)</div>
   </div>
 </header>
 
@@ -434,8 +440,8 @@
               </div>
           </div>
           <div class="calc-card" id="calc_smartCard" style="border-top: 3px solid var(--yield);">
-              <div style="color:var(--yield); font-weight:900; margin-bottom:5px;">5. 聰明平衡 (SMART)</div>
-              <div style="font-size:0.8rem; color:#666; margin-bottom:10px;">狙擊跌最深標的 (Sniper Mode)</div>
+              <div style="color:var(--yield); font-weight:900; margin-bottom:5px;">5. 聰明平衡 (CLEC)</div>
+              <div style="font-size:0.8rem; color:#666; margin-bottom:10px;">生存模式：鎖利與滴灌</div>
               <table class="calc-table">
                   <thead><tr><th>ASSET</th><th>CURRENT (%)</th><th style="text-align:center">ACTION</th><th style="text-align:right">FINAL (%)</th></tr></thead>
                   <tbody id="calc_smartBody"></tbody>
@@ -454,7 +460,6 @@
   
   <div class="footer-grid" id="footerContainer">
       <div class="refresh-btn" onclick="init()">↻ REFRESH DATA</div>
-      <div class="system-status">SYSTEM ACCESS: <span class="sys-count connecting" id="visitorCount">CONNECTING...</span></div>
   </div>
 </div>
 
@@ -501,7 +506,7 @@ const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQuNQc
 
 let currentRate = 32.5;
 let cardsData = {}, portfolios = {}, strategiesData = {}, eventsData = [], lawsData = [];
-let configData = { title: 'PROJECT CAGE', meta: 'v16.73', ytUrl: '' }; 
+let configData = { title: 'PROJECT COLOSSEUM', meta: 'v16.80', ytUrl: '' }; 
 let logoUrl = ''; 
 let isFallback = false;
 const defaultIcons = { 'C01': `<svg class="mc-media" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" r="20" stroke="currentColor" stroke-width="2" fill="none"/></svg>` };
@@ -526,38 +531,50 @@ async function init() {
     // Initialize Calculator Logic
     initCalculator();
     
-    // 🛠️ v16.62: Safe Counter Trigger
-    updateVisitorCount();
+    // 🛠️ v16.77: Start Velocity Tracking
+    trackLiveActivity();
 }
 
-// 🛠️ v16.62: Robust Counter with Timeout Fallback
-function updateVisitorCount() {
-    const el = document.getElementById('visitorCount');
-    if(!el) return;
+// 🛠️ v16.77: Real Traffic Velocity (Activity-Based)
+function trackLiveActivity() {
+    const liveEl = document.getElementById('liveUsers');
+    const visitEl = document.getElementById('visitorCount');
+    let lastCount = 0;
+    
+    function fetchCount() {
+        fetch('https://api.counterapi.dev/v1/mark_investment_dashboard/visits/up')
+            .then(res => res.json())
+            .then(data => {
+                const currentCount = data.count;
+                visitEl.innerText = `[ ${currentCount.toLocaleString()} ]`;
+                
+                // Calculate Velocity (Activity)
+                // If it's the first fetch, we don't have a delta, so default to 1 (You)
+                if (lastCount === 0) {
+                    lastCount = currentCount;
+                    liveEl.innerText = "1"; // You are here
+                } else {
+                    const delta = currentCount - lastCount;
+                    // Live Users = You (1) + New Arrivals (Delta)
+                    // If no new arrivals, it stays 1 (Truthful)
+                    const liveEstimate = 1 + delta;
+                    liveEl.innerText = liveEstimate;
+                    
+                    // Update baseline for next check
+                    lastCount = currentCount;
+                }
+            })
+            .catch(err => {
+                console.warn('Counter API Error');
+                visitEl.innerText = '[ OFFLINE ]';
+            });
+    }
 
-    const timeout = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Timeout')), 3000)
-    );
-
-    const fetchData = fetch('https://api.counterapi.dev/v1/mark_investment_dashboard/visits/up')
-        .then(res => {
-            if (!res.ok) throw new Error('Network response was not ok');
-            return res.json();
-        });
-
-    Promise.race([fetchData, timeout])
-        .then(data => {
-            el.innerText = `[ ${data.count.toLocaleString()} ]`;
-            el.classList.remove('connecting');
-            el.style.color = 'var(--yield)'; 
-        })
-        .catch(err => {
-            console.warn('Counter Failed:', err);
-            const fakeNum = Math.floor(Date.now() / 10000000); 
-            el.innerText = `[ ${fakeNum.toLocaleString()}* ]`;
-            el.classList.remove('connecting');
-            el.style.color = 'var(--tw)'; 
-        });
+    // Initial Fetch
+    fetchCount();
+    
+    // Poll every 10 seconds to check for new activity
+    setInterval(fetchCount, 10000);
 }
 
 function parseSheetData(text){
@@ -864,20 +881,14 @@ function renderAll(){ renderHeader(); renderDashboard(); renderCards(); renderEv
 // 🛠️ Calculator Logic (Encapsulated)
 function initCalculator() {
     const inputs = {
-        // 🛠️ v16.68 Inputs
         hold00662: document.getElementById('calc_hold00662'),
         hold00670L: document.getElementById('calc_hold00670L'),
         holdCash: document.getElementById('calc_holdCash'),
-        
-        // 🛠️ v16.68 Targets
         alloc00662: document.getElementById('calc_alloc00662'),
         alloc00670L: document.getElementById('calc_alloc00670L'),
-        allocCash: document.getElementById('calc_allocCash'), // Ensure this ID is correct in HTML!
-        
-        // 🛠️ v16.68 Perf
+        allocCash: document.getElementById('calc_allocCash'), 
         perf00662: document.getElementById('calc_perf00662'),
         perf00670L: document.getElementById('calc_perf00670L'),
-        
         injection: document.getElementById('calc_injection'), 
         useInjection: document.getElementById('calc_useInjection') 
     };
@@ -963,7 +974,8 @@ function initCalculator() {
             const targetCash = totalWealth * (allocCash / 100);
             
             // --- Calculate Actions ---
-            let action00662, action00670L, actionCash, totalInjectionUsed;
+            // 🧠 1. Mindless Rebalancing (Ratio Restoration)
+            let action00662, action00670L, actionCash;
             let final00662, final00670L, finalCash, finalTotal;
             
             if (!isInjectionMode) {
@@ -971,7 +983,6 @@ function initCalculator() {
                  action00662 = target00662 - current00662;
                  action00670L = target00670L - current00670L;
                  actionCash = targetCash - currentCash; 
-                 totalInjectionUsed = Math.abs(actionCash); 
                  
                  final00662 = target00662;
                  final00670L = target00670L;
@@ -987,7 +998,7 @@ function initCalculator() {
                      action00662 = injectionVal * (gap00662 / totalGap);
                      action00670L = injectionVal * (gap00670L / totalGap);
                  } else {
-                     // 🛠️ v16.73: Mindless Fallback to Ratio if no gaps
+                     // Mindless Fallback to Ratio if no gaps
                      const stockRatioTotal = raw00662 + raw00670L;
                      if(stockRatioTotal > 0) {
                          action00662 = injectionVal * (raw00662 / stockRatioTotal);
@@ -995,7 +1006,6 @@ function initCalculator() {
                      }
                  }
                  actionCash = 0; 
-                 totalInjectionUsed = injectionVal;
                  
                  final00662 = current00662 + action00662;
                  final00670L = current00670L + action00670L;
@@ -1003,79 +1013,49 @@ function initCalculator() {
                  finalTotal = final00662 + final00670L + finalCash;
             }
     
-            // Smart Logic (Sniper)
+            // 🧠 2. Smart Logic (James Survival)
             let smartAction00662, smartAction00670L, smartActionCash, smartFinalTotal;
             
-            if (!isInjectionMode) {
-                 // 🛠️ v16.69 Smart Standard: Conservative Logic
-                 const targetCashRatioVal = allocCash / 100;
-                 const excessRatio = Math.max(0, currentCashRatioVal - targetCashRatioVal); // Use calculated ratio
-                 const conservativeExcessCash = excessRatio * currentCash; // Apply overflow % to Cash Pile only
-                 
-                 const excessCash = conservativeExcessCash; // Use this new amount
-                 
-                 if (drop00670L < drop00662) { smartAction00670L = excessCash; smartAction00662 = 0; }
-                 else { smartAction00662 = excessCash; smartAction00670L = 0; }
-                 smartActionCash = -excessCash;
+            // Calculate Cost & Profit for 00670L
+            const cost00670L = hold00670L / (1 + (drop00670L / 100));
+            const profit00670L = hold00670L - cost00670L;
+            const isBull = profit00670L > 0; // Bull Market if QLD is profitable
+
+            smartAction00662 = 0;
+            smartAction00670L = 0;
+            smartActionCash = 0;
+
+            if (isInjectionMode) {
+                // Dynamic Survival Mode
+                if (!isBull) {
+                    // Bear Market (Loss): Use ALL Injection to Buy QLD
+                    smartAction00670L = injectionVal;
+                    smartActionCash = 0; 
+                } else {
+                    // Bull Market (Profit): Use ALL Injection to Buy Cash
+                    smartActionCash = injectionVal;
+                }
             } else {
-                 // 🛠️ v16.73: Smart Injection - Bear vs Bull
-                 const isBearMarket = drop00662 < 0 || drop00670L < 0;
-                 
-                 smartAction00662 = 0;
-                 smartAction00670L = 0;
-                 
-                 if (isBearMarket) {
-                     // Waterfall Logic
-                     let first, second, gapFirst, gapSecond;
-                     let is00662First = false;
-                     
-                     if (drop00670L < drop00662) {
-                         // 00670L is worse
-                         gapFirst = Math.max(0, target00670L - current00670L);
-                         gapSecond = Math.max(0, target00662 - current00662);
-                         is00662First = false;
-                     } else {
-                         gapFirst = Math.max(0, target00662 - current00662);
-                         gapSecond = Math.max(0, target00670L - current00670L);
-                         is00662First = true;
-                     }
-                     
-                     let remainingInj = injectionVal;
-                     
-                     // Fill First Priority Gap
-                     const fillFirst = Math.min(remainingInj, gapFirst);
-                     if (is00662First) smartAction00662 += fillFirst; else smartAction00670L += fillFirst;
-                     remainingInj -= fillFirst;
-                     
-                     // Fill Second Priority Gap
-                     if (remainingInj > 0) {
-                         const fillSecond = Math.min(remainingInj, gapSecond);
-                         if (!is00662First) smartAction00662 += fillSecond; else smartAction00670L += fillSecond;
-                         remainingInj -= fillSecond;
-                     }
-                     
-                     // Remaining by Ratio
-                     if (remainingInj > 0) {
-                         const stockRatioTotal = raw00662 + raw00670L;
-                         if (stockRatioTotal > 0) {
-                             smartAction00662 += remainingInj * (raw00662 / stockRatioTotal);
-                             smartAction00670L += remainingInj * (raw00670L / stockRatioTotal);
-                         }
-                     }
-                 } else {
-                     // 🛠️ v16.73: Bull Market - Force Allocation Ratio
-                     const stockRatioTotal = raw00662 + raw00670L;
-                     if (stockRatioTotal > 0) {
-                         smartAction00662 = injectionVal * (raw00662 / stockRatioTotal);
-                         smartAction00670L = injectionVal * (raw00670L / stockRatioTotal);
-                     }
-                 }
-                 smartActionCash = 0;
+                // Pure Rebalancing Survival Mode
+                if (!isBull) {
+                    // Bear Market (Loss): Buy QLD using 2% of Total Wealth
+                    let dripAmount = totalAfterDrop * 0.02; // 2% Rule
+                    if (dripAmount > currentCash) dripAmount = currentCash;
+                    smartAction00670L = dripAmount;
+                    smartActionCash = -dripAmount;
+                } else {
+                    // Bull Market (Profit): Sell Half Profit
+                    let harvestAmount = profit00670L / 2;
+                    if (harvestAmount < 0) harvestAmount = 0;
+                    smartAction00670L = -harvestAmount;
+                    smartActionCash = harvestAmount;
+                }
             }
             
             const smartFinal00662 = current00662 + smartAction00662;
             const smartFinal00670L = current00670L + smartAction00670L;
-            const smartFinalCash = currentCash + smartActionCash; 
+            const smartFinalCash = currentCash + smartActionCash + (isInjectionMode ? 0 : 0); // Injection already accounted for
+            
             smartFinalTotal = smartFinal00662 + smartFinal00670L + smartFinalCash;
     
             // UI Updates
@@ -1084,28 +1064,14 @@ function initCalculator() {
                  outputs.mindlessTotal.style.color = "var(--yield)";
                  outputs.smartLabel.innerText = "外部注資 (INJECTION USED)";
                  outputs.smartTotal.style.color = "var(--yield)";
-                 outputs.smartCard.style.display = 'block';
-                 outputs.mindlessCard.style.gridColumn = 'auto'; 
             } else {
                  outputs.mindlessLabel.innerText = "現金消耗 (CONSUMPTION)"; 
                  outputs.smartLabel.innerText = "現金消耗 (CONSUMPTION)"; 
-                 
-                 const isReserve = actionCash > 0; 
-                 if(isReserve) {
-                     outputs.smartCard.style.display = 'none';
-                     outputs.mindlessCard.style.gridColumn = '1 / -1'; 
-                     outputs.mindlessLabel.innerText = "現金儲備 (RESERVE)";
-                     outputs.mindlessTotal.style.color = "var(--yield)"; 
-                 } else {
-                     outputs.smartCard.style.display = 'block';
-                     outputs.mindlessCard.style.gridColumn = 'auto';
-                     outputs.mindlessLabel.innerText = "現金消耗 (CONSUMPTION)";
-                     outputs.mindlessTotal.style.color = "var(--tw)"; 
-                     outputs.smartTotal.style.color = "var(--yield)"; 
-                 }
+                 outputs.mindlessTotal.style.color = "var(--tw)"; 
+                 outputs.smartTotal.style.color = "var(--yield)"; 
             }
             
-            // Render Mindless
+            // Render Mindless Table
             outputs.mindlessBody.innerHTML = `
                 <tr>
                     <td>00662</td>
@@ -1134,34 +1100,43 @@ function initCalculator() {
             `;
             outputs.mindlessTotal.innerText = isInjectionMode ? fmtMoney(injectionVal) : fmtMoney(Math.abs(actionCash));
     
-            // Render Smart
-            const qqqBadge = smartAction00662 > 0 ? `<span class="calc-badge badge-buy">🔥 +${fmtMoney(smartAction00662)}</span>` : '-';
-            const qldBadge = smartAction00670L > 0 ? `<span class="calc-badge badge-buy">🔥 +${fmtMoney(smartAction00670L)}</span>` : '-';
+            // Render Smart Table (James Survival)
+            const qqqBadge = smartAction00662 > 0 ? `<span class="calc-badge badge-buy">🔥 +${fmtMoney(smartAction00662)}</span>` : (smartAction00662 < 0 ? `<span class="calc-badge badge-sell">${fmtMoney(smartAction00662)}</span>` : '-');
+            const qldBadge = smartAction00670L > 0 ? `<span class="calc-badge badge-buy">🔥 +${fmtMoney(smartAction00670L)}</span>` : (smartAction00670L < 0 ? `<span class="calc-badge badge-sell">${fmtMoney(smartAction00670L)}</span>` : '-');
+            const cashBadge = smartActionCash > 0 ? `<span class="calc-badge badge-buy" style="border-color:var(--yield); color:var(--yield);">+${fmtMoney(smartActionCash)}</span>` : (smartActionCash < 0 ? `<span class="calc-badge badge-sell" style="border-color:var(--tw); color:var(--tw);">${fmtMoney(smartActionCash)}</span>` : '-');
+
+            const smartTotalCalc = smartFinal00662 + smartFinal00670L + smartFinalCash;
             
             outputs.smartBody.innerHTML = `
                 <tr>
                     <td>00662</td>
                     <td>${fmtMoney(current00662)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(current00662Ratio)})</span></td>
                     <td style="text-align:center;">${qqqBadge}</td>
-                    <td style="text-align:right;">${fmtMoney(smartFinal00662)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(smartFinal00662/smartFinalTotal)})</span></td>
+                    <td style="text-align:right;">${fmtMoney(smartFinal00662)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(smartFinal00662/smartTotalCalc)})</span></td>
                 </tr>
                 <tr>
                     <td>00670L</td>
                     <td>${fmtMoney(current00670L)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(current00670LRatio)})</span></td>
                     <td style="text-align:center;">${qldBadge}</td>
-                    <td style="text-align:right;">${fmtMoney(smartFinal00670L)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(smartFinal00670L/smartFinalTotal)})</span></td>
+                    <td style="text-align:right;">${fmtMoney(smartFinal00670L)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(smartFinal00670L/smartTotalCalc)})</span></td>
                 </tr>
                 <tr>
                     <td>CASH</td>
                     <td>${fmtMoney(currentCash)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(currentCashRatioVal)})</span></td>
-                    <td style="text-align:center;"><span class="calc-badge badge-sell" style="${isInjectionMode?'opacity:0.3':''}">${smartActionCash==0?'-':fmtMoney(smartActionCash)}</span></td>
-                    <td style="text-align:right;">${fmtMoney(smartFinalCash)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(smartFinalCash/smartFinalTotal)})</span></td>
+                    <td style="text-align:center;">${cashBadge}</td>
+                    <td style="text-align:right;">${fmtMoney(smartFinalCash)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(smartFinalCash/smartTotalCalc)})</span></td>
                 </tr>
             `;
+            
+            let statusText = isBull ? "🐂 牛市 (Bull)" : "🐻 熊市 (Bear)";
+            let strategyText = isInjectionMode 
+                ? (isBull ? "注資存糧 (Cash)" : "注資抄底 (QLD)") 
+                : (isBull ? "獲利收割 (Half Profit)" : "滴灌救命 (2% Drip)");
+            
             outputs.smartAssets.innerHTML = `
                 <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#888; margin-top:5px; border-top:1px dashed #333; padding-top:5px;">
-                    <span>Total (Pre-Inj): ${fmtMoney(totalWealth - injectionVal)}</span>
-                    <span>Final: ${fmtMoney(smartFinalTotal)}</span>
+                    <span>${statusText}</span>
+                    <span style="color:${isBull?'var(--yield)':'var(--tw)'}; font-weight:bold;">${strategyText}</span>
                 </div>
             `;
             outputs.smartTotal.innerText = isInjectionMode ? fmtMoney(injectionVal) : fmtMoney(Math.abs(smartActionCash));
