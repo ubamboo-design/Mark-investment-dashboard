@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
-<title>PROJECT COLOSSEUM v16.80</title>
+<title>PROJECT COLOSSEUM v16.86</title>
 <style>
     /* CSS 全局設定 */
     :root {
@@ -338,7 +338,7 @@
   <img id="pageLogo" src="" alt="Logo">
   <div class="header-text">
       <h1 id="pageTitle">PROJECT COLOSSEUM</h1>
-      <div class="meta-info" id="pageMeta">v16.80 (Dual Strategy)</div>
+      <div class="meta-info" id="pageMeta">v16.86 (Round K)</div>
   </div>
 </header>
 
@@ -382,19 +382,20 @@
   <div class="calc-container">
       <div class="calc-grid-3">
           <div class="calc-card blue">
-              <div style="color:var(--us); font-weight:bold; margin-bottom:10px;">1. 現有持倉 (CURRENT HOLDINGS)</div>
+              <div style="color:var(--us); font-weight:bold; margin-bottom:10px;">1. 本金 (ORIGINAL PRINCIPAL)</div>
+              <div style="margin-bottom:5px; font-size:0.7rem; color:#666;">輸入您的「原始本金」</div>
               <div style="display:flex; flex-direction:column; gap:5px;">
                   <div style="display:flex; justify-content:space-between; align-items:center;">
                       <span class="calc-label" style="width:50px;">00662</span>
-                      <input type="number" id="calc_hold00662" value="5000000" class="calc-input" style="flex:1;">
+                      <input type="number" id="calc_hold00662" value="2000000" class="calc-input" style="flex:1;">
                   </div>
                   <div style="display:flex; justify-content:space-between; align-items:center;">
                       <span class="calc-label" style="width:50px;">00670L</span>
                       <input type="number" id="calc_hold00670L" value="2000000" class="calc-input" style="flex:1;">
                   </div>
                   <div style="display:flex; justify-content:space-between; align-items:center;">
-                      <span class="calc-label" style="width:50px; color:var(--yield);">CASH</span>
-                      <input type="number" id="calc_holdCash" value="3000000" class="calc-input" style="flex:1; border-color:var(--yield); color:var(--yield);">
+                      <span class="calc-label" style="width:50px; color:var(--yield);">00865B</span>
+                      <input type="number" id="calc_hold00865B" value="2000000" class="calc-input" style="flex:1; border-color:var(--yield); color:var(--yield);">
                   </div>
               </div>
               <div style="margin-top:10px;">
@@ -413,14 +414,16 @@
               <div style="display:flex; gap:5px;">
                   <div><span class="calc-label">00662</span><input type="number" id="calc_alloc00662" value="5" class="calc-input"></div>
                   <div><span class="calc-label">00670L</span><input type="number" id="calc_alloc00670L" value="2" class="calc-input"></div>
-                  <div><span class="calc-label" style="color:var(--yield)">CASH</span><input type="number" id="calc_allocCash" value="3" class="calc-input" style="color:var(--yield); border-color:var(--yield);"></div>
+                  <div><span class="calc-label" style="color:var(--yield)">00865B</span><input type="number" id="calc_alloc00865B" value="3" class="calc-input" style="color:var(--yield); border-color:var(--yield);"></div>
               </div>
           </div>
           <div class="calc-card red">
-              <div style="color:var(--tw); font-weight:bold; margin-bottom:10px;">3. 市場跌幅 (%)</div>
+              <div style="color:var(--tw); font-weight:bold; margin-bottom:10px;">3. 模擬走勢 (SIMULATION %)</div>
+              <div style="margin-bottom:5px; font-size:0.7rem; color:#666;">輸入預測漲跌幅 (+/-)</div>
               <div style="display:flex; gap:5px;">
-                  <div><span class="calc-label">00662 Drop</span><input type="number" id="calc_perf00662" value="0" class="calc-input" style="color:var(--tw);"></div>
-                  <div><span class="calc-label">00670L Drop</span><input type="number" id="calc_perf00670L" value="0" class="calc-input" style="color:var(--tw);"></div>
+                  <div><span class="calc-label">00662 %</span><input type="number" id="calc_perf00662" value="0" class="calc-input" style="color:var(--tw);"></div>
+                  <div><span class="calc-label">00670L %</span><input type="number" id="calc_perf00670L" value="0" class="calc-input" style="color:var(--tw);"></div>
+                  <div><span class="calc-label" style="color:var(--yield)">00865B %</span><input type="number" id="calc_perf00865B" value="0" class="calc-input" style="color:var(--yield); border-color:var(--yield);"></div>
               </div>
           </div>
       </div>
@@ -428,27 +431,27 @@
       <div class="calc-grid-2" id="calc_resultsGrid">
           <div class="calc-card" id="calc_mindlessCard" style="border-top: 3px solid var(--tw);">
               <div style="color:var(--tw); font-weight:900; margin-bottom:5px;">4. 比例平衡 (RATIO)</div>
-              <div style="font-size:0.8rem; color:#666; margin-bottom:10px;">強制回歸設定比例</div>
+              <div style="font-size:0.8rem; color:#666; margin-bottom:10px;">基於試算後的總值重分配</div>
               <table class="calc-table">
-                  <thead><tr><th>ASSET</th><th>CURRENT (%)</th><th style="text-align:center">ACTION</th><th style="text-align:right">TARGET (%)</th></tr></thead>
+                  <thead><tr><th>ASSET</th><th>SIMULATED</th><th style="text-align:center">ACTION</th><th style="text-align:right">TARGET</th></tr></thead>
                   <tbody id="calc_mindlessBody"></tbody>
               </table>
               <div id="calc_mindlessAssets"></div>
               <div style="margin-top:10px; text-align:center; font-size:0.8rem; color:#888;">
-                  <span id="calc_mindlessLabel">現金消耗 (CONSUMPTION)</span>: 
+                  <span id="calc_mindlessLabel">00865B 消耗 (CONSUMPTION)</span>: 
                   <span id="calc_mindlessTotal" style="color:var(--tw); font-weight:bold;">--</span>
               </div>
           </div>
           <div class="calc-card" id="calc_smartCard" style="border-top: 3px solid var(--yield);">
               <div style="color:var(--yield); font-weight:900; margin-bottom:5px;">5. 聰明平衡 (CLEC)</div>
-              <div style="font-size:0.8rem; color:#666; margin-bottom:10px;">生存模式：鎖利與滴灌</div>
+              <div style="font-size:0.8rem; color:#666; margin-bottom:10px;">James 生存模式 (Survival)</div>
               <table class="calc-table">
-                  <thead><tr><th>ASSET</th><th>CURRENT (%)</th><th style="text-align:center">ACTION</th><th style="text-align:right">FINAL (%)</th></tr></thead>
+                  <thead><tr><th>ASSET</th><th>SIMULATED</th><th style="text-align:center">ACTION</th><th style="text-align:right">FINAL</th></tr></thead>
                   <tbody id="calc_smartBody"></tbody>
               </table>
               <div id="calc_smartAssets"></div>
               <div style="margin-top:10px; text-align:center; font-size:0.8rem; color:#888;">
-                  <span id="calc_smartLabel">現金消耗 (CONSUMPTION)</span>: 
+                  <span id="calc_smartLabel">00865B 消耗 (CONSUMPTION)</span>: 
                   <span id="calc_smartTotal" style="color:var(--yield); font-weight:bold;">--</span>
               </div>
           </div>
@@ -506,7 +509,7 @@ const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQuNQc
 
 let currentRate = 32.5;
 let cardsData = {}, portfolios = {}, strategiesData = {}, eventsData = [], lawsData = [];
-let configData = { title: 'PROJECT COLOSSEUM', meta: 'v16.80', ytUrl: '' }; 
+let configData = { title: 'PROJECT COLOSSEUM', meta: 'v16.86', ytUrl: '' }; 
 let logoUrl = ''; 
 let isFallback = false;
 const defaultIcons = { 'C01': `<svg class="mc-media" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" r="20" stroke="currentColor" stroke-width="2" fill="none"/></svg>` };
@@ -883,12 +886,13 @@ function initCalculator() {
     const inputs = {
         hold00662: document.getElementById('calc_hold00662'),
         hold00670L: document.getElementById('calc_hold00670L'),
-        holdCash: document.getElementById('calc_holdCash'),
+        holdCash: document.getElementById('calc_hold00865B'),
         alloc00662: document.getElementById('calc_alloc00662'),
         alloc00670L: document.getElementById('calc_alloc00670L'),
-        allocCash: document.getElementById('calc_allocCash'), 
+        allocCash: document.getElementById('calc_alloc00865B'),
         perf00662: document.getElementById('calc_perf00662'),
         perf00670L: document.getElementById('calc_perf00670L'),
+        perfCash: document.getElementById('calc_perf00865B'),
         injection: document.getElementById('calc_injection'), 
         useInjection: document.getElementById('calc_useInjection') 
     };
@@ -907,10 +911,13 @@ function initCalculator() {
         betaDisplay: document.getElementById('calc_betaDisplay')
     };
 
-    const fmtMoney = (val) => new Intl.NumberFormat('zh-TW', { maximumFractionDigits: 0 }).format(Math.floor(val));
+    // 🛠️ v16.86: Round to Thousands Logic
+    const fmtMoney = (val) => {
+        const rounded = Math.round(val / 1000) * 1000;
+        return new Intl.NumberFormat('zh-TW', { maximumFractionDigits: 0 }).format(rounded);
+    }
     const fmtPct = (val) => floorDec(val * 100, 1).toFixed(1) + '%';
     
-    // 🛠️ v16.64: Toggle Input State
     inputs.useInjection.addEventListener('change', (e) => {
         if(e.target.checked) {
             inputs.injection.style.opacity = '1';
@@ -924,81 +931,75 @@ function initCalculator() {
 
     function calculate() {
         try {
-            // 1. Get Holdings
-            const hold00662 = parseFloat(inputs.hold00662.value) || 0;
-            const hold00670L = parseFloat(inputs.hold00670L.value) || 0;
-            const holdCash = parseFloat(inputs.holdCash.value) || 0;
+            // Inputs: Original Principal
+            const principal00662 = parseFloat(inputs.hold00662.value) || 0;
+            const principal00670L = parseFloat(inputs.hold00670L.value) || 0;
+            const principalCash = parseFloat(inputs.holdCash.value) || 0; 
             
+            // Performance (P/L %)
+            const perf00662 = parseFloat(inputs.perf00662.value) || 0;
+            const perf00670L = parseFloat(inputs.perf00670L.value) || 0;
+            const perfCash = parseFloat(inputs.perfCash.value) || 0; 
+            
+            // 🛠️ 1. Simulate Current Market Value
+            const sim00662 = principal00662 * (1 + perf00662 / 100);
+            const sim00670L = principal00670L * (1 + perf00670L / 100);
+            const simCash = principalCash * (1 + perfCash / 100);
+            const simTotalWealth = sim00662 + sim00670L + simCash;
+
+            // Injection
             const injectionInputVal = parseFloat(inputs.injection.value) || 0;
             const isInjectionMode = inputs.useInjection.checked;
             const injectionVal = isInjectionMode ? injectionInputVal : 0;
             
-            // 2. Get Targets
+            // Allocations
             const raw00662 = parseFloat(inputs.alloc00662.value) || 0;
             const raw00670L = parseFloat(inputs.alloc00670L.value) || 0;
             const rawCash = parseFloat(inputs.allocCash.value) || 0;
             
-            // 3. Get Drops (Default to 0 if NaN)
-            const drop00662 = parseFloat(inputs.perf00662.value) || 0;
-            const drop00670L = parseFloat(inputs.perf00670L.value) || 0;
-    
-            // Ratio Calculation
+            // Ratios
             let totalParts = raw00662 + raw00670L + rawCash;
             if (totalParts === 0) totalParts = 1;
             const alloc00662 = (raw00662 / totalParts) * 100;
             const alloc00670L = (raw00670L / totalParts) * 100;
             const allocCash = (rawCash / totalParts) * 100;
-    
-            // Beta Calculation
+            
             const betaVal = ((raw00662 * 1) + (raw00670L * 2)) / totalParts;
             outputs.betaDisplay.innerHTML = `β: ${betaVal.toFixed(2)}`;
-    
-            // Current Value After Drop
-            const current00662 = hold00662 * (1 + drop00662 / 100);
-            const current00670L = hold00670L * (1 + drop00670L / 100);
-            const currentCash = holdCash;
-            
-            // Total Wealth Logic
-            const totalAfterDrop = current00662 + current00670L + currentCash;
-            const totalWealth = totalAfterDrop + injectionVal;
-    
-            // Ratios for Display
-            const currentTotalForRatio = current00662 + current00670L + currentCash;
-            const current00662Ratio = currentTotalForRatio > 0 ? current00662 / currentTotalForRatio : 0;
-            const current00670LRatio = currentTotalForRatio > 0 ? current00670L / currentTotalForRatio : 0;
-            const currentCashRatioVal = currentTotalForRatio > 0 ? currentCash / currentTotalForRatio : 0; // Use Val for calculation
-            
-            // Target Amounts
-            const target00662 = totalWealth * (alloc00662 / 100);
-            const target00670L = totalWealth * (alloc00670L / 100);
-            const targetCash = totalWealth * (allocCash / 100);
-            
-            // --- Calculate Actions ---
-            // 🧠 1. Mindless Rebalancing (Ratio Restoration)
+
+            // Simulated Ratios
+            const simTotalForRatio = simTotalWealth;
+            const sim00662Ratio = simTotalForRatio > 0 ? sim00662 / simTotalForRatio : 0;
+            const sim00670LRatio = simTotalForRatio > 0 ? sim00670L / simTotalForRatio : 0;
+            const simCashRatio = simTotalForRatio > 0 ? simCash / simTotalForRatio : 0;
+
+            // --- 🧠 1. Mindless Rebalancing ---
+            const mindlessTotalWealth = simTotalWealth + injectionVal;
+            const target00662 = mindlessTotalWealth * (alloc00662 / 100);
+            const target00670L = mindlessTotalWealth * (alloc00670L / 100);
+            const targetCash = mindlessTotalWealth * (allocCash / 100);
+
             let action00662, action00670L, actionCash;
             let final00662, final00670L, finalCash, finalTotal;
-            
+
             if (!isInjectionMode) {
-                 // Standard Rebalancing
-                 action00662 = target00662 - current00662;
-                 action00670L = target00670L - current00670L;
-                 actionCash = targetCash - currentCash; 
+                 action00662 = target00662 - sim00662;
+                 action00670L = target00670L - sim00670L;
+                 actionCash = targetCash - simCash; 
                  
                  final00662 = target00662;
                  final00670L = target00670L;
                  finalCash = targetCash;
-                 finalTotal = totalWealth;
+                 finalTotal = mindlessTotalWealth;
             } else {
-                 // Injection Mode (Mindless Gap + Ratio Fallback)
-                 const gap00662 = Math.max(0, target00662 - current00662);
-                 const gap00670L = Math.max(0, target00670L - current00670L);
+                 const gap00662 = Math.max(0, target00662 - sim00662);
+                 const gap00670L = Math.max(0, target00670L - sim00670L);
                  const totalGap = gap00662 + gap00670L;
                  
                  if (totalGap > 0) {
                      action00662 = injectionVal * (gap00662 / totalGap);
                      action00670L = injectionVal * (gap00670L / totalGap);
                  } else {
-                     // Mindless Fallback to Ratio if no gaps
                      const stockRatioTotal = raw00662 + raw00670L;
                      if(stockRatioTotal > 0) {
                          action00662 = injectionVal * (raw00662 / stockRatioTotal);
@@ -1007,19 +1008,17 @@ function initCalculator() {
                  }
                  actionCash = 0; 
                  
-                 final00662 = current00662 + action00662;
-                 final00670L = current00670L + action00670L;
-                 finalCash = currentCash; 
+                 final00662 = sim00662 + action00662;
+                 final00670L = sim00670L + action00670L;
+                 finalCash = simCash; 
                  finalTotal = final00662 + final00670L + finalCash;
             }
-    
-            // 🧠 2. Smart Logic (James Survival)
+
+            // --- 🧠 2. Smart Logic (James Survival) ---
             let smartAction00662, smartAction00670L, smartActionCash, smartFinalTotal;
             
-            // Calculate Cost & Profit for 00670L
-            const cost00670L = hold00670L / (1 + (drop00670L / 100));
-            const profit00670L = hold00670L - cost00670L;
-            const isBull = profit00670L > 0; // Bull Market if QLD is profitable
+            const profit00670L = sim00670L - principal00670L;
+            const isBull = profit00670L > 0; 
 
             smartAction00662 = 0;
             smartAction00670L = 0;
@@ -1028,33 +1027,53 @@ function initCalculator() {
             if (isInjectionMode) {
                 // Dynamic Survival Mode
                 if (!isBull) {
-                    // Bear Market (Loss): Use ALL Injection to Buy QLD
+                    // Bear (Loss): Buy QLD Aggressively
                     smartAction00670L = injectionVal;
                     smartActionCash = 0; 
                 } else {
-                    // Bull Market (Profit): Use ALL Injection to Buy Cash
-                    smartActionCash = injectionVal;
+                    // Bull (Profit): 🛠️ v16.84 NEW LOGIC -> Buy STOCK Gaps
+                    const smartTotalWealth = simTotalWealth + injectionVal;
+                    // Calculate ideal targets for stocks
+                    const ideal00662 = smartTotalWealth * (alloc00662 / 100);
+                    const ideal00670L = smartTotalWealth * (alloc00670L / 100);
+                    
+                    // Calc gaps
+                    const g00662 = Math.max(0, ideal00662 - sim00662);
+                    const g00670L = Math.max(0, ideal00670L - sim00670L);
+                    const totalG = g00662 + g00670L;
+                    
+                    if (totalG > 0) {
+                        smartAction00662 = injectionVal * (g00662 / totalG);
+                        smartAction00670L = injectionVal * (g00670L / totalG);
+                    } else {
+                        const stockRatioTotal = raw00662 + raw00670L;
+                        if(stockRatioTotal > 0) {
+                            smartAction00662 = injectionVal * (raw00662 / stockRatioTotal);
+                            smartAction00670L = injectionVal * (raw00670L / stockRatioTotal);
+                        }
+                    }
+                    smartActionCash = 0; 
                 }
             } else {
                 // Pure Rebalancing Survival Mode
                 if (!isBull) {
-                    // Bear Market (Loss): Buy QLD using 2% of Total Wealth
-                    let dripAmount = totalAfterDrop * 0.02; // 2% Rule
-                    if (dripAmount > currentCash) dripAmount = currentCash;
+                    // Bear (Loss): Sell 00865B (2% Total Wealth) -> Buy QLD
+                    let dripAmount = simTotalWealth * 0.02; 
+                    if (dripAmount > simCash) dripAmount = simCash;
                     smartAction00670L = dripAmount;
-                    smartActionCash = -dripAmount;
+                    smartActionCash = -dripAmount; 
                 } else {
-                    // Bull Market (Profit): Sell Half Profit
+                    // Bull (Profit): Sell Half Profit QLD -> Buy 00865B
                     let harvestAmount = profit00670L / 2;
                     if (harvestAmount < 0) harvestAmount = 0;
                     smartAction00670L = -harvestAmount;
-                    smartActionCash = harvestAmount;
+                    smartActionCash = harvestAmount; 
                 }
             }
             
-            const smartFinal00662 = current00662 + smartAction00662;
-            const smartFinal00670L = current00670L + smartAction00670L;
-            const smartFinalCash = currentCash + smartActionCash + (isInjectionMode ? 0 : 0); // Injection already accounted for
+            const smartFinal00662 = sim00662 + smartAction00662;
+            const smartFinal00670L = sim00670L + smartAction00670L;
+            const smartFinalCash = simCash + smartActionCash + (isInjectionMode ? 0 : 0); 
             
             smartFinalTotal = smartFinal00662 + smartFinal00670L + smartFinalCash;
     
@@ -1065,42 +1084,42 @@ function initCalculator() {
                  outputs.smartLabel.innerText = "外部注資 (INJECTION USED)";
                  outputs.smartTotal.style.color = "var(--yield)";
             } else {
-                 outputs.mindlessLabel.innerText = "現金消耗 (CONSUMPTION)"; 
-                 outputs.smartLabel.innerText = "現金消耗 (CONSUMPTION)"; 
+                 outputs.mindlessLabel.innerText = "00865B 消耗 (CONSUMPTION)"; 
+                 outputs.smartLabel.innerText = "00865B 消耗 (CONSUMPTION)"; 
                  outputs.mindlessTotal.style.color = "var(--tw)"; 
                  outputs.smartTotal.style.color = "var(--yield)"; 
             }
             
-            // Render Mindless Table
+            // Mindless Table
             outputs.mindlessBody.innerHTML = `
                 <tr>
                     <td>00662</td>
-                    <td>${fmtMoney(current00662)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(current00662Ratio)})</span></td>
+                    <td>${fmtMoney(sim00662)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(sim00662Ratio)})</span></td>
                     <td style="text-align:center;"><span class="calc-badge ${action00662>=0?'badge-buy':'badge-sell'}">${action00662>=0?'+':''}${fmtMoney(action00662)}</span></td>
                     <td style="text-align:right;">${fmtMoney(final00662)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(final00662/finalTotal)})</span></td>
                 </tr>
                 <tr>
                     <td>00670L</td>
-                    <td>${fmtMoney(current00670L)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(current00670LRatio)})</span></td>
+                    <td>${fmtMoney(sim00670L)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(sim00670LRatio)})</span></td>
                     <td style="text-align:center;"><span class="calc-badge ${action00670L>=0?'badge-buy':'badge-sell'}">${action00670L>=0?'+':''}${fmtMoney(action00670L)}</span></td>
                     <td style="text-align:right;">${fmtMoney(final00670L)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(final00670L/finalTotal)})</span></td>
                 </tr>
                 <tr>
-                    <td>CASH</td>
-                    <td>${fmtMoney(currentCash)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(currentCashRatioVal)})</span></td>
+                    <td>00865B</td>
+                    <td>${fmtMoney(simCash)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(simCashRatio)})</span></td>
                     <td style="text-align:center;"><span class="calc-badge ${actionCash>=0?'badge-buy':'badge-sell'}" style="${isInjectionMode?'opacity:0.3':''}">${actionCash==0?'-':(actionCash>0?'+':'')+fmtMoney(actionCash)}</span></td>
                     <td style="text-align:right;">${fmtMoney(finalCash)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(finalCash/finalTotal)})</span></td>
                 </tr>
             `;
             outputs.mindlessAssets.innerHTML = `
                 <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#888; margin-top:5px; border-top:1px dashed #333; padding-top:5px;">
-                    <span>Total (Pre-Inj): ${fmtMoney(totalWealth - injectionVal)}</span>
+                    <span>Sim Total: ${fmtMoney(simTotalWealth)}</span>
                     <span>Final: ${fmtMoney(finalTotal)}</span>
                 </div>
             `;
             outputs.mindlessTotal.innerText = isInjectionMode ? fmtMoney(injectionVal) : fmtMoney(Math.abs(actionCash));
     
-            // Render Smart Table (James Survival)
+            // Smart Table
             const qqqBadge = smartAction00662 > 0 ? `<span class="calc-badge badge-buy">🔥 +${fmtMoney(smartAction00662)}</span>` : (smartAction00662 < 0 ? `<span class="calc-badge badge-sell">${fmtMoney(smartAction00662)}</span>` : '-');
             const qldBadge = smartAction00670L > 0 ? `<span class="calc-badge badge-buy">🔥 +${fmtMoney(smartAction00670L)}</span>` : (smartAction00670L < 0 ? `<span class="calc-badge badge-sell">${fmtMoney(smartAction00670L)}</span>` : '-');
             const cashBadge = smartActionCash > 0 ? `<span class="calc-badge badge-buy" style="border-color:var(--yield); color:var(--yield);">+${fmtMoney(smartActionCash)}</span>` : (smartActionCash < 0 ? `<span class="calc-badge badge-sell" style="border-color:var(--tw); color:var(--tw);">${fmtMoney(smartActionCash)}</span>` : '-');
@@ -1110,19 +1129,19 @@ function initCalculator() {
             outputs.smartBody.innerHTML = `
                 <tr>
                     <td>00662</td>
-                    <td>${fmtMoney(current00662)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(current00662Ratio)})</span></td>
+                    <td>${fmtMoney(sim00662)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(sim00662Ratio)})</span></td>
                     <td style="text-align:center;">${qqqBadge}</td>
                     <td style="text-align:right;">${fmtMoney(smartFinal00662)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(smartFinal00662/smartTotalCalc)})</span></td>
                 </tr>
                 <tr>
                     <td>00670L</td>
-                    <td>${fmtMoney(current00670L)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(current00670LRatio)})</span></td>
+                    <td>${fmtMoney(sim00670L)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(sim00670LRatio)})</span></td>
                     <td style="text-align:center;">${qldBadge}</td>
                     <td style="text-align:right;">${fmtMoney(smartFinal00670L)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(smartFinal00670L/smartTotalCalc)})</span></td>
                 </tr>
                 <tr>
-                    <td>CASH</td>
-                    <td>${fmtMoney(currentCash)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(currentCashRatioVal)})</span></td>
+                    <td>00865B</td>
+                    <td>${fmtMoney(simCash)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(simCashRatio)})</span></td>
                     <td style="text-align:center;">${cashBadge}</td>
                     <td style="text-align:right;">${fmtMoney(smartFinalCash)} <span style="font-size:0.75rem; color:#888;">(${fmtPct(smartFinalCash/smartTotalCalc)})</span></td>
                 </tr>
@@ -1130,8 +1149,8 @@ function initCalculator() {
             
             let statusText = isBull ? "🐂 牛市 (Bull)" : "🐻 熊市 (Bear)";
             let strategyText = isInjectionMode 
-                ? (isBull ? "注資存糧 (Cash)" : "注資抄底 (QLD)") 
-                : (isBull ? "獲利收割 (Half Profit)" : "滴灌救命 (2% Drip)");
+                ? (isBull ? "注資補股 (Stock)" : "注資抄底 (QLD)") 
+                : (isBull ? "獲利收割 (Harvest)" : "滴灌救命 (2% Drip)");
             
             outputs.smartAssets.innerHTML = `
                 <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#888; margin-top:5px; border-top:1px dashed #333; padding-top:5px;">
